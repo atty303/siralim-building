@@ -6,6 +6,8 @@ mod data;
 use crate::creatures::{CreatureSelectEvent, CreatureTable};
 use crate::data::Creature;
 use dioxus::prelude::*;
+use dioxus_free_icons::icons::bs_icons;
+use dioxus_free_icons::Icon;
 
 fn main() {
     dioxus_logger::init(log::LevelFilter::Debug).expect("failed to init logger");
@@ -24,8 +26,11 @@ fn App(cx: Scope) -> Element {
                 onclick: move |_| show_creatures_modal.set(true),
                 "open"
             }
-            PartyMember {
-                creature: (Some(creatures.get(0).unwrap().clone()), None, None)
+            div {
+                class: "party",
+                PartyMember {
+                    creature: (Some(creatures.get(0).unwrap().clone()), None, None)
+                }
             }
         }
         CreatureModal {
@@ -143,7 +148,7 @@ fn PartyMemberTrait<'a>(cx: Scope<'a, PartyMemberTraitProps<'a>>) -> Element {
             div {
                 class: "clear",
                 button {
-                    "X"
+                    Icon { width: 24, height: 24, fill: "black", icon: bs_icons::BsXLg }
                 }
             }
         }

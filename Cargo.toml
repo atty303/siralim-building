@@ -7,6 +7,7 @@ edition = "2021"
 dioxus = "0.3.1"
 dioxus-web = "0.3.0"
 dioxus-logger = "0.3.0"
+dioxus-free-icons = { version = "0.6.0", features = [ "bootstrap" ] }
 log = "0.4.17"
 rust-embed = { version = "6.4.2", features = [ "debug-embed" ] }
 serde = "1.0.152"
