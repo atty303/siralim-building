@@ -15,7 +15,10 @@ fn App(cx: Scope) -> Element {
     let creatures = data::Data::creatures();
     cx.render(rsx! {
         div {
-            CreatureTable { items: creatures }
+            input { }
+            div {
+                CreatureTable { items: creatures }
+            }
         }
     })
 }
