@@ -5,7 +5,7 @@ mod creatures;
 mod data;
 
 use crate::components::ClassIcon;
-use crate::creatures::{CreatureSelectEvent, CreatureTable};
+use crate::creatures::CreatureModal;
 use crate::data::Creature;
 use dioxus::prelude::*;
 use dioxus_free_icons::icons::bs_icons;
@@ -19,7 +19,7 @@ fn main() {
 fn App(cx: Scope) -> Element {
     let creatures = data::Data::creatures();
 
-    let mut show_creatures_modal = use_state(cx, || false);
+    let show_creatures_modal = use_state(cx, || false);
 
     cx.render(rsx! {
         div {
@@ -38,7 +38,7 @@ fn App(cx: Scope) -> Element {
         CreatureModal {
             items: creatures,
             show: **show_creatures_modal,
-            on_select: move |e| {
+            on_select: move |_| {
                 show_creatures_modal.set(false);
             }
         }
@@ -51,46 +51,6 @@ fn App(cx: Scope) -> Element {
         //         on_select: move |e|
         //     }
         // }
-    })
-}
-
-#[derive(Props)]
-struct ModalProps<'a> {
-    show: bool,
-    on_request_close: EventHandler<'a, ()>,
-    children: Element<'a>,
-}
-
-fn Modal<'a>(cx: Scope<'a, ModalProps<'a>>) -> Element {
-    if cx.props.show {
-        cx.render(rsx! {
-            button { onclick: move |_|  cx.props.on_request_close.call(()), "close" }
-            div {
-                &cx.props.children
-            }
-        })
-    } else {
-        None
-    }
-}
-
-#[derive(Props)]
-struct CreatureModalProps<'a> {
-    items: Vec<Creature>,
-    show: bool,
-    on_select: EventHandler<'a, CreatureSelectEvent>,
-}
-
-fn CreatureModal<'a>(cx: Scope<'a, CreatureModalProps<'a>>) -> Element {
-    cx.render(rsx! {
-        Modal {
-            show: cx.props.show,
-            on_request_close: move |_| cx.props.on_select.call(CreatureSelectEvent { creature: None }),
-            CreatureTable {
-                items: cx.props.items.to_vec(),
-                on_select: move |e| cx.props.on_select.call(e)
-            }
-        }
     })
 }
 

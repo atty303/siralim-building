@@ -1,11 +1,31 @@
 #![allow(non_snake_case)]
 
-use crate::components::ClassIcon;
+use crate::components::{ClassIcon, Modal};
 use crate::data::Creature;
 use dioxus::prelude::*;
 
 pub struct CreatureSelectEvent {
     pub creature: Option<Creature>,
+}
+
+#[derive(Props)]
+pub struct CreatureModalProps<'a> {
+    items: Vec<Creature>,
+    show: bool,
+    on_select: EventHandler<'a, CreatureSelectEvent>,
+}
+
+pub fn CreatureModal<'a>(cx: Scope<'a, CreatureModalProps<'a>>) -> Element {
+    cx.render(rsx! {
+        Modal {
+            show: cx.props.show,
+            on_request_close: move |_| cx.props.on_select.call(CreatureSelectEvent { creature: None }),
+            CreatureTable {
+                items: cx.props.items.to_vec(),
+                on_select: move |e| cx.props.on_select.call(e)
+            }
+        }
+    })
 }
 
 #[derive(Props)]
@@ -80,12 +100,6 @@ pub struct CreatureClassProps {
 }
 
 fn CreatureClass(cx: Scope<CreatureClassProps>) -> Element {
-    let lower_class = cx.props.value.to_lowercase();
-    let icon = if ["nature", "chaos", "sorcery", "death", "life"].contains(&lower_class.as_str()) {
-        rsx! { img { src: format_args!("image/{}.png", &lower_class) } }
-    } else {
-        rsx! { "" }
-    };
     cx.render(rsx! { ClassIcon { value: &cx.props.value }, cx.props.value.as_str() })
 }
 

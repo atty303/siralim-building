@@ -2,6 +2,26 @@
 
 use dioxus::prelude::*;
 
+#[derive(Props)]
+pub struct ModalProps<'a> {
+    show: bool,
+    on_request_close: EventHandler<'a, ()>,
+    children: Element<'a>,
+}
+
+pub fn Modal<'a>(cx: Scope<'a, ModalProps<'a>>) -> Element {
+    if cx.props.show {
+        cx.render(rsx! {
+            button { onclick: move |_|  cx.props.on_request_close.call(()), "close" }
+            div {
+                &cx.props.children
+            }
+        })
+    } else {
+        None
+    }
+}
+
 #[derive(PartialEq, Props)]
 pub struct ClassIconProps<'a> {
     value: &'a String,
