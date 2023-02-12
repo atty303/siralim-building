@@ -18,12 +18,12 @@ sass = { source_map = true, input = "*" }
 
 # use binaryen.wasm-opt for output Wasm file
 # binaryen just will trigger in `web` platform
-binaryen = { wasm_opt = true }
+#binaryen = { wasm_opt = true }
 
 [web.app]
 
 # HTML title tag content
-title = "dioxus | ⛺"
+title = "Siralim Building"
 
 [web.watcher]
 
@@ -33,14 +33,15 @@ index_on_404 = true
 reload_html = true
 
 # which files or dirs will be watcher monitoring
-watch_path = ["src"]
+watch_path = ["data", "public", "src"]
 
 # include `assets` in web platform
 [web.resource]
 
 # CSS style file
 style = [
-    "style/main.css"
+    "https://unpkg.com/sanitize.css",
+    "style/main.css",
 ]
 
 # Javascript code file
