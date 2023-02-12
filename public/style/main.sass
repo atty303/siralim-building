@@ -1,6 +1,8 @@
 body
   background: white
   color: black
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
+  font-size: 90%
 
 .party
   margin: 20px
@@ -11,13 +13,12 @@ body
   border: 1px solid grey
 
   .left-pane
-    width: 10rem
-    background: antiquewhite
+    width: 200px
+    border-right: 1px solid #ccc
 
   .right-pane
     flex-grow: 1
     padding-inline: 0
-    background: cadetblue
 
     ul
       display: flex
@@ -27,25 +28,57 @@ body
 
       li
         display: flex
-        height: 2rem
+        //height: 4rem
+        border-bottom: 1px solid #ccc
 
         .detail
           flex-grow: 1
+          border-right: 1px solid #ccc
+
+        .detail.non-empty
+          display: flex
+
+          .creature
+            width: 15%
+            > span
+              display: block
+              margin: 15px
+              //line-height: calc(4rem - 40px)
+              padding: 5px
+              background: #eee
+              > img
+                margin-right: 4px
+          .trait-name
+            width: 15%
+            white-space: nowrap
+            > span
+              //min-height: 4rem
+          .trait-description
+            width: 70%
+            > span
+              //line-height: 1rem
+
+        .detail.empty
+          text-align: center
+          //line-height: 4rem
+          color: #888
 
         .clear
-          width: 2rem
+          min-width: 4rem
+          min-height: 4rem
+          border-right: 1px solid #ccc
 
           button
-            align-items: center
-            //display: flex
             background: transparent
             border: none
-            margin: auto
+            width: 100%
             height: 100%
+            color: #888
+            cursor: pointer
 
-        .clear:hover
-          background: red
-          color: white
+          button:hover
+            background: red
+            color: white
 
 table.creatures
   thead tr

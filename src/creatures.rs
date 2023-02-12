@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use crate::components::ClassIcon;
 use crate::data::Creature;
 use dioxus::prelude::*;
 
@@ -85,7 +86,7 @@ fn CreatureClass(cx: Scope<CreatureClassProps>) -> Element {
     } else {
         rsx! { "" }
     };
-    cx.render(rsx! { icon, cx.props.value.as_str() })
+    cx.render(rsx! { ClassIcon { value: &cx.props.value }, cx.props.value.as_str() })
 }
 
 #[derive(PartialEq, Props)]

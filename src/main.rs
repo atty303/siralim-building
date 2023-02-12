@@ -1,8 +1,10 @@
 #![allow(non_snake_case)]
 
+mod components;
 mod creatures;
 mod data;
 
+use crate::components::ClassIcon;
 use crate::creatures::{CreatureSelectEvent, CreatureTable};
 use crate::data::Creature;
 use dioxus::prelude::*;
@@ -142,20 +144,31 @@ fn PartyMemberTrait<'a>(cx: Scope<'a, PartyMemberTraitProps<'a>>) -> Element {
     let e = if let Some(c) = &cx.props.creature.0 {
         rsx! {
             div {
-                class: "detail",
-                c.creature.as_str(),
+                class: "detail non-empty",
+                div {
+                    class: "creature",
+                    span { ClassIcon { value: &c.class } c.creature.as_str() }
+                }
+                div {
+                    class: "trait-name",
+                    span { c.trait_name.as_str() }
+                }
+                div {
+                    class: "trait-description",
+                    span { c.trait_description.as_str() }
+                }
             }
             div {
                 class: "clear",
                 button {
-                    Icon { width: 24, height: 24, fill: "black", icon: bs_icons::BsXLg }
+                    Icon { width: 24, height: 24, icon: bs_icons::BsXLg }
                 }
             }
         }
     } else {
         rsx! {
             div {
-                class: "detail",
+                class: "detail empty",
                 cx.props.empty_text
             }
             div {
