@@ -6,3 +6,6 @@ edition = "2021"
 [dependencies]
 dioxus = "0.3.1"
 dioxus-web = "0.3.0"
+dioxus-logger = "0.3.0"
+log = "0.4.17"
+rust-embed = { version = "6.4.2", features = [ "debug-embed" ] }
