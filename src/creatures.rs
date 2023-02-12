@@ -20,6 +20,7 @@ pub fn CreatureModal<'a>(cx: Scope<'a, CreatureModalProps<'a>>) -> Element {
         Modal {
             show: cx.props.show,
             on_request_close: move |_| cx.props.on_select.call(CreatureSelectEvent { creature: None }),
+            input { }
             CreatureTable {
                 items: cx.props.items.to_vec(),
                 on_select: move |e| cx.props.on_select.call(e)

@@ -4,6 +4,34 @@ body
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
   font-size: 90%
 
+.modal-overlay
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background-color: #00000080
+
+  .modal
+    position: absolute
+    top: 2.5%
+    left: 2.5%
+    right: 2.5%
+    bottom: 2.5%
+    width: 95%
+    height: 95%
+    background: white
+    box-shadow: 0 0 10px #888
+
+    > .title
+      width: 100%
+      background: #444
+      height: 2rem
+
+    > .content
+      padding: 10px
+      max-height: calc(100% - 2rem)
+
 .party
   margin: 20px
 
@@ -50,7 +78,6 @@ body
                 margin-right: 4px
           .trait-name
             width: 15%
-            white-space: nowrap
             > span
               //min-height: 4rem
           .trait-description
@@ -81,11 +108,16 @@ body
             color: white
 
 table.creatures
+  max-height: 100%
   thead tr
     background: #ccc
     th
       text-align: left
       padding: 8px
   tbody
-    td.class, td.family, td.creature, td.trait, td.material_name
+    max-height: 100%
+    overflow-y: scroll
+    tr:nth-child(2n)
+      background: #f0f0f0
+    td.class
       white-space: nowrap
