@@ -3,16 +3,17 @@
 use crate::data::Creature;
 use dioxus::prelude::*;
 
-#[derive(PartialEq, Props)]
-pub struct CreatureTableProps {
+pub struct CreatureSelectEvent {
+    pub creature: Option<Creature>,
+}
+
+#[derive(Props)]
+pub struct CreatureTableProps<'a> {
     items: Vec<Creature>,
+    on_select: EventHandler<'a, CreatureSelectEvent>,
 }
 
-impl CreatureTableProps {
-    //    fn from()
-}
-
-pub fn CreatureTable(cx: Scope<CreatureTableProps>) -> Element {
+pub fn CreatureTable<'a>(cx: Scope<'a, CreatureTableProps<'a>>) -> Element {
     cx.render(rsx! {
         table {
             class: "creatures",
@@ -35,6 +36,9 @@ pub fn CreatureTable(cx: Scope<CreatureTableProps>) -> Element {
                 cx.props.items.iter().map(|c|
                     rsx! {
                         tr {
+                            onclick: move |_| {
+                                cx.props.on_select.call(CreatureSelectEvent { creature: Some(c.clone()) });
+                            },
                             td { class: "class", CreatureClass { value: c.class.clone() } }
                             td { class: "family", c.family.as_str() }
                             td { class: "creature", c.creature.as_str() }

@@ -2,6 +2,48 @@ body
   background: white
   color: black
 
+.party-member
+  display: flex
+  width: 100%
+  border: 1px solid grey
+
+  .left-pane
+    width: 10rem
+    background: antiquewhite
+
+  .right-pane
+    flex-grow: 1
+    padding-inline: 0
+    background: cadetblue
+
+    ul
+      display: flex
+      flex-direction: column
+      margin: 0
+      padding-inline: 0
+
+      li
+        display: flex
+        height: 2rem
+
+        .detail
+          flex-grow: 1
+
+        .clear
+          width: 2rem
+
+          button
+            align-items: center
+            //display: flex
+            background: transparent
+            border: none
+            margin: auto
+            height: 100%
+
+        .clear:hover
+          background: red
+          color: white
+
 table.creatures
   thead tr
     background: #ccc
