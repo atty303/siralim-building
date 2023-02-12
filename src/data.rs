@@ -9,6 +9,16 @@ pub struct Creature {
     pub trait_name: String,
     pub trait_description: String,
     pub material_name: String,
+    pub stats: Option<CreatureStats>,
+}
+
+#[derive(PartialEq, Deserialize)]
+pub struct CreatureStats {
+    pub health: i32,
+    pub attack: i32,
+    pub intelligence: i32,
+    pub defense: i32,
+    pub speed: i32,
 }
 
 #[derive(RustEmbed)]

@@ -23,6 +23,11 @@ pub fn CreatureTable(cx: Scope<CreatureTableProps>) -> Element {
                     th { "Creature" }
                     th { "Trait" }
                     th { "Trait Description" }
+                    th { img { src: "image/health.png" } }
+                    th { img { src: "image/attack.png" } }
+                    th { img { src: "image/intelligence.png" } }
+                    th { img { src: "image/defense.png" } }
+                    th { img { src: "image/speed.png" } }
                     th { "Material Name" }
                 }
             }
@@ -35,6 +40,26 @@ pub fn CreatureTable(cx: Scope<CreatureTableProps>) -> Element {
                             td { class: "creature", c.creature.as_str() }
                             td { class: "trait", c.trait_name.as_str() }
                             td { class: "trait_description", c.trait_description.as_str() }
+                            td {
+                                class: "stat health",
+                                c.stats.as_ref().map(|s| rsx! { CreatureStat { value: s.health } })
+                            }
+                            td {
+                                class: "stat attack",
+                                c.stats.as_ref().map(|s| rsx! { CreatureStat { value: s.attack } })
+                            }
+                            td {
+                                class: "stat intelligence",
+                                c.stats.as_ref().map(|s| rsx! { CreatureStat { value: s.intelligence } })
+                            }
+                            td {
+                                class: "stat defense",
+                                c.stats.as_ref().map(|s| rsx! { CreatureStat { value: s.defense } })
+                            }
+                            td {
+                                class: "stat speed",
+                                c.stats.as_ref().map(|s| rsx! { CreatureStat { value: s.speed } })
+                            }
                             td { class: "material_name", c.material_name.as_str() }
                         }
                     }
@@ -57,4 +82,13 @@ fn CreatureClass(cx: Scope<CreatureClassProps>) -> Element {
         rsx! { "" }
     };
     cx.render(rsx! { icon, cx.props.value.as_str() })
+}
+
+#[derive(PartialEq, Props)]
+pub struct CreatureStatProps {
+    value: i32,
+}
+
+fn CreatureStat(cx: Scope<CreatureStatProps>) -> Element {
+    cx.render(rsx! { "{cx.props.value}" })
 }
