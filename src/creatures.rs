@@ -10,7 +10,7 @@ pub struct CreatureSelectEvent {
 
 #[derive(Props)]
 pub struct CreatureModalProps<'a> {
-    items: Vec<Creature>,
+    items: &'a Vec<Creature>,
     show: bool,
     on_select: EventHandler<'a, CreatureSelectEvent>,
 }
@@ -22,7 +22,7 @@ pub fn CreatureModal<'a>(cx: Scope<'a, CreatureModalProps<'a>>) -> Element {
             on_request_close: move |_| cx.props.on_select.call(CreatureSelectEvent { creature: None }),
             input { }
             CreatureTable {
-                items: cx.props.items.to_vec(),
+                items: cx.props.items,
                 on_select: move |e| cx.props.on_select.call(e)
             }
         }
@@ -31,7 +31,7 @@ pub fn CreatureModal<'a>(cx: Scope<'a, CreatureModalProps<'a>>) -> Element {
 
 #[derive(Props)]
 pub struct CreatureTableProps<'a> {
-    items: Vec<Creature>,
+    items: &'a Vec<Creature>,
     on_select: EventHandler<'a, CreatureSelectEvent>,
 }
 
