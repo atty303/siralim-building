@@ -6,7 +6,34 @@ use dioxus::prelude::*;
 use dioxus_free_icons::icons::bs_icons;
 use dioxus_free_icons::Icon;
 
-#[derive(Props, PartialEq)]
+#[derive(Clone, PartialEq)]
+pub struct Member {
+    pub primary_creature: Option<Creature>,
+    pub fused_creature: Option<Creature>,
+    pub artifact_creature: Option<Creature>,
+}
+
+#[derive(PartialEq, Props)]
+pub struct PartyProps {
+    party: Vec<Member>,
+}
+
+pub fn Party(cx: Scope<PartyProps>) -> Element {
+    cx.render(rsx! {
+        div {
+            class: "party",
+            cx.props.party.iter().map(|m| {
+                rsx! {
+                    PartyMember {
+                        creature: (m.primary_creature.clone(), m.fused_creature.clone(), m.artifact_creature.clone())
+                    }
+                }
+            })
+        }
+    })
+}
+
+#[derive(PartialEq, Props)]
 pub struct PartyMemberProps {
     creature: (Option<Creature>, Option<Creature>, Option<Creature>),
 }
