@@ -53,10 +53,15 @@ struct PartyMemberTraitProps<'a> {
 }
 
 fn PartyMemberTrait<'a>(cx: Scope<'a, PartyMemberTraitProps<'a>>) -> Element {
+    let opacity = use_state(cx, || 1.0);
     let e = if let Some(c) = &cx.props.creature.0 {
         rsx! {
             div {
-                class: "detail non-empty",
+                class: "trait non-empty",
+                "draggable": "true",
+                style: "opacity: {opacity}",
+                ondragstart: move |_| opacity.set(0.5),
+                ondragend: move |_| opacity.set(1.0),
                 div {
                     class: "creature",
                     span { ClassIcon { value: &c.class } c.creature.as_str() }
@@ -80,7 +85,7 @@ fn PartyMemberTrait<'a>(cx: Scope<'a, PartyMemberTraitProps<'a>>) -> Element {
     } else {
         rsx! {
             div {
-                class: "detail empty",
+                class: "trait empty",
                 cx.props.empty_text
             }
             div {

@@ -17,7 +17,7 @@ fn main() {
 fn App(cx: Scope) -> Element {
     let creatures = data::Data::creatures();
 
-    let show_creatures_modal = use_state(cx, || true);
+    let show_creatures_modal = use_state(cx, || false);
 
     cx.render(rsx! {
         div {
