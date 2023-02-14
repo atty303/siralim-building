@@ -1,222 +1,208 @@
-#![allow(non_snake_case)]
-
-use crate::components::ClassIcon;
 use crate::data::Creature;
-use dioxus::prelude::*;
-use dioxus_free_icons::icons::bs_icons;
-use dioxus_free_icons::Icon;
-
-#[derive(Clone, PartialEq)]
-pub struct Member {
-    pub primary_creature: Option<Creature>,
-    pub fused_creature: Option<Creature>,
-    pub artifact_creature: Option<Creature>,
-}
-impl Member {
-    pub fn get_creature(&self, i: i32) -> &Option<Creature> {
-        match i {
-            0 => &self.primary_creature,
-            1 => &self.fused_creature,
-            2 => &self.artifact_creature,
-            _ => &None,
-        }
-    }
-    pub fn set_creature(&mut self, i: i32, c: &Option<Creature>) {
-        match i {
-            0 => self.primary_creature = c.clone(),
-            1 => self.fused_creature = c.clone(),
-            2 => self.artifact_creature = c.clone(),
-            _ => (),
-        }
-    }
-}
+use crate::member::Member;
+use std::ops::Deref;
+use yew::prelude::*;
 
 #[derive(Debug)]
-pub struct PartyMemberSwapEvent {
-    pub from_position: i32,
-    pub from_index: i32,
-    pub to_position: i32,
-    pub to_index: i32,
+pub struct PartySwapEvent {
+    pub from_position: usize,
+    pub from_index: usize,
+    pub to_position: usize,
+    pub to_index: usize,
 }
 
-#[derive(Props)]
-pub struct PartyProps<'a> {
-    party: &'a Vec<Member>,
-    on_swap: EventHandler<'a, PartyMemberSwapEvent>,
+#[derive(PartialEq, Clone, Debug)]
+struct PartyDragEvent {
+    position: usize,
+    index: usize,
+}
+impl PartyDragEvent {
+    fn new(position: usize, index: usize) -> PartyDragEvent {
+        PartyDragEvent { position, index }
+    }
 }
 
-pub fn Party<'a>(cx: Scope<'a, PartyProps<'a>>) -> Element {
-    let dragging: &UseState<Option<PartyMemberTraitDragEvent>> = use_state(cx, || None);
-
-    cx.render(rsx! {
-        div {
-            class: "party",
-            cx.props.party.iter().enumerate().map(|(i, m)| {
-                rsx! {
-                    PartyMember {
-                        position: i as i32
-                        creature: (m.primary_creature.clone(), m.fused_creature.clone(), m.artifact_creature.clone())
-                        on_drag_start: move |e| {
-                            dragging.set(Some(e));
-                        }
-                        on_drop: move |e: PartyMemberTraitDropEvent| {
-                            if let Some(a) = dragging.get() {
-                                cx.props.on_swap.call(PartyMemberSwapEvent {
-                                    from_position: a.position,
-                                    from_index: a.index,
-                                    to_position: e.position,
-                                    to_index: e.index,
-                                })
-                            }
-                            dragging.set(None);
-                        }
-                    }
-                }
-            })
-        }
-    })
+#[derive(Properties, PartialEq)]
+pub struct PartyProps {
+    pub party: Vec<Member>,
+    pub on_swap: Callback<PartySwapEvent>,
 }
 
-struct PartyMemberTraitDragEvent {
-    position: i32,
-    index: i32,
-    creature: Creature,
-}
-
-struct PartyMemberTraitDropEvent {
-    position: i32,
-    index: i32,
-}
-
-#[derive(Props)]
-pub struct PartyMemberProps<'a> {
-    position: i32,
-    creature: (Option<Creature>, Option<Creature>, Option<Creature>),
-    on_drag_start: EventHandler<'a, PartyMemberTraitDragEvent>,
-    on_drop: EventHandler<'a, PartyMemberTraitDropEvent>,
-}
-
-pub fn PartyMember<'a>(cx: Scope<'a, PartyMemberProps<'a>>) -> Element {
-    cx.render(rsx! {
-        div {
-            class: "party-member",
-            div {
-                class: "left-pane",
-                "x"
-            }
-            div {
-                class: "right-pane",
-                ul {
-                    li {
-                        PartyMemberTrait {
-                            creature: (&cx.props.creature.0,)
-                            empty_text: "Click to add primary trait"
-                            on_drag_start: move |e| cx.props.on_drag_start.call(PartyMemberTraitDragEvent {
-                                position: cx.props.position,
-                                index: 0,
-                                creature: e,
-                            })
-                            on_drop: move |_| cx.props.on_drop.call(PartyMemberTraitDropEvent {
-                                position: cx.props.position,
-                                index: 0,
+#[function_component(Party)]
+pub fn party(props: &PartyProps) -> Html {
+    let dragging: UseStateHandle<Option<PartyDragEvent>> = use_state(|| None);
+    html! {
+        <div class="party">
+            {props.party.iter().enumerate().map(|(i, m)| {
+                let on_drag_start = {
+                    let dragging = dragging.clone();
+                    Callback::from(move |e: PartyDragEvent| {
+                        log::debug!("dragstart: {:?}", e);
+                        dragging.set(Some(e));
+                    })
+                };
+                let on_drop = {
+                    let dragging = dragging.clone();
+                    let on_swap = props.on_swap.clone();
+                    Callback::from(move |e: PartyDragEvent| {
+                        log::debug!("drop: {:?}", e);
+                        if let Some(a) = dragging.as_ref() {
+                            on_swap.emit(PartySwapEvent {
+                                from_position: a.position,
+                                from_index: a.index,
+                                to_position: e.position,
+                                to_index: e.index,
                             })
                         }
-                    }
-                    li {
-                        PartyMemberTrait {
-                            creature: (&cx.props.creature.1,)
-                            empty_text: "Click to add fused trait"
-                            on_drag_start: move |e| cx.props.on_drag_start.call(PartyMemberTraitDragEvent {
-                                position: cx.props.position,
-                                index: 1,
-                                creature: e,
-                            })
-                            on_drop: move |_| cx.props.on_drop.call(PartyMemberTraitDropEvent {
-                                position: cx.props.position,
-                                index: 0,
-                            })
-                        }
-                    }
-                    li {
-                        PartyMemberTrait {
-                            creature: (&cx.props.creature.2,)
-                            empty_text: "Click to add artifact trait"
-                            on_drag_start: move |e| cx.props.on_drag_start.call(PartyMemberTraitDragEvent {
-                                position: cx.props.position,
-                                index: 2,
-                                creature: e,
-                            })
-                            on_drop: move |_| cx.props.on_drop.call(PartyMemberTraitDropEvent {
-                                position: cx.props.position,
-                                index: 0,
-                            })
-                        }
-                    }
+                        dragging.set(None);
+                    })
+                };
+                html! {
+                    <PartyMember
+                        position={i}
+                        member={m.clone()}
+                        on_drag_start={on_drag_start}
+                        on_drop={on_drop}
+                    >
+                    </PartyMember>
                 }
-            }
-        }
-    })
+            }).collect::<Html>()}
+        </div>
+    }
 }
 
-#[derive(Props)]
-struct PartyMemberTraitProps<'a> {
-    creature: (&'a Option<Creature>,),
-    empty_text: &'static str,
-    on_drag_start: EventHandler<'a, Creature>,
-    on_drop: EventHandler<'a>,
+#[derive(Properties, PartialEq)]
+struct PartyMemberProps {
+    position: usize,
+    member: Member,
+    on_drag_start: Callback<PartyDragEvent>,
+    on_drop: Callback<PartyDragEvent>,
 }
 
-fn PartyMemberTrait<'a>(cx: Scope<'a, PartyMemberTraitProps<'a>>) -> Element {
-    let opacity = use_state(cx, || 1.0);
-    let e = if let Some(c) = &cx.props.creature.0 {
-        rsx! {
-            div {
-                class: "trait non-empty",
-                "draggable": "true",
-                style: "opacity: {opacity}",
-                onclick: move |e| {
-                    log::debug!("onclick: {:?}", e);
-                },
-                ondragstart: move |e| {
-                    log::debug!("ondragstart: {:?}", e);
-                    opacity.set(0.5);
-                    cx.props.on_drag_start.call(c.clone());
-                },
-                ondragend: move |_| opacity.set(1.0),
-                ondrop: move |e| {
-                    log::debug!("ondrop: {:?}", e);
-                    cx.props.on_drop.call(());
-                },
-                div {
-                    class: "creature",
-                    span { ClassIcon { value: &c.class } c.creature.as_str() }
-                }
-                div {
-                    class: "trait-name",
-                    span { c.trait_name.as_str() }
-                }
-                div {
-                    class: "trait-description",
-                    span { c.trait_description.as_str() }
-                }
-            }
-            div {
-                class: "clear",
-                button {
-                    Icon { width: 24, height: 24, icon: bs_icons::BsXLg }
-                }
-            }
-        }
-    } else {
-        rsx! {
-            div {
-                class: "trait empty",
-                cx.props.empty_text
-            }
-            div {
-                class: "clear"
-            }
-        }
+#[function_component(PartyMember)]
+fn party_member(props: &PartyMemberProps) -> Html {
+    let on_drag_start = |index: usize| {
+        let on_drag_start = props.on_drag_start.clone();
+        let e = PartyDragEvent::new(props.position, index);
+        Callback::from(move |_| {
+            log::debug!("ondragstart");
+            on_drag_start.emit(e.clone());
+        })
     };
-    cx.render(e)
+    let on_drop = |index: usize| {
+        let on_drop = props.on_drop.clone();
+        let e = PartyDragEvent::new(props.position, index);
+        Callback::from(move |_| {
+            log::debug!("ondrop");
+            on_drop.emit(e.clone());
+        })
+    };
+
+    html! {
+        <div class="party-member">
+            <div class="left-pane"></div>
+            <div class="right-pane">
+                <ul>
+                    <li>
+                        <PartyTrait
+                            creature={props.member.primary_creature.clone()}
+                            empty_text={"Click to add primary trait"}
+                            on_drag_start={on_drag_start(0).clone()}
+                            on_drop={on_drop(0).clone()}
+                        />
+                    </li>
+                    <li>
+                        <PartyTrait
+                            creature={props.member.fused_creature.clone()}
+                            empty_text={"Click to add fused trait"}
+                            on_drag_start={on_drag_start(1).clone()}
+                            on_drop={on_drop(1).clone()}
+                        />
+                    </li>
+                    <li>
+                        <PartyTrait
+                            creature={props.member.artifact_creature.clone()}
+                            empty_text={"Click to add artifact trait"}
+                            on_drag_start={on_drag_start(2).clone()}
+                            on_drop={on_drop(2).clone()}
+                        />
+                    </li>
+                </ul>
+            </div>
+        </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct PartyTraitProps {
+    creature: Option<Creature>,
+    empty_text: &'static str,
+    on_drag_start: Callback<()>,
+    on_drop: Callback<()>,
+}
+
+#[function_component(PartyTrait)]
+fn party_trait(props: &PartyTraitProps) -> Html {
+    let opacity = use_state(|| 1.0);
+
+    let ondragstart = {
+        let on_drag_start = props.on_drag_start.clone();
+        let opacity = opacity.clone();
+        Callback::from(move |_| {
+            opacity.set(0.5);
+            on_drag_start.emit(());
+        })
+    };
+
+    let ondragend = {
+        let opacity = opacity.clone();
+        Callback::from(move |_| opacity.set(1.0))
+    };
+
+    let ondragover = { Callback::from(move |e: DragEvent| e.prevent_default()) };
+
+    let ondrop = {
+        let on_drop = props.on_drop.clone();
+        Callback::from(move |e| {
+            log::debug!("ondrop: {:?}", e);
+            on_drop.emit(());
+        })
+    };
+
+    if let Some(c) = &props.creature {
+        html! {
+                <>
+                    <div
+                        class="trait non-empty"
+                        style={format!("opacity: {}", opacity.deref())}
+                        draggable="true"
+                        ondragstart={ondragstart}
+                        ondragend={ondragend}
+                        ondragover={ondragover}
+                        ondrop={ondrop}
+                    >
+                        <div class="creature">
+                            <span>{c.creature.as_str()}</span>
+                        </div>
+                        <div class="trait-name">
+                            <span>{c.trait_name.as_str()}</span>
+                        </div>
+                        <div class="trait-description">
+                            <span>{c.trait_description.as_str()}</span>
+                        </div>
+                    </div>
+                    <div class="clear">
+        //                     Icon { width: 24, height: 24, icon: bs_icons::BsXLg }
+                        <button></button>
+                    </div>
+                </>
+            }
+    } else {
+        html! {
+            <>
+                <div class="trait empty">{props.empty_text}</div>
+                <div class="clear"></div>
+            </>
+        }
+    }
 }

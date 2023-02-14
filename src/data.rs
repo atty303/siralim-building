@@ -1,7 +1,7 @@
 use rust_embed::RustEmbed;
 use serde::Deserialize;
 
-#[derive(PartialEq, Clone, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug, Deserialize)]
 pub struct Creature {
     pub class: String,
     pub family: String,
@@ -12,7 +12,7 @@ pub struct Creature {
     pub stats: Option<CreatureStats>,
 }
 
-#[derive(PartialEq, Clone, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug, Deserialize)]
 pub struct CreatureStats {
     pub health: i32,
     pub attack: i32,
