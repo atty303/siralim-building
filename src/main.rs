@@ -7,6 +7,7 @@ use crate::data::Creature;
 use crate::member::Member;
 use crate::party::{Party, PartySwapEvent};
 use crate::state::{Action, State};
+use std::ptr::null;
 use yew::prelude::*;
 
 fn main() {
@@ -27,6 +28,13 @@ struct AppProps {
 #[function_component(App)]
 fn app(props: &AppProps) -> Html {
     let show_creatures_modal = use_state(|| false);
+    let location: web_sys::Location = web_sys::window().unwrap().location();
+    let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
+    log::debug!("{:?}", location.pathname());
+    history
+        .replace_state_with_url(&wasm_bindgen::JsValue::null(), "", Some("hoge"))
+        .unwrap();
+    log::debug!("{:?}", location.pathname());
 
     let state = use_reducer(|| State::new(&props.creatures));
 
@@ -58,16 +66,6 @@ fn app(props: &AppProps) -> Html {
     }
 }
 
-// fn App(cx: Scope<AppProps>) -> Element {
-//     cx.render(rsx! {
-//         div {
-//             Party {
-//                 party: party
-//                 on_swap: move |e: PartyMemberSwapEvent| {
-//                     log::info!("{:?}", e);
-//                 }
-//             }
-//         }
 //         CreatureModal {
 //             items: &cx.props.creatures,
 //             show: **show_creatures_modal,
@@ -75,5 +73,3 @@ fn app(props: &AppProps) -> Html {
 //                 show_creatures_modal.set(false);
 //             }
 //         }
-//     })
-// }

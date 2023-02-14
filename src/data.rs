@@ -10,6 +10,7 @@ pub struct Creature {
     pub trait_description: String,
     pub material_name: String,
     pub stats: Option<CreatureStats>,
+    pub uid: String,
 }
 
 #[derive(PartialEq, Eq, Clone, Debug, Deserialize)]
