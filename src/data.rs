@@ -22,14 +22,32 @@ pub struct CreatureStats {
     pub speed: i32,
 }
 
+#[derive(PartialEq, Eq, Debug)]
+pub struct Data {
+    pub creatures: Vec<Creature>,
+}
+
+impl Data {
+    pub fn load() -> Data {
+        let file = EmbedData::get("data/creatures.json").unwrap();
+        Data {
+            creatures: serde_json::from_slice(file.data.as_ref()).unwrap(),
+        }
+    }
+
+    pub fn get_creature_by_uid(&self, uid: &String) -> Option<&Creature> {
+        self.creatures.iter().find(|c| &c.uid == uid)
+    }
+}
+
 #[derive(RustEmbed)]
 #[folder = "data/"]
 #[prefix = "data/"]
-pub struct Data;
+pub struct EmbedData;
 
-impl Data {
+impl EmbedData {
     pub fn creatures() -> Vec<Creature> {
-        let file = Data::get("data/creatures.json").unwrap();
+        let file = EmbedData::get("data/creatures.json").unwrap();
         return serde_json::from_slice(file.data.as_ref()).unwrap();
     }
 }

@@ -6,7 +6,7 @@ mod state;
 use crate::data::Creature;
 use crate::member::Member;
 use crate::party::{Party, PartySwapEvent};
-use crate::state::{Action, State};
+use crate::state::{Action, Save, State};
 use qstring::QString;
 use std::ops::Deref;
 use std::ptr::null;
@@ -16,7 +16,7 @@ fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
     let props = AppProps {
-        creatures: data::Data::creatures(),
+        data: data::Data::load(),
     };
 
     yew::Renderer::<App>::with_props(props).render();
@@ -24,7 +24,7 @@ fn main() {
 
 #[derive(Properties, PartialEq)]
 struct AppProps {
-    creatures: Vec<Creature>,
+    data: data::Data,
 }
 
 #[function_component(App)]
@@ -35,21 +35,30 @@ fn app(props: &AppProps) -> Html {
     log::debug!("{:?}", location.search());
 
     let qs = QString::from(location.search().unwrap().as_str());
-    if let Some(s) = qs.get("s") {
-        log::debug!("{:?}", s);
-        //String::from(s)
-    }
+    let loaded_state = if let Some(s) = qs.get("s") {
+        log::debug!("save: {:?}", s);
+        let maybe_save = Save::from(&String::from(s));
+        if let Ok(save) = maybe_save {
+            Some(State::from(&save, &props.data))
+        } else {
+            log::warn!("failed to load save: {:?}", maybe_save);
+            None
+        }
+    } else {
+        None
+    };
+    let initial_state = loaded_state.unwrap_or_else(|| State::new(&props.data));
 
-    let state = use_reducer(|| State::new(&props.creatures));
+    let state = use_reducer(|| initial_state);
 
     use_effect_with_deps(
         move |state| {
-            let save: String = String::from(state.deref().deref());
+            let save_string = state.as_save().as_string();
             history
                 .replace_state_with_url(
                     &wasm_bindgen::JsValue::null(),
                     "",
-                    Some(format!("/?s={}", save).as_str()),
+                    Some(format!("/?s={}", save_string).as_str()),
                 )
                 .unwrap();
             || ()
