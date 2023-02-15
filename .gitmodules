@@ -1,0 +1,3 @@
+[submodule "siralim-ultimate-api"]
+	path = siralim-ultimate-api
+	url = git@github.com:rovermicrover/siralim-ultimate-api.git
