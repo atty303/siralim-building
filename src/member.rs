@@ -1,4 +1,4 @@
-use crate::data::Creature;
+use data::Creature;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Member {

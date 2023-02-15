@@ -1,12 +1,12 @@
-mod data;
+mod embed_data;
 mod member;
 mod party;
 mod state;
 
-use crate::data::Creature;
 use crate::member::Member;
 use crate::party::{Party, PartySwapEvent};
 use crate::state::{Action, Save, State};
+use data::Creature;
 use qstring::QString;
 use std::ops::Deref;
 use std::ptr::null;
@@ -16,7 +16,7 @@ fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
     let props = AppProps {
-        data: data::Data::load(),
+        data: embed_data::EmbedData::load(),
     };
 
     yew::Renderer::<App>::with_props(props).render();

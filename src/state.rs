@@ -7,8 +7,8 @@ use base64::Engine;
 use serde::{Deserialize, Serialize, Serializer};
 use yew::prelude::*;
 
-use crate::data::{Creature, Data};
 use crate::member::Member;
+use data::{Creature, Data};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct State {

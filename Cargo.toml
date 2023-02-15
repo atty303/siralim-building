@@ -1,9 +1,12 @@
+[workspace]
+
 [package]
-name = "siralim-building"
+name = "web"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+data = { path = "data" }
 yew = { version = "0.20.0", features = [ "csr" ] }
 wasm-bindgen = "0.2.84"
 web-sys = { version = "0.3.61", features = [ "Window", "History", "Location" ] }
@@ -16,4 +19,5 @@ apache-avro = { version = "0.14.0", features = [ "derive" ] }
 base64 = "0.21.0"
 flate2 = "1.0.25"
 qstring = "0.7.2"
+
 anyhow = "1.0.69"

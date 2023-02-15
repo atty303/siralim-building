@@ -1,0 +1,6 @@
+[package]
+name = "data"
+version = "0.1.0"
+
+[dependencies]
+serde = "1.0.152"
