@@ -7,6 +7,8 @@ use crate::data::Creature;
 use crate::member::Member;
 use crate::party::{Party, PartySwapEvent};
 use crate::state::{Action, State};
+use qstring::QString;
+use std::ops::Deref;
 use std::ptr::null;
 use yew::prelude::*;
 
@@ -30,13 +32,30 @@ fn app(props: &AppProps) -> Html {
     let show_creatures_modal = use_state(|| false);
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
-    log::debug!("{:?}", location.pathname());
-    history
-        .replace_state_with_url(&wasm_bindgen::JsValue::null(), "", Some("hoge"))
-        .unwrap();
-    log::debug!("{:?}", location.pathname());
+    log::debug!("{:?}", location.search());
+
+    let qs = QString::from(location.search().unwrap().as_str());
+    if let Some(s) = qs.get("s") {
+        log::debug!("{:?}", s);
+        //String::from(s)
+    }
 
     let state = use_reducer(|| State::new(&props.creatures));
+
+    use_effect_with_deps(
+        move |state| {
+            let save: String = String::from(state.deref().deref());
+            history
+                .replace_state_with_url(
+                    &wasm_bindgen::JsValue::null(),
+                    "",
+                    Some(format!("/?s={}", save).as_str()),
+                )
+                .unwrap();
+            || ()
+        },
+        state.clone(),
+    );
 
     let on_swap = {
         let state = state.clone();

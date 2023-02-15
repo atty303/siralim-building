@@ -1,7 +1,14 @@
+use std::io::Write;
+use std::rc::Rc;
+
+use apache_avro::Schema::Record;
+use apache_avro::{AvroSchema, Schema};
+use base64::Engine;
+use serde::{Deserialize, Serialize, Serializer};
+use yew::prelude::*;
+
 use crate::data::Creature;
 use crate::member::Member;
-use std::rc::Rc;
-use yew::prelude::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct State {
@@ -29,6 +36,81 @@ impl State {
                 },
             ],
         }
+    }
+}
+
+// static RAW_SCHEMA: &'static str = r#"
+// {
+//     "type": "record",
+//     "name": "Save",
+//     "fields": [{
+//         "name": "party",
+//         "type": "record",
+//         "fields": [
+//             {
+//                 "name": "members",
+//                 "type": "array",
+//                 "items": {
+//                     "type": "record",
+//                     "name": "SaveMember",
+//                     "fields": [
+//                        {"name": "primary_creature", "type": ["string", "null"]},
+//                        {"name": "fused_creature", "type": ["string", "null"]},
+//                        {"name": "artifact_creature", "type": ["string", "null"]}
+//                     ]
+//                 }
+//             }
+//         ]
+//     }]
+// }
+// "#;
+//
+// static SCHEMA: Lazy<Schema> = Lazy::new(|| Schema::parse_str(RAW_SCHEMA).unwrap());
+//
+#[derive(Serialize, Deserialize, AvroSchema)]
+struct Save {
+    party: SaveParty,
+}
+
+#[derive(Serialize, Deserialize, AvroSchema)]
+struct SaveParty {
+    members: Vec<SaveMember>,
+}
+
+#[derive(Serialize, Deserialize, AvroSchema)]
+struct SaveMember {
+    primary_creature: Option<String>,
+    fused_creature: Option<String>,
+    artifact_creature: Option<String>,
+}
+
+impl From<&State> for String {
+    fn from(value: &State) -> Self {
+        let save = Save {
+            party: SaveParty {
+                members: value
+                    .party
+                    .iter()
+                    .map(|m| SaveMember {
+                        primary_creature: m.primary_creature.clone().map(|c| c.uid),
+                        fused_creature: m.fused_creature.clone().map(|c| c.uid),
+                        artifact_creature: m.artifact_creature.clone().map(|c| c.uid),
+                    })
+                    .collect(),
+            },
+        };
+        let save_value = apache_avro::to_value(save).unwrap();
+        let bytes = apache_avro::to_avro_datum(&Save::get_schema(), save_value).unwrap();
+        let mut e = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::best());
+        e.write_all(&bytes).unwrap();
+        let c = e.finish().unwrap();
+        base64::engine::general_purpose::URL_SAFE.encode(c)
+    }
+}
+
+impl From<&String> for State {
+    fn from(value: &String) -> Self {
+        todo!()
     }
 }
 
