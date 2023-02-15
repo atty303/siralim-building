@@ -200,7 +200,12 @@ fn party_trait(props: &PartyTraitProps) -> Html {
     } else {
         html! {
             <>
-                <div class="trait empty">{props.empty_text}</div>
+                <div class="trait empty"
+                     ondragover={ondragover}
+                     ondrop={ondrop}
+                >
+                    {props.empty_text}
+                </div>
                 <div class="clear"></div>
             </>
         }

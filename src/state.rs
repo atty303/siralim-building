@@ -131,21 +131,36 @@ impl Reducible for State {
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
         match action {
             Action::Swap((from_position, from_index, to_position, to_index)) => {
-                let from_member = self.party.get(from_position).unwrap().clone();
-                let from = from_member.get_creature(from_index);
-                let to_member = self.party.get(to_position).unwrap().clone();
-                let to = to_member.get_creature(to_index);
+                if from_position == to_position {
+                    let member = self.party.get(from_position).unwrap().clone();
+                    let from = member.get_creature(from_index);
+                    let to = member.get_creature(to_index);
 
-                let mut f = from_member.clone();
-                f.set_creature(from_index, &to);
-                let mut t = to_member.clone();
-                t.set_creature(to_index, &from);
+                    let mut m = member.clone();
+                    m.set_creature(from_index, &to);
+                    m.set_creature(to_index, &from);
 
-                let mut p = self.party.to_vec();
-                p[to_position] = t;
-                p[from_position] = f;
+                    let mut p = self.party.to_vec();
+                    p[from_position] = m;
 
-                State { party: p }.into()
+                    State { party: p }.into()
+                } else {
+                    let from_member = self.party.get(from_position).unwrap().clone();
+                    let from = from_member.get_creature(from_index);
+                    let to_member = self.party.get(to_position).unwrap().clone();
+                    let to = to_member.get_creature(to_index);
+
+                    let mut f = from_member.clone();
+                    f.set_creature(from_index, &to);
+                    let mut t = to_member.clone();
+                    t.set_creature(to_index, &from);
+
+                    let mut p = self.party.to_vec();
+                    p[to_position] = t;
+                    p[from_position] = f;
+
+                    State { party: p }.into()
+                }
             }
         }
     }
