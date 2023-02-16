@@ -1,4 +1,9 @@
+pub mod r#trait;
+
+extern crate implicit_clone;
 extern crate serde;
+extern crate tantivy;
+
 use serde::Deserialize;
 
 #[derive(PartialEq, Eq, Clone, Debug, Deserialize)]

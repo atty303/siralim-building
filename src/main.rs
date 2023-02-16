@@ -8,6 +8,7 @@ use crate::member::Member;
 use crate::party::{Party, PartySwapEvent};
 use crate::state::{Action, Save, State};
 use data::Creature;
+use implicit_clone::unsync::IString;
 use qstring::QString;
 use std::ops::Deref;
 use std::ptr::null;
@@ -43,6 +44,7 @@ fn app(props: &AppProps) -> Html {
     for r in searcher.segment_readers().iter() {
         //r.doc_ids_alive().
     }
+    let a: AttrValue = IString::default();
 
     let query_parser = QueryParser::for_index(
         &index,

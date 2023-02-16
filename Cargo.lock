@@ -366,7 +366,9 @@ dependencies = [
 name = "data"
 version = "0.1.0"
 dependencies = [
+ "implicit-clone",
  "serde",
+ "tantivy",
 ]
 
 [[package]]
@@ -2346,6 +2348,7 @@ dependencies = [
  "data",
  "flate2",
  "getrandom",
+ "implicit-clone",
  "log",
  "qstring",
  "rust-embed",
