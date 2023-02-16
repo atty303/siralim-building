@@ -3,4 +3,4 @@ name = "data"
 version = "0.1.0"
 
 [dependencies]
-serde = "1.0.152"
+serde = { version = "1.0.152", features = [ "derive" ] }
