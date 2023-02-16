@@ -40,6 +40,9 @@ fn app(props: &AppProps) -> Html {
     let index = tantivy::Index::open(dir).unwrap();
     let reader = index.reader().unwrap();
     let searcher = reader.searcher();
+    for r in searcher.segment_readers().iter() {
+        //r.doc_ids_alive().
+    }
 
     let query_parser = QueryParser::for_index(
         &index,
