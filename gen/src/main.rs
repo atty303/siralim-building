@@ -112,6 +112,11 @@ fn gen_traits() {
     let sources = schema_builder.add_text_field("sources", TextOptions::default().set_stored());
     let sprite = schema_builder.add_text_field("sprite", TextOptions::default().set_stored());
     let health = schema_builder.add_u64_field("health", STORED);
+    let attack = schema_builder.add_u64_field("attack", STORED);
+    let intelligence = schema_builder.add_u64_field("intelligence", STORED);
+    let defense = schema_builder.add_u64_field("defense", STORED);
+    let speed = schema_builder.add_u64_field("speed", STORED);
+    let total = schema_builder.add_u64_field("total", STORED);
 
     let schema = schema_builder.build();
 
@@ -140,6 +145,12 @@ fn gen_traits() {
         if let Some(c) = r.1 {
             doc.add_text(sprite, c.battle_sprite.clone());
             doc.add_u64(health, c.health as u64);
+            doc.add_u64(attack, c.attack as u64);
+            doc.add_u64(intelligence, c.intelligence as u64);
+            doc.add_u64(defense, c.defense as u64);
+            doc.add_u64(speed, c.speed as u64);
+            doc.add_u64(total, c.total as u64);
+
             for s in c.sources.split(",") {
                 doc.add_text(sources, s.trim().to_string())
             }
@@ -156,44 +167,30 @@ fn main() {
     let index = tantivy::Index::open_in_dir("embed/traits").unwrap();
 
     let reader = index.reader().unwrap();
-    reader.reload().unwrap();
     let searcher = reader.searcher();
 
-    // let query_parser = QueryParser::for_index(
-    //     &index,
-    //     vec![
-    //         index.schema().get_field("creature").unwrap(),
-    //         index.schema().get_field("description").unwrap(),
-    //     ],
-    // );
-    // let query = query_parser.parse_query("class:chaos").unwrap();
-    // let query = query_parser.parse_query("id:7776716764160283234").unwrap();
-    let query = TermSetQuery::new(vec![
-        Term::from_field_u64(
-            index.schema().get_field("id").unwrap(),
-            13421718727927563020u64,
-        ),
-        Term::from_field_u64(
-            index.schema().get_field("id").unwrap(),
-            2016719850152869480u64,
-        ),
-    ]);
-    // let query = RangeQuery::new_u64(
-    //     index.schema().get_field("id").unwrap(),
-    //     7776716764160283234..7776716764160283234,
-    // );
+    // let query = TermSetQuery::new(vec![
+    //     Term::from_field_u64(
+    //         index.schema().get_field("id").unwrap(),
+    //         13421718727927563020u64,
+    //     ),
+    //     Term::from_field_u64(
+    //         index.schema().get_field("id").unwrap(),
+    //         2016719850152869480u64,
+    //     ),
+    // ]);
     let query = AllQuery;
-    println!("{:?}", query);
-
-    let docs = searcher
-        .search(&query, &tantivy::collector::TopDocs::with_limit(10))
-        .unwrap();
     let docs = searcher
         .search(&query, &tantivy::collector::DocSetCollector)
         .unwrap();
-    // println!("{}", docs);
     for doc_address in docs {
         let doc = searcher.doc(doc_address).unwrap();
-        println!("{}", index.schema().to_json(&doc));
+        let nd = index.schema().to_named_doc(&doc);
+        println!(
+            "{:?}: {:?}",
+            nd.0.get("id").unwrap().get(0).unwrap(),
+            nd.0.get("health")
+        );
+        //println!("{}", index.schema().to_json(&doc));
     }
 }
