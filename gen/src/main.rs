@@ -1,8 +1,12 @@
 extern crate csv;
 extern crate serde;
+extern crate tantivy;
 
 use csv::StringRecord;
 use serde::Deserialize;
+use tantivy::doc;
+use tantivy::query::QueryParser;
+use tantivy::schema::{STORED, TEXT};
 
 #[derive(Debug, Deserialize)]
 struct Record {
@@ -30,7 +34,7 @@ struct CreatureRecord {
     r#trait: String,
 }
 
-fn compendium_traits() {
+fn load_compendium_traits() -> Vec<Record> {
     let rep = reqwest::blocking::get("https://docs.google.com/spreadsheets/d/1qvWwf1fNB5jN8bJ8dFGAVzC7scgDCoBO-hglwjTT4iY/gviz/tq?tqx=out:csv&sheet=Traits").unwrap();
     let body = rep.bytes().unwrap();
     //let text = rep.text().unwrap();
@@ -50,10 +54,11 @@ fn compendium_traits() {
         .skip(2)
         .map(|r| r.unwrap())
         .collect::<Vec<Record>>();
-    for maybe_row in reader.deserialize().skip(2) {
-        let row: Record = maybe_row.unwrap();
-        println!("{:?}", row);
-    }
+    traits
+    // for maybe_row in reader.deserialize().skip(2) {
+    //     let row: Record = maybe_row.unwrap();
+    //     println!("{:?}", row);
+    // }
 }
 
 fn load_creatures() -> Vec<CreatureRecord> {
@@ -67,7 +72,57 @@ fn load_creatures() -> Vec<CreatureRecord> {
         .collect::<Vec<CreatureRecord>>()
 }
 
-fn main() {
+fn gen_traits() {
     let creatures = load_creatures();
-    println!("{:?}", creatures);
+    let traits = load_compendium_traits();
+
+    let a = traits.iter().map(|t| {
+        let r = creatures.iter().find(|c| c.name == t.creature);
+        (t, r)
+    });
+
+    let mut schema_builder = tantivy::schema::Schema::builder();
+    let creature = schema_builder.add_text_field("creature", TEXT | STORED);
+    let trait_description = schema_builder.add_text_field("trait_description", TEXT | STORED);
+    let schema = schema_builder.build();
+
+    let index = tantivy::Index::create_in_dir("embed/traits", schema).unwrap();
+
+    let mut index_writer = index.writer(100_000_000).unwrap();
+
+    a.for_each(|r| {
+        index_writer
+            .add_document(doc!(
+                creature => r.0.creature.clone(),
+                trait_description => r.0.trait_description.clone(),
+            ))
+            .unwrap();
+    });
+
+    index_writer.commit().unwrap();
+}
+
+fn main() {
+    let mut schema_builder = tantivy::schema::Schema::builder();
+    let creature = schema_builder.add_text_field("creature", TEXT | STORED);
+    let trait_description = schema_builder.add_text_field("trait_description", TEXT | STORED);
+    let schema = schema_builder.build();
+
+    //    let index = tantivy::Index::create_in_dir("embed/traits", schema.clone()).unwrap();
+    let index = tantivy::Index::open_in_dir("embed/traits").unwrap();
+
+    let reader = index.reader().unwrap();
+    let searcher = reader.searcher();
+
+    let query_parser = QueryParser::for_index(&index, vec![creature, trait_description]);
+    let query = query_parser.parse_query("attack").unwrap();
+
+    let docs = searcher
+        .search(&query, &tantivy::collector::TopDocs::with_limit(10))
+        .unwrap();
+
+    for (_score, doc_address) in docs {
+        let doc = searcher.doc(doc_address).unwrap();
+        println!("{}", schema.to_json(&doc));
+    }
 }

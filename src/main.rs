@@ -10,6 +10,7 @@ use data::Creature;
 use qstring::QString;
 use std::ops::Deref;
 use std::ptr::null;
+use tantivy::query::QueryParser;
 use yew::prelude::*;
 
 fn main() {
@@ -33,6 +34,25 @@ fn app(props: &AppProps) -> Html {
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
     log::debug!("{:?}", location.search());
+
+    let index = tantivy::Index::open(embed_data::EmbedDirectory::default()).unwrap();
+    let reader = index.reader().unwrap();
+    let searcher = reader.searcher();
+
+    let query_parser = QueryParser::for_index(
+        &index,
+        vec![index.schema().get_field("trait_description").unwrap()],
+    );
+    let query = query_parser.parse_query("attack").unwrap();
+
+    let docs = searcher
+        .search(&query, &tantivy::collector::TopDocs::with_limit(10))
+        .unwrap();
+
+    for (score, doc_address) in docs {
+        let doc = searcher.doc(doc_address).unwrap();
+        log::debug!("{}: {}", score, index.schema().to_json(&doc));
+    }
 
     let qs = QString::from(location.search().unwrap().as_str());
     let loaded_state = if let Some(s) = qs.get("s") {
