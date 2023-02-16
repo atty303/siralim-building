@@ -48,9 +48,13 @@ impl TraitSchema {
         schema_builder.add_u64_field("speed", STORED);
         schema_builder.add_u64_field("total", STORED);
 
-        TraitSchema {
+        Self {
             schema: schema_builder.build(),
         }
+    }
+
+    pub fn from(schema: Schema) -> TraitSchema {
+        Self { schema }
     }
 
     pub fn schema(&self) -> Schema {
