@@ -1,4 +1,5 @@
 mod embed_data;
+mod embed_directory;
 mod member;
 mod party;
 mod state;
@@ -35,7 +36,8 @@ fn app(props: &AppProps) -> Html {
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
     log::debug!("{:?}", location.search());
 
-    let index = tantivy::Index::open(embed_data::EmbedDirectory::default()).unwrap();
+    let dir = embed_directory::EmbedDirectory::new(embed_data::EmbedTraits);
+    let index = tantivy::Index::open(dir).unwrap();
     let reader = index.reader().unwrap();
     let searcher = reader.searcher();
 
@@ -43,7 +45,7 @@ fn app(props: &AppProps) -> Html {
         &index,
         vec![index.schema().get_field("trait_description").unwrap()],
     );
-    let query = query_parser.parse_query("attack").unwrap();
+    let query = query_parser.parse_query("spell").unwrap();
 
     let docs = searcher
         .search(&query, &tantivy::collector::TopDocs::with_limit(10))
