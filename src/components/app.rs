@@ -1,4 +1,5 @@
 use crate::components::party::{Party, PartySwapEvent};
+use crate::components::traits::TraitsModal;
 use crate::save::Save;
 use crate::state::{Action, State};
 use qstring::QString;
@@ -11,7 +12,7 @@ pub struct AppProps {
 
 #[function_component(App)]
 pub fn app(props: &AppProps) -> Html {
-    let show_creatures_modal = use_state(|| false);
+    let show_traits_modal = use_state(|| true);
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
 
@@ -60,15 +61,38 @@ pub fn app(props: &AppProps) -> Html {
         })
     };
 
-    let open_creatures_modal = move |_| {
-        show_creatures_modal.set(true);
+    let open_traits_modal = {
+        let show_traits_modal = show_traits_modal.clone();
+        Callback::from(move |_| {
+            show_traits_modal.set(true);
+        })
     };
+
+    let on_close_traits_modal = {
+        let show_traits_modal = show_traits_modal.clone();
+        Callback::from(move |_| {
+            show_traits_modal.set(false);
+        })
+    };
+    let on_select_trait = {
+        let show_traits_modal = show_traits_modal.clone();
+        Callback::from(move |_| {
+            show_traits_modal.set(false);
+        })
+    };
+
     html! {
         <div>
-            <button onclick={open_creatures_modal}>{"open"}</button>
+            <button onclick={open_traits_modal}>{"open"}</button>
             <Party
                 party={state.party.clone()}
                 on_swap={on_swap}
+            />
+            <TraitsModal
+                data={props.data.clone()}
+                show={*show_traits_modal}
+                on_cancel={on_close_traits_modal}
+                on_select={on_select_trait}
             />
         </div>
     }

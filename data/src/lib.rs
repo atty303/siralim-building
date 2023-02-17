@@ -35,7 +35,7 @@ pub struct CreatureStats {
     pub speed: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Data {
     traits_index: Index,
 }
