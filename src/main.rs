@@ -1,10 +1,10 @@
+mod components;
 mod embed_data;
 mod embed_directory;
 mod member;
-mod party;
 mod state;
 
-use crate::party::{Party, PartySwapEvent};
+use crate::components::party::{Party, PartySwapEvent};
 use crate::state::{Action, Save, State};
 use qstring::QString;
 use yew::prelude::*;
