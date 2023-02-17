@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize, Serializer};
 use yew::prelude::*;
 
 use crate::member::Member;
+use data::r#trait::Trait;
 use data::{Creature, Data};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -20,19 +21,23 @@ impl State {
         State {
             party: vec![
                 Member {
-                    primary_creature: Some(data.creatures.get(0).unwrap().clone()),
-                    fused_creature: None,
-                    artifact_creature: None,
+                    primary_trait: Some(
+                        data.get_trait(17346231099549687105u64 as i64)
+                            .unwrap()
+                            .clone(),
+                    ),
+                    fused_trait: None,
+                    artifact_trait: None,
                 },
                 Member {
-                    primary_creature: None,
-                    fused_creature: Some(data.creatures.get(100).unwrap().clone()),
-                    artifact_creature: None,
+                    primary_trait: None,
+                    fused_trait: None,
+                    artifact_trait: None,
                 },
                 Member {
-                    primary_creature: None,
-                    fused_creature: None,
-                    artifact_creature: Some(data.creatures.get(200).unwrap().clone()),
+                    primary_trait: None,
+                    fused_trait: None,
+                    artifact_trait: None,
                 },
             ],
         }
@@ -46,9 +51,13 @@ pub struct Save {
 
 #[derive(Serialize, Deserialize, AvroSchema, Debug)]
 struct SaveMember {
-    primary_creature: Option<String>,
-    fused_creature: Option<String>,
-    artifact_creature: Option<String>,
+    primary_trait: Option<i64>,
+    fused_trait: Option<i64>,
+    artifact_trait: Option<i64>,
+}
+
+fn id_to_trait(data: &Data, id: Option<i64>) -> Option<Trait> {
+    id.iter().flat_map(|i| data.get_trait(*i).ok()).next()
 }
 
 impl State {
@@ -58,24 +67,9 @@ impl State {
                 .party
                 .iter()
                 .map(|m| Member {
-                    primary_creature: m
-                        .primary_creature
-                        .as_ref()
-                        .map(|uid| data.get_creature_by_uid(&uid))
-                        .flatten()
-                        .map(|c| c.clone()),
-                    fused_creature: m
-                        .fused_creature
-                        .as_ref()
-                        .map(|uid| data.get_creature_by_uid(&uid))
-                        .flatten()
-                        .map(|c| c.clone()),
-                    artifact_creature: m
-                        .artifact_creature
-                        .as_ref()
-                        .map(|uid| data.get_creature_by_uid(&uid))
-                        .flatten()
-                        .map(|c| c.clone()),
+                    primary_trait: id_to_trait(data, m.primary_trait),
+                    fused_trait: id_to_trait(data, m.fused_trait),
+                    artifact_trait: id_to_trait(data, m.artifact_trait),
                 })
                 .collect(),
         }
@@ -87,9 +81,9 @@ impl State {
                 .party
                 .iter()
                 .map(|m| SaveMember {
-                    primary_creature: m.primary_creature.clone().map(|c| c.uid),
-                    fused_creature: m.fused_creature.clone().map(|c| c.uid),
-                    artifact_creature: m.artifact_creature.clone().map(|c| c.uid),
+                    primary_trait: m.primary_trait.clone().map(|c| c.id),
+                    fused_trait: m.fused_trait.clone().map(|c| c.id),
+                    artifact_trait: m.artifact_trait.clone().map(|c| c.id),
                 })
                 .collect(),
         }

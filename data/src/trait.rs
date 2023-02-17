@@ -5,7 +5,7 @@ use tantivy::Document;
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Trait {
-    pub id: u64,
+    pub id: i64,
     pub class: IString,
     pub family: IString,
     pub creature: IString,
@@ -32,7 +32,7 @@ pub struct TraitSchema {
 impl TraitSchema {
     pub fn new() -> TraitSchema {
         let mut schema_builder = Schema::builder();
-        schema_builder.add_u64_field("id", INDEXED | STORED);
+        schema_builder.add_i64_field("id", INDEXED | STORED);
         schema_builder.add_text_field("class", TEXT | STORED | FAST);
         schema_builder.add_text_field("family", TEXT | STORED);
         schema_builder.add_text_field("creature", TEXT | STORED);
@@ -129,7 +129,7 @@ impl TraitSchema {
             None
         };
         Trait {
-            id: doc.get_first(self.id()).unwrap().as_u64().unwrap(),
+            id: doc.get_first(self.id()).unwrap().as_i64().unwrap(),
             class: TraitSchema::get_text(doc, self.class()),
             family: TraitSchema::get_text(doc, self.family()),
             creature: TraitSchema::get_text(doc, self.creature()),

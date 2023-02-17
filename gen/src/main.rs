@@ -110,9 +110,10 @@ fn gen_traits() {
         if !hash_set.insert(hash) {
             panic!("hash collided at {}", i);
         }
+        println!("{}: {}", i, hash);
 
         let mut doc = Document::default();
-        doc.add_u64(schema.id(), hash);
+        doc.add_i64(schema.id(), hash as i64);
         doc.add_text(schema.class(), r.class.clone());
         doc.add_text(schema.family(), r.family.clone());
         doc.add_text(schema.creature(), r.creature.clone());

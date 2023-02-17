@@ -19,7 +19,7 @@ fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
     let props = AppProps {
-        data: embed_data::EmbedData::load(),
+        data: embed_data::load(),
     };
 
     yew::Renderer::<App>::with_props(props).render();
@@ -36,30 +36,6 @@ fn app(props: &AppProps) -> Html {
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
     log::debug!("{:?}", location.search());
-
-    let dir = embed_directory::EmbedDirectory::new(embed_data::EmbedTraits);
-    let index = tantivy::Index::open(dir).unwrap();
-    let reader = index.reader().unwrap();
-    let searcher = reader.searcher();
-    for r in searcher.segment_readers().iter() {
-        //r.doc_ids_alive().
-    }
-    let a: AttrValue = IString::default();
-
-    let query_parser = QueryParser::for_index(
-        &index,
-        vec![index.schema().get_field("trait_description").unwrap()],
-    );
-    let query = query_parser.parse_query("spell").unwrap();
-
-    let docs = searcher
-        .search(&query, &tantivy::collector::TopDocs::with_limit(10))
-        .unwrap();
-
-    for (score, doc_address) in docs {
-        let doc = searcher.doc(doc_address).unwrap();
-        log::debug!("{}: {}", score, index.schema().to_json(&doc));
-    }
 
     let qs = QString::from(location.search().unwrap().as_str());
     let loaded_state = if let Some(s) = qs.get("s") {

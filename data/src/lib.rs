@@ -37,20 +37,28 @@ pub struct CreatureStats {
 
 #[derive(Debug)]
 pub struct Data {
-    pub creatures: Vec<Creature>,
     traits_index: Index,
 }
 
+impl PartialEq for Data {
+    fn eq(&self, other: &Self) -> bool {
+        self.traits_index.schema() == other.traits_index.schema()
+    }
+}
+
 impl Data {
+    pub fn from(traits_index: Index) -> Data {
+        Self { traits_index }
+    }
     pub fn traits_index(&self) -> Index {
         self.traits_index.clone()
     }
 
-    pub fn get_trait(&self, id: u64) -> anyhow::Result<Trait> {
+    pub fn get_trait(&self, id: i64) -> anyhow::Result<Trait> {
         let searcher = self.traits_index.reader()?.searcher();
         let schema = TraitSchema::from(self.traits_index.schema());
         let query = TermQuery::new(
-            Term::from_field_u64(schema.id(), id),
+            Term::from_field_i64(schema.id(), id),
             IndexRecordOption::Basic,
         );
         let docs = searcher.search(&query, &DocSetCollector)?;
@@ -60,9 +68,5 @@ impl Data {
         } else {
             Err(std::io::Error::from(ErrorKind::NotFound))?
         }
-    }
-
-    pub fn get_creature_by_uid(&self, uid: &String) -> Option<&Creature> {
-        self.creatures.iter().find(|c| &c.uid == uid)
     }
 }

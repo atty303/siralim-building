@@ -5,7 +5,7 @@
   },
   "segments": [
     {
-      "segment_id": "a79be560-538c-43e1-b7f3-e09dd10ddeb0",
+      "segment_id": "7c0456d7-944f-499b-8617-88f3eb8041ca",
       "max_doc": 1592,
       "deletes": null
     }
@@ -13,7 +13,7 @@
   "schema": [
     {
       "name": "id",
-      "type": "u64",
+      "type": "i64",
       "options": {
         "indexed": true,
         "fieldnorms": true,

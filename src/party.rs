@@ -1,4 +1,5 @@
 use crate::member::Member;
+use data::r#trait::Trait;
 use data::Creature;
 use std::ops::Deref;
 use yew::prelude::*;
@@ -105,7 +106,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                 <ul>
                     <li>
                         <PartyTrait
-                            creature={props.member.primary_creature.clone()}
+                            r#trait={props.member.primary_trait.clone()}
                             empty_text={"Click to add primary trait"}
                             on_drag_start={on_drag_start(0).clone()}
                             on_drop={on_drop(0).clone()}
@@ -113,7 +114,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                     </li>
                     <li>
                         <PartyTrait
-                            creature={props.member.fused_creature.clone()}
+                            r#trait={props.member.fused_trait.clone()}
                             empty_text={"Click to add fused trait"}
                             on_drag_start={on_drag_start(1).clone()}
                             on_drop={on_drop(1).clone()}
@@ -121,7 +122,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                     </li>
                     <li>
                         <PartyTrait
-                            creature={props.member.artifact_creature.clone()}
+                            r#trait={props.member.artifact_trait.clone()}
                             empty_text={"Click to add artifact trait"}
                             on_drag_start={on_drag_start(2).clone()}
                             on_drop={on_drop(2).clone()}
@@ -135,7 +136,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct PartyTraitProps {
-    creature: Option<Creature>,
+    r#trait: Option<Trait>,
     empty_text: &'static str,
     on_drag_start: Callback<()>,
     on_drop: Callback<()>,
@@ -169,7 +170,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
         })
     };
 
-    if let Some(c) = &props.creature {
+    if let Some(c) = &props.r#trait {
         html! {
                 <>
                     <div
