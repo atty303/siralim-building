@@ -1,8 +1,7 @@
-use std::borrow::Borrow;
 use std::fmt::{Debug, Formatter};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use rust_embed::RustEmbed;
 use tantivy::directory::error::{DeleteError, OpenReadError, OpenWriteError};
@@ -30,6 +29,7 @@ impl TerminatingWrite for NullWriter {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Default)]
 pub struct EmbedDirectory<T: RustEmbed + Sync> {
     embed: T,
@@ -61,7 +61,7 @@ impl<T> Directory for EmbedDirectory<T>
 where
     T: RustEmbed + Sync + Send + Clone + 'static,
 {
-    fn get_file_handle(&self, path: &Path) -> Result<Arc<dyn FileHandle>, OpenReadError> {
+    fn get_file_handle(&self, _path: &Path) -> Result<Arc<dyn FileHandle>, OpenReadError> {
         todo!()
     }
 
@@ -72,7 +72,7 @@ where
         }
     }
 
-    fn delete(&self, path: &Path) -> Result<(), DeleteError> {
+    fn delete(&self, _path: &Path) -> Result<(), DeleteError> {
         Ok(())
     }
 
@@ -80,7 +80,7 @@ where
         Ok(<T as RustEmbed>::get(path.to_str().unwrap()).is_some())
     }
 
-    fn open_write(&self, path: &Path) -> Result<WritePtr, OpenWriteError> {
+    fn open_write(&self, _path: &Path) -> Result<WritePtr, OpenWriteError> {
         Ok(BufWriter::new(Box::new(NullWriter {})))
     }
 
@@ -91,7 +91,7 @@ where
             .to_vec())
     }
 
-    fn atomic_write(&self, path: &Path, data: &[u8]) -> std::io::Result<()> {
+    fn atomic_write(&self, _path: &Path, _data: &[u8]) -> std::io::Result<()> {
         Ok(())
     }
 

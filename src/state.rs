@@ -1,15 +1,15 @@
-use std::error::Error;
 use std::io::{Read, Write};
 use std::rc::Rc;
 
-use apache_avro::{AvroSchema, Schema};
+use apache_avro::AvroSchema;
 use base64::Engine;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use yew::prelude::*;
 
-use crate::member::Member;
 use data::r#trait::Trait;
-use data::{Creature, Data};
+use data::Data;
+
+use crate::member::Member;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct State {

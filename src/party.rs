@@ -1,6 +1,5 @@
 use crate::member::Member;
 use data::r#trait::Trait;
-use data::Creature;
 use std::ops::Deref;
 use yew::prelude::*;
 

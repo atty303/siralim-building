@@ -4,15 +4,9 @@ mod member;
 mod party;
 mod state;
 
-use crate::member::Member;
 use crate::party::{Party, PartySwapEvent};
 use crate::state::{Action, Save, State};
-use data::Creature;
-use implicit_clone::unsync::IString;
 use qstring::QString;
-use std::ops::Deref;
-use std::ptr::null;
-use tantivy::query::QueryParser;
 use yew::prelude::*;
 
 fn main() {
@@ -71,7 +65,6 @@ fn app(props: &AppProps) -> Html {
 
     let on_swap = {
         let state = state.clone();
-        let party = state.party.clone();
         Callback::from(move |e: PartySwapEvent| {
             log::debug!("on_swap: {:?}", e);
             state.dispatch(Action::Swap((
