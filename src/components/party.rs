@@ -32,6 +32,7 @@ pub struct PartyProps {
     pub party: Vec<Member>,
     pub on_swap: Callback<PartySwapEvent>,
     pub on_click: Callback<PartyTraitEvent>,
+    pub on_clear: Callback<PartyTraitEvent>,
 }
 
 #[function_component(Party)]
@@ -44,6 +45,12 @@ pub fn party(props: &PartyProps) -> Html {
                     let on_click = props.on_click.clone();
                     Callback::from(move |e: PartyTraitEvent| {
                         on_click.emit(e.clone());
+                    })
+                };
+                let on_clear = {
+                    let on_clear = props.on_clear.clone();
+                    Callback::from(move |e: PartyTraitEvent| {
+                        on_clear.emit(e.clone());
                     })
                 };
                 let on_drag_start = {
@@ -74,6 +81,7 @@ pub fn party(props: &PartyProps) -> Html {
                         position={i}
                         member={m.clone()}
                         on_click={on_click}
+                        on_clear={on_clear}
                         on_drag_start={on_drag_start}
                         on_drop={on_drop}
                     >
@@ -89,6 +97,7 @@ struct PartyMemberProps {
     position: usize,
     member: Member,
     on_click: Callback<PartyTraitEvent>,
+    on_clear: Callback<PartyTraitEvent>,
     on_drag_start: Callback<PartyTraitEvent>,
     on_drop: Callback<PartyTraitEvent>,
 }
@@ -101,6 +110,11 @@ fn party_member(props: &PartyMemberProps) -> Html {
         Callback::from(move |_| {
             on_click.emit(e.clone());
         })
+    };
+    let on_clear = |index: usize| {
+        let on_clear = props.on_clear.clone();
+        let e = PartyTraitEvent::new(props.position, index);
+        Callback::from(move |_| on_clear.emit(e.clone()))
     };
     let on_drag_start = |index: usize| {
         let on_drag_start = props.on_drag_start.clone();
@@ -129,6 +143,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                             r#trait={props.member.primary_trait.clone()}
                             empty_text={"Click to add primary trait"}
                             on_click={on_click(0).clone()}
+                            on_clear={on_clear(0).clone()}
                             on_drag_start={on_drag_start(0).clone()}
                             on_drop={on_drop(0).clone()}
                         />
@@ -138,6 +153,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                             r#trait={props.member.fused_trait.clone()}
                             empty_text={"Click to add fused trait"}
                             on_click={on_click(1).clone()}
+                            on_clear={on_clear(1).clone()}
                             on_drag_start={on_drag_start(1).clone()}
                             on_drop={on_drop(1).clone()}
                         />
@@ -147,6 +163,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                             r#trait={props.member.artifact_trait.clone()}
                             empty_text={"Click to add artifact trait"}
                             on_click={on_click(2).clone()}
+                            on_clear={on_clear(2).clone()}
                             on_drag_start={on_drag_start(2).clone()}
                             on_drop={on_drop(2).clone()}
                         />
@@ -162,6 +179,7 @@ pub struct PartyTraitProps {
     r#trait: Option<Trait>,
     empty_text: &'static str,
     on_click: Callback<()>,
+    on_clear: Callback<()>,
     on_drag_start: Callback<()>,
     on_drop: Callback<()>,
 }
@@ -173,6 +191,11 @@ fn party_trait(props: &PartyTraitProps) -> Html {
     let onclick = {
         let on_click = props.on_click.clone();
         Callback::from(move |_| on_click.emit(()))
+    };
+
+    let onclear = {
+        let on_clear = props.on_clear.clone();
+        Callback::from(move |_| on_clear.emit(()))
     };
 
     let ondragstart = {
@@ -226,7 +249,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                     </div>
                 </div>
                 <div class="clear">
-                    <button><Icon icon_id={IconId::BootstrapXLg} /></button>
+                    <button onclick={onclear}><Icon icon_id={IconId::BootstrapXLg} /></button>
                 </div>
             </>
         }

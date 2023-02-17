@@ -69,11 +69,13 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
                 <input type="text" onkeypress={onkeypress}/>
                 <span>{items.len()} {" items"}</span>
             </div>
-            <TraitTable
-                data={props.data.clone()}
-                items={(*items).clone()}
-                on_select={on_select}
-            />
+            <div class="table">
+                <TraitTable
+                    data={props.data.clone()}
+                    items={(*items).clone()}
+                    on_select={on_select}
+                />
+            </div>
         </Modal>
     }
 }

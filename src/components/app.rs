@@ -12,13 +12,24 @@ pub struct AppProps {
 
 #[function_component(App)]
 pub fn app(props: &AppProps) -> Html {
-    let show_traits_modal = use_state(|| true);
+    let show_modal = use_state(|| false);
+    use_effect_with_deps(
+        move |v| {
+            let class = if **v { "open-modal" } else { "" };
+            let document: web_sys::Document = web_sys::window().unwrap().document().unwrap();
+            let body = document.body().unwrap();
+            body.set_class_name(class);
+        },
+        show_modal.clone(),
+    );
+
+    let show_traits_modal = use_state(|| false);
+
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
 
     let qs = QString::from(location.search().unwrap().as_str());
     let loaded_state = if let Some(s) = qs.get("s") {
-        log::debug!("save: {:?}", s);
         let maybe_save = Save::from_string(&String::from(s));
         if let Ok(save) = maybe_save {
             Some(save.as_state(&props.data))
@@ -51,10 +62,18 @@ pub fn app(props: &AppProps) -> Html {
     let clicked_member = use_state(|| None);
     let on_member_click = {
         let clicked_member = clicked_member.clone();
+        let show_modal = show_modal.clone();
         let show_traits_modal = show_traits_modal.clone();
         Callback::from(move |e: PartyTraitEvent| {
             clicked_member.set(Some(e));
+            show_modal.set(true);
             show_traits_modal.set(true);
+        })
+    };
+    let on_member_clear = {
+        let state = state.clone();
+        Callback::from(move |e: PartyTraitEvent| {
+            state.dispatch(Action::Clear((e.position, e.index)));
         })
     };
 
@@ -71,24 +90,21 @@ pub fn app(props: &AppProps) -> Html {
         })
     };
 
-    let open_traits_modal = {
-        let show_traits_modal = show_traits_modal.clone();
-        Callback::from(move |_| {
-            show_traits_modal.set(true);
-        })
-    };
-
     let on_close_traits_modal = {
+        let show_modal = show_modal.clone();
         let show_traits_modal = show_traits_modal.clone();
         Callback::from(move |_| {
+            show_modal.set(false);
             show_traits_modal.set(false);
         })
     };
     let on_select_trait = {
+        let show_modal = show_modal.clone();
         let show_traits_modal = show_traits_modal.clone();
         let clicked_member = clicked_member.clone();
         let state = state.clone();
         Callback::from(move |e: TraitSelectEvent| {
+            show_modal.set(false);
             show_traits_modal.set(false);
             if let Some(t) = clicked_member.as_ref() {
                 state.dispatch(Action::Set((t.position, t.index, e.r#trait)));
@@ -98,11 +114,11 @@ pub fn app(props: &AppProps) -> Html {
 
     html! {
         <div>
-            <button onclick={open_traits_modal}>{"open"}</button>
             <Party
                 party={state.party.clone()}
                 on_swap={on_swap}
                 on_click={on_member_click}
+                on_clear={on_member_clear}
             />
             <TraitsModal
                 data={props.data.clone()}
@@ -113,11 +129,3 @@ pub fn app(props: &AppProps) -> Html {
         </div>
     }
 }
-
-//         CreatureModal {
-//             items: &cx.props.creatures,
-//             show: **show_creatures_modal,
-//             on_select: move |_| {
-//                 show_creatures_modal.set(false);
-//             }
-//         }

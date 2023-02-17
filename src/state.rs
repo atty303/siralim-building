@@ -81,6 +81,7 @@ impl State {
 
 pub enum Action {
     Set((usize, usize, Trait)),
+    Clear((usize, usize)),
     Swap((usize, usize, usize, usize)),
 }
 
@@ -92,6 +93,13 @@ impl Reducible for State {
             Action::Set((position, index, r#trait)) => {
                 let mut member = self.party.get(position).unwrap().clone();
                 member.set_creature(index, &Some(r#trait));
+                let mut p = self.party.to_vec();
+                p[position] = member;
+                State { party: p }.into()
+            }
+            Action::Clear((position, index)) => {
+                let mut member = self.party.get(position).unwrap().clone();
+                member.set_creature(index, &None);
                 let mut p = self.party.to_vec();
                 p[position] = member;
                 State { party: p }.into()
