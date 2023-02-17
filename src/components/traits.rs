@@ -23,7 +23,7 @@ pub struct TraitsModalProps {
 
 #[function_component(TraitsModal)]
 pub fn traits_modal(props: &TraitsModalProps) -> Html {
-    let query = use_state(|| IString::from(""));
+    let query = use_state(|| IString::from("class:death"));
 
     let on_cancel = {
         let on_cancel = props.on_cancel.clone();
@@ -47,9 +47,10 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
     html! {
         <Modal
             show={props.show}
+            class={classes!("trait")}
             on_request_close={on_cancel}
         >
-            <input onkeypress={onkeypress}/>
+            <input type="text" onkeypress={onkeypress}/>
             <TraitTable
                 data={props.data.clone()}
                 on_select={on_select}
