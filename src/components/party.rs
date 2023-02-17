@@ -1,8 +1,12 @@
-use crate::state::Member;
-use data::r#trait::Trait;
 use std::ops::Deref;
+
 use yew::prelude::*;
 use yew_icons::{Icon, IconId};
+
+use data::r#trait::Trait;
+
+use crate::components::icon::ClassIcon;
+use crate::state::Member;
 
 #[derive(Debug)]
 pub struct PartySwapEvent {
@@ -183,7 +187,10 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                     ondrop={ondrop}
                 >
                     <div class="creature">
-                        <span>{c.creature.as_str()}</span>
+                        <span>
+                            <ClassIcon value={c.class.clone()} />
+                            {c.creature.as_str()}
+                        </span>
                     </div>
                     <div class="trait-name">
                         <span>{c.trait_name.as_str()}</span>
