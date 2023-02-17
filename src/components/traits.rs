@@ -24,6 +24,21 @@ pub struct TraitsModalProps {
 #[function_component(TraitsModal)]
 pub fn traits_modal(props: &TraitsModalProps) -> Html {
     let query = use_state(|| IString::from("class:death"));
+    let items = use_state(|| Vec::<Trait>::new());
+
+    {
+        let data = props.data.clone();
+        let items = items.clone();
+        use_effect_with_deps(
+            move |query| {
+                if let Ok(xs) = data.search_trait(query.as_str()) {
+                    items.set(xs);
+                }
+                || ()
+            },
+            query.clone(),
+        );
+    }
 
     let on_cancel = {
         let on_cancel = props.on_cancel.clone();
@@ -53,8 +68,8 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
             <input type="text" onkeypress={onkeypress}/>
             <TraitTable
                 data={props.data.clone()}
+                items={(*items).clone()}
                 on_select={on_select}
-                query={(*query).clone()}
             />
         </Modal>
     }
@@ -63,28 +78,12 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
 #[derive(Properties, PartialEq)]
 struct TraitTableProps {
     data: Data,
-    query: IString,
+    items: Vec<Trait>,
     on_select: Callback<TraitSelectEvent>,
 }
 
 #[function_component(TraitTable)]
 fn trait_table(props: &TraitTableProps) -> Html {
-    let items = use_state(|| Vec::<Trait>::new());
-
-    {
-        let data = props.data.clone();
-        let items = items.clone();
-        use_effect_with_deps(
-            move |query| {
-                if let Ok(xs) = data.search_trait(query.as_str()) {
-                    items.set(xs);
-                }
-                || ()
-            },
-            props.query.clone(),
-        );
-    }
-
     let on_click = |t: Trait| {
         let on_select = props.on_select.clone();
         let e = TraitSelectEvent { r#trait: t };
@@ -109,7 +108,7 @@ fn trait_table(props: &TraitTableProps) -> Html {
                 </tr>
             </thead>
             <tbody>
-                {items.iter().map(|c| html! {
+                {props.items.iter().map(|c| html! {
                     <tr onclick={on_click(c.clone()).clone()}>
                         <td class="class">
                             <ClassIcon value={c.class.clone()} />

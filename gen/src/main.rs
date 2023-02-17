@@ -39,7 +39,7 @@ impl CompendiumTraitRecord {
             "trait_description",
             "material_name",
         ]));
-        return reader.deserialize().skip(2).map(|r| r.unwrap()).collect();
+        return reader.deserialize().skip(3).map(|r| r.unwrap()).collect();
     }
 
     fn default_hash(&self) -> u64 {
@@ -110,7 +110,7 @@ fn gen_traits() {
         if !hash_set.insert(hash) {
             panic!("hash collided at {}", i);
         }
-        println!("{}: {}", i, hash);
+        println!("{}: {} {:?}", i, hash, r);
 
         let mut doc = Document::default();
         doc.add_i64(schema.id(), hash as i64);
