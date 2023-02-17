@@ -16,13 +16,13 @@ jobs:
       - name: Setup Pages
         id: setup-pages
         uses: actions/configure-pages@v3
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.2.0
       - name: Rustup
         run: |
           rustup set auto-self-update disable
           rustup toolchain install stable --profile minimal
           rustup target add wasm32-unknown-unknown
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.2.0
       - name: Cargo install
         run: |
           cargo install trunk
