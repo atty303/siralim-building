@@ -1,7 +1,0 @@
-[build]
-target = "index.html"
-dist = "dist"
-
-[[hooks]]
-stage = "build"
-command = "./tailwind-build.bat"
