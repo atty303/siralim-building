@@ -2,6 +2,7 @@ use crate::state::Member;
 use data::r#trait::Trait;
 use std::ops::Deref;
 use yew::prelude::*;
+use yew_icons::{Icon, IconId};
 
 #[derive(Debug)]
 pub struct PartySwapEvent {
@@ -171,32 +172,31 @@ fn party_trait(props: &PartyTraitProps) -> Html {
 
     if let Some(c) = &props.r#trait {
         html! {
-                <>
-                    <div
-                        class="trait non-empty"
-                        style={format!("opacity: {}", opacity.deref())}
-                        draggable="true"
-                        ondragstart={ondragstart}
-                        ondragend={ondragend}
-                        ondragover={ondragover}
-                        ondrop={ondrop}
-                    >
-                        <div class="creature">
-                            <span>{c.creature.as_str()}</span>
-                        </div>
-                        <div class="trait-name">
-                            <span>{c.trait_name.as_str()}</span>
-                        </div>
-                        <div class="trait-description">
-                            <span>{c.trait_description.as_str()}</span>
-                        </div>
+            <>
+                <div
+                    class="trait non-empty"
+                    style={format!("opacity: {}", opacity.deref())}
+                    draggable="true"
+                    ondragstart={ondragstart}
+                    ondragend={ondragend}
+                    ondragover={ondragover}
+                    ondrop={ondrop}
+                >
+                    <div class="creature">
+                        <span>{c.creature.as_str()}</span>
                     </div>
-                    <div class="clear">
-        //                     Icon { width: 24, height: 24, icon: bs_icons::BsXLg }
-                        <button></button>
+                    <div class="trait-name">
+                        <span>{c.trait_name.as_str()}</span>
                     </div>
-                </>
-            }
+                    <div class="trait-description">
+                        <span>{c.trait_description.as_str()}</span>
+                    </div>
+                </div>
+                <div class="clear">
+                    <button><Icon icon_id={IconId::BootstrapXLg} /></button>
+                </div>
+            </>
+        }
     } else {
         html! {
             <>
