@@ -21,11 +21,11 @@ jobs:
           rustup set auto-self-update disable
           rustup toolchain install stable --profile minimal
           rustup target add wasm32-unknown-unknown
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2.2.0
       - name: Cargo install
         run: |
           cargo install trunk
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2.2.0
       - name: Build
         run: trunk build --public-url ${{ steps.setup-pages.outputs.base_path }}
       - name: Upload artifact
