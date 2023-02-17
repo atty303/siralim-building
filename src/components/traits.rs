@@ -1,3 +1,5 @@
+use implicit_clone::unsync::IString;
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 use data::r#trait::Trait;
@@ -21,6 +23,8 @@ pub struct TraitsModalProps {
 
 #[function_component(TraitsModal)]
 pub fn traits_modal(props: &TraitsModalProps) -> Html {
+    let query = use_state(|| IString::from(""));
+
     let on_cancel = {
         let on_cancel = props.on_cancel.clone();
         Callback::from(move |_| on_cancel.emit(()))
@@ -29,30 +33,56 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
         let on_select = props.on_select.clone();
         Callback::from(move |e| on_select.emit(e))
     };
+    let onkeypress = {
+        let query = query.clone();
+        Callback::from(move |e: KeyboardEvent| {
+            if e.key() == "Enter" {
+                let input: HtmlInputElement = e.target_unchecked_into();
+                let value = input.value();
+                query.set(IString::from(value));
+            }
+        })
+    };
 
     html! {
         <Modal
             show={props.show}
             on_request_close={on_cancel}
         >
-            <input/>
+            <input onkeypress={onkeypress}/>
             <TraitTable
                 data={props.data.clone()}
                 on_select={on_select}
+                query={(*query).clone()}
             />
         </Modal>
     }
 }
 
 #[derive(Properties, PartialEq)]
-pub struct TraitTableProps {
+struct TraitTableProps {
     data: Data,
+    query: IString,
     on_select: Callback<TraitSelectEvent>,
 }
 
 #[function_component(TraitTable)]
-pub fn trait_table(props: &TraitTableProps) -> Html {
+fn trait_table(props: &TraitTableProps) -> Html {
     let items = use_state(|| Vec::<Trait>::new());
+
+    {
+        let data = props.data.clone();
+        let items = items.clone();
+        use_effect_with_deps(
+            move |query| {
+                if let Ok(xs) = data.search_trait(query.as_str()) {
+                    items.set(xs);
+                }
+                || ()
+            },
+            props.query.clone(),
+        );
+    }
 
     let on_click = |t: Trait| {
         let on_select = props.on_select.clone();

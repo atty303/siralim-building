@@ -4,36 +4,14 @@ extern crate tantivy;
 
 use std::io::ErrorKind;
 
-use serde::Deserialize;
-use tantivy::collector::DocSetCollector;
-use tantivy::query::TermQuery;
+use tantivy::collector::{DocSetCollector, TopDocs};
+use tantivy::query::{QueryParser, TermQuery};
 use tantivy::schema::IndexRecordOption;
 use tantivy::{Index, Term};
 
 use r#trait::{Trait, TraitSchema};
 
 pub mod r#trait;
-
-#[derive(PartialEq, Eq, Clone, Debug, Deserialize)]
-pub struct Creature {
-    pub class: String,
-    pub family: String,
-    pub creature: String,
-    pub trait_name: String,
-    pub trait_description: String,
-    pub material_name: String,
-    pub stats: Option<CreatureStats>,
-    pub uid: String,
-}
-
-#[derive(PartialEq, Eq, Clone, Debug, Deserialize)]
-pub struct CreatureStats {
-    pub health: i32,
-    pub attack: i32,
-    pub intelligence: i32,
-    pub defense: i32,
-    pub speed: i32,
-}
 
 #[derive(Debug, Clone)]
 pub struct Data {
@@ -68,5 +46,19 @@ impl Data {
         } else {
             Err(std::io::Error::from(ErrorKind::NotFound))?
         }
+    }
+
+    pub fn search_trait(&self, qs: &str) -> anyhow::Result<Vec<Trait>> {
+        let searcher = self.traits_index.reader()?.searcher();
+        let schema = TraitSchema::from(self.traits_index.schema());
+        let query_parser = QueryParser::for_index(&self.traits_index, vec![schema.description()]);
+        let query = query_parser.parse_query(qs)?;
+        let docs = searcher.search(&query, &TopDocs::with_limit(10_000))?;
+        docs.into_iter()
+            .map(|(_score, address)| {
+                let doc = searcher.doc(address)?;
+                Ok(schema.to_struct(&doc))
+            })
+            .collect()
     }
 }
