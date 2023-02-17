@@ -34,12 +34,25 @@ impl State {
                     fused_trait: None,
                     artifact_trait: None,
                 },
+                Member {
+                    primary_trait: None,
+                    fused_trait: None,
+                    artifact_trait: None,
+                },
+                Member {
+                    primary_trait: None,
+                    fused_trait: None,
+                    artifact_trait: None,
+                },
+                Member {
+                    primary_trait: None,
+                    fused_trait: None,
+                    artifact_trait: None,
+                },
             ],
         }
     }
 }
-
-impl State {}
 
 pub enum Action {
     Swap((usize, usize, usize, usize)),
