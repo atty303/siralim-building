@@ -69,7 +69,7 @@ input[type=text]
 
   .left-pane
     width: 200px
-    border-right: 1px solid #ccc
+    border-right: 1px solid $outline
 
   .right-pane
     flex-grow: 1
@@ -84,11 +84,11 @@ input[type=text]
       li
         display: flex
         //height: 4rem
-        border-bottom: 1px solid #ccc
+        border-bottom: 1px solid $outline
 
         .trait
           flex-grow: 1
-          border-right: 1px solid #ccc
+          border-right: 1px solid $outline
 
         .trait.non-empty
           display: flex
@@ -101,7 +101,8 @@ input[type=text]
               margin: 15px
               //line-height: calc(4rem - 40px)
               padding: 5px
-              background: #eee
+              background: $surface-variant
+              color: $on-surface-variant
               > img
                 margin-right: 4px
           .trait-name
