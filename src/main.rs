@@ -3,7 +3,6 @@ use crate::components::app::{App, AppProps};
 mod components;
 mod embed_data;
 mod embed_directory;
-mod member;
 mod save;
 mod state;
 

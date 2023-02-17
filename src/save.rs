@@ -7,8 +7,7 @@ use serde::{Deserialize, Serialize};
 use data::r#trait::Trait;
 use data::Data;
 
-use crate::member::Member;
-use crate::state::State;
+use crate::state::{Member, State};
 
 #[derive(Serialize, Deserialize, AvroSchema, Debug)]
 pub struct Save {

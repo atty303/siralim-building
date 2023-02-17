@@ -1,4 +1,4 @@
-use crate::member::Member;
+use crate::state::Member;
 use data::r#trait::Trait;
 use std::ops::Deref;
 use yew::prelude::*;
