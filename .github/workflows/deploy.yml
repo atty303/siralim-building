@@ -27,7 +27,7 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2.2.0
       - name: Build
-        run: trunk build --public-url ${{ st1eps.setup-pages.outputs.base_path }}
+        run: trunk build --public-url ${{ steps.setup-pages.outputs.base_path }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
