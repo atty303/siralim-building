@@ -1,7 +1,11 @@
+$primary: #D0BCFF
+$on-primary: #381E72
 $primary-container: #4F378B
 $on-primary-container: #EADDFF
 $secondary-container: #4A4458
 $on-secondary-container: #E8DEF8
+$error-container: #8C1D18
+$on-error-container: #F9DEDC
 $background: #1C1B1F
 $on-background: #E6E1E5
 $surface: #1C1B1F
@@ -23,6 +27,7 @@ input[type=text]
   background: inherit
   color: inherit
   padding: 5px
+  border-radius: 5px
 
 // -----
 .modal-overlay
@@ -127,8 +132,8 @@ input[type=text]
             cursor: pointer
 
           button:hover
-            background: red
-            color: white
+            background: $error-container
+            color: $on-error-container
 
 table.trait
   max-height: 100%
@@ -143,7 +148,12 @@ table.trait
     color: $on-surface
     max-height: 100%
     overflow-y: scroll
+    tr
+      cursor: pointer
     tr:nth-child(2n)
       background: #313033
+    tr:hover
+      background: $primary
+      color: $on-primary
     td.class
       white-space: nowrap

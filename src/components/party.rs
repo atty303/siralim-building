@@ -17,13 +17,13 @@ pub struct PartySwapEvent {
 }
 
 #[derive(PartialEq, Clone, Debug)]
-struct PartyDragEvent {
-    position: usize,
-    index: usize,
+pub struct PartyTraitEvent {
+    pub position: usize,
+    pub index: usize,
 }
-impl PartyDragEvent {
-    fn new(position: usize, index: usize) -> PartyDragEvent {
-        PartyDragEvent { position, index }
+impl PartyTraitEvent {
+    fn new(position: usize, index: usize) -> PartyTraitEvent {
+        PartyTraitEvent { position, index }
     }
 }
 
@@ -31,17 +31,24 @@ impl PartyDragEvent {
 pub struct PartyProps {
     pub party: Vec<Member>,
     pub on_swap: Callback<PartySwapEvent>,
+    pub on_click: Callback<PartyTraitEvent>,
 }
 
 #[function_component(Party)]
 pub fn party(props: &PartyProps) -> Html {
-    let dragging: UseStateHandle<Option<PartyDragEvent>> = use_state(|| None);
+    let dragging: UseStateHandle<Option<PartyTraitEvent>> = use_state(|| None);
     html! {
         <div class="party">
             {props.party.iter().enumerate().map(|(i, m)| {
+                let on_click = {
+                    let on_click = props.on_click.clone();
+                    Callback::from(move |e: PartyTraitEvent| {
+                        on_click.emit(e.clone());
+                    })
+                };
                 let on_drag_start = {
                     let dragging = dragging.clone();
-                    Callback::from(move |e: PartyDragEvent| {
+                    Callback::from(move |e: PartyTraitEvent| {
                         log::debug!("dragstart: {:?}", e);
                         dragging.set(Some(e));
                     })
@@ -49,7 +56,7 @@ pub fn party(props: &PartyProps) -> Html {
                 let on_drop = {
                     let dragging = dragging.clone();
                     let on_swap = props.on_swap.clone();
-                    Callback::from(move |e: PartyDragEvent| {
+                    Callback::from(move |e: PartyTraitEvent| {
                         log::debug!("drop: {:?}", e);
                         if let Some(a) = dragging.as_ref() {
                             on_swap.emit(PartySwapEvent {
@@ -66,6 +73,7 @@ pub fn party(props: &PartyProps) -> Html {
                     <PartyMember
                         position={i}
                         member={m.clone()}
+                        on_click={on_click}
                         on_drag_start={on_drag_start}
                         on_drop={on_drop}
                     >
@@ -80,15 +88,23 @@ pub fn party(props: &PartyProps) -> Html {
 struct PartyMemberProps {
     position: usize,
     member: Member,
-    on_drag_start: Callback<PartyDragEvent>,
-    on_drop: Callback<PartyDragEvent>,
+    on_click: Callback<PartyTraitEvent>,
+    on_drag_start: Callback<PartyTraitEvent>,
+    on_drop: Callback<PartyTraitEvent>,
 }
 
 #[function_component(PartyMember)]
 fn party_member(props: &PartyMemberProps) -> Html {
+    let on_click = |index: usize| {
+        let on_click = props.on_click.clone();
+        let e = PartyTraitEvent::new(props.position, index);
+        Callback::from(move |_| {
+            on_click.emit(e.clone());
+        })
+    };
     let on_drag_start = |index: usize| {
         let on_drag_start = props.on_drag_start.clone();
-        let e = PartyDragEvent::new(props.position, index);
+        let e = PartyTraitEvent::new(props.position, index);
         Callback::from(move |_| {
             log::debug!("ondragstart");
             on_drag_start.emit(e.clone());
@@ -96,7 +112,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
     };
     let on_drop = |index: usize| {
         let on_drop = props.on_drop.clone();
-        let e = PartyDragEvent::new(props.position, index);
+        let e = PartyTraitEvent::new(props.position, index);
         Callback::from(move |_| {
             log::debug!("ondrop");
             on_drop.emit(e.clone());
@@ -112,6 +128,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         <PartyTrait
                             r#trait={props.member.primary_trait.clone()}
                             empty_text={"Click to add primary trait"}
+                            on_click={on_click(0).clone()}
                             on_drag_start={on_drag_start(0).clone()}
                             on_drop={on_drop(0).clone()}
                         />
@@ -120,6 +137,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         <PartyTrait
                             r#trait={props.member.fused_trait.clone()}
                             empty_text={"Click to add fused trait"}
+                            on_click={on_click(1).clone()}
                             on_drag_start={on_drag_start(1).clone()}
                             on_drop={on_drop(1).clone()}
                         />
@@ -128,6 +146,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         <PartyTrait
                             r#trait={props.member.artifact_trait.clone()}
                             empty_text={"Click to add artifact trait"}
+                            on_click={on_click(2).clone()}
                             on_drag_start={on_drag_start(2).clone()}
                             on_drop={on_drop(2).clone()}
                         />
@@ -142,6 +161,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
 pub struct PartyTraitProps {
     r#trait: Option<Trait>,
     empty_text: &'static str,
+    on_click: Callback<()>,
     on_drag_start: Callback<()>,
     on_drop: Callback<()>,
 }
@@ -149,6 +169,11 @@ pub struct PartyTraitProps {
 #[function_component(PartyTrait)]
 fn party_trait(props: &PartyTraitProps) -> Html {
     let opacity = use_state(|| 1.0);
+
+    let onclick = {
+        let on_click = props.on_click.clone();
+        Callback::from(move |_| on_click.emit(()))
+    };
 
     let ondragstart = {
         let on_drag_start = props.on_drag_start.clone();
@@ -181,6 +206,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                     class="trait non-empty"
                     style={format!("opacity: {}", opacity.deref())}
                     draggable="true"
+                    onclick={onclick}
                     ondragstart={ondragstart}
                     ondragend={ondragend}
                     ondragover={ondragover}
@@ -207,9 +233,11 @@ fn party_trait(props: &PartyTraitProps) -> Html {
     } else {
         html! {
             <>
-                <div class="trait empty"
-                     ondragover={ondragover}
-                     ondrop={ondrop}
+                <div
+                    class="trait empty"
+                    onclick={onclick}
+                    ondragover={ondragover}
+                    ondrop={ondrop}
                 >
                     {props.empty_text}
                 </div>

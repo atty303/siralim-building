@@ -80,6 +80,7 @@ impl State {
 }
 
 pub enum Action {
+    Set((usize, usize, Trait)),
     Swap((usize, usize, usize, usize)),
 }
 
@@ -88,6 +89,13 @@ impl Reducible for State {
 
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
         match action {
+            Action::Set((position, index, r#trait)) => {
+                let mut member = self.party.get(position).unwrap().clone();
+                member.set_creature(index, &Some(r#trait));
+                let mut p = self.party.to_vec();
+                p[position] = member;
+                State { party: p }.into()
+            }
             Action::Swap((from_position, from_index, to_position, to_index)) => {
                 if from_position == to_position {
                     let member = self.party.get(from_position).unwrap().clone();

@@ -1,5 +1,5 @@
-use crate::components::party::{Party, PartySwapEvent};
-use crate::components::traits::TraitsModal;
+use crate::components::party::{Party, PartySwapEvent, PartyTraitEvent};
+use crate::components::traits::{TraitSelectEvent, TraitsModal};
 use crate::save::Save;
 use crate::state::{Action, State};
 use qstring::QString;
@@ -48,6 +48,16 @@ pub fn app(props: &AppProps) -> Html {
         state.clone(),
     );
 
+    let clicked_member = use_state(|| None);
+    let on_member_click = {
+        let clicked_member = clicked_member.clone();
+        let show_traits_modal = show_traits_modal.clone();
+        Callback::from(move |e: PartyTraitEvent| {
+            clicked_member.set(Some(e));
+            show_traits_modal.set(true);
+        })
+    };
+
     let on_swap = {
         let state = state.clone();
         Callback::from(move |e: PartySwapEvent| {
@@ -76,8 +86,13 @@ pub fn app(props: &AppProps) -> Html {
     };
     let on_select_trait = {
         let show_traits_modal = show_traits_modal.clone();
-        Callback::from(move |_| {
+        let clicked_member = clicked_member.clone();
+        let state = state.clone();
+        Callback::from(move |e: TraitSelectEvent| {
             show_traits_modal.set(false);
+            if let Some(t) = clicked_member.as_ref() {
+                state.dispatch(Action::Set((t.position, t.index, e.r#trait)));
+            }
         })
     };
 
@@ -87,6 +102,7 @@ pub fn app(props: &AppProps) -> Html {
             <Party
                 party={state.party.clone()}
                 on_swap={on_swap}
+                on_click={on_member_click}
             />
             <TraitsModal
                 data={props.data.clone()}

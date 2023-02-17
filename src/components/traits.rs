@@ -66,6 +66,7 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
             on_request_close={on_cancel}
         >
             <input type="text" onkeypress={onkeypress}/>
+            <span>{items.len()} {" items"}</span>
             <TraitTable
                 data={props.data.clone()}
                 items={(*items).clone()}
