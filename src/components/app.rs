@@ -51,7 +51,7 @@ pub fn app(props: &AppProps) -> Html {
                 .replace_state_with_url(
                     &wasm_bindgen::JsValue::null(),
                     "",
-                    Some(format!("/?s={}", save_string).as_str()),
+                    Some(format!("{}?s={}", location.pathname().unwrap(), save_string).as_str()),
                 )
                 .unwrap();
             || ()
