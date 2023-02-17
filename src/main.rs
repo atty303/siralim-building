@@ -2,10 +2,12 @@ mod components;
 mod embed_data;
 mod embed_directory;
 mod member;
+mod save;
 mod state;
 
 use crate::components::party::{Party, PartySwapEvent};
-use crate::state::{Action, Save, State};
+use crate::save::Save;
+use crate::state::{Action, State};
 use qstring::QString;
 use yew::prelude::*;
 
@@ -34,9 +36,9 @@ fn app(props: &AppProps) -> Html {
     let qs = QString::from(location.search().unwrap().as_str());
     let loaded_state = if let Some(s) = qs.get("s") {
         log::debug!("save: {:?}", s);
-        let maybe_save = Save::from(&String::from(s));
+        let maybe_save = Save::from_string(&String::from(s));
         if let Ok(save) = maybe_save {
-            Some(State::from(&save, &props.data))
+            Some(save.as_state(&props.data))
         } else {
             log::warn!("failed to load save: {:?}", maybe_save);
             None
@@ -50,7 +52,7 @@ fn app(props: &AppProps) -> Html {
 
     use_effect_with_deps(
         move |state| {
-            let save_string = state.as_save().as_string();
+            let save_string = Save::from_state(state).as_string();
             history
                 .replace_state_with_url(
                     &wasm_bindgen::JsValue::null(),
