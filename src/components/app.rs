@@ -1,9 +1,12 @@
+use std::rc::Rc;
+
+use qstring::QString;
+use yew::prelude::*;
+
 use crate::components::party::{Party, PartySwapEvent, PartyTraitEvent};
 use crate::components::traits::{TraitSelectEvent, TraitsModal};
 use crate::save::Save;
 use crate::state::{Action, State};
-use qstring::QString;
-use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct AppProps {
@@ -112,8 +115,10 @@ pub fn app(props: &AppProps) -> Html {
         })
     };
 
+    let data = use_memo(|_| props.data.clone(), ());
+
     html! {
-        <div>
+        <ContextProvider<Rc<data::Data>> context={data}>
             <Party
                 party={state.party.clone()}
                 on_swap={on_swap}
@@ -126,6 +131,6 @@ pub fn app(props: &AppProps) -> Html {
                 on_cancel={on_close_traits_modal}
                 on_select={on_select_trait}
             />
-        </div>
+        </ContextProvider<Rc<data::Data>>>
     }
 }

@@ -5,6 +5,7 @@ use yew::prelude::*;
 use data::r#trait::Trait;
 use data::Data;
 
+use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
 use crate::components::modal::Modal;
 
@@ -122,7 +123,9 @@ fn trait_table(props: &TraitTableProps) -> Html {
                         <td class="family">{c.family.clone()}</td>
                         <td class="creature">{c.creature.clone()}</td>
                         <td class="trait">{c.trait_name.clone()}</td>
-                        <td class="trait_description">{c.trait_description.clone()}</td>
+                        <td class="trait_description">
+                            <Description value={c.trait_description.clone()} />
+                        </td>
                         <td class="stat health"><CreatureStat value={c.stats.as_ref().map(|s| s.health)} /></td>
                         <td class="stat attack"><CreatureStat value={c.stats.as_ref().map(|s| s.attack)} /></td>
                         <td class="stat intelligence"><CreatureStat value={c.stats.as_ref().map(|s| s.intelligence)} /></td>

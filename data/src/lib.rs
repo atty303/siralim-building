@@ -22,24 +22,25 @@ pub mod r#trait;
 #[derive(Debug, Clone)]
 pub struct Data {
     traits_index: Index,
-    effects: Vec<Effect>,
+    pub effects: HashMap<IString, Effect>,
 }
 
 impl PartialEq for Data {
     fn eq(&self, other: &Self) -> bool {
         self.traits_index.schema() == other.traits_index.schema()
+        //&& self.effects. == other.effects
     }
 }
 
 impl Data {
     pub fn from(traits_index: Index, effects: Vec<Effect>) -> Data {
-        let a = effects
+        let map = effects
             .iter()
-            .map(|e| (e.name.clone(), e))
+            .map(|e| (e.name.clone(), e.clone()))
             .collect::<HashMap<_, _>>();
         Self {
             traits_index,
-            effects,
+            effects: map,
         }
     }
     pub fn traits_index(&self) -> Index {
