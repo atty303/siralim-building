@@ -367,6 +367,7 @@ name = "data"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "apache-avro",
  "implicit-clone",
  "serde",
  "tantivy",
@@ -574,6 +575,7 @@ dependencies = [
 name = "gen"
 version = "0.1.0"
 dependencies = [
+ "apache-avro",
  "csv",
  "data",
  "reqwest",

@@ -10,7 +10,7 @@ pub struct Trait {
     pub family: IString,
     pub creature: IString,
     pub trait_name: IString,
-    pub trait_description: IString,
+    pub trait_description: Vec<IString>,
     pub material_name: IString,
     pub sources: Vec<IString>,
     pub stats: Option<Stats>,
@@ -111,6 +111,12 @@ impl TraitSchema {
         IString::from(Rc::from(doc.get_first(field).unwrap().as_text().unwrap()))
     }
 
+    fn get_text_all(doc: &Document, field: Field) -> Vec<IString> {
+        doc.get_all(field)
+            .map(|t| IString::from(Rc::from(t.as_text().unwrap())))
+            .collect()
+    }
+
     pub fn to_struct(&self, doc: &Document) -> Trait {
         let stats = if let Some(health) = doc.get_first(self.health()).map(|v| v.as_u64().unwrap())
         {
@@ -134,12 +140,9 @@ impl TraitSchema {
             family: TraitSchema::get_text(doc, self.family()),
             creature: TraitSchema::get_text(doc, self.creature()),
             trait_name: TraitSchema::get_text(doc, self.name()),
-            trait_description: TraitSchema::get_text(doc, self.description()),
+            trait_description: TraitSchema::get_text_all(doc, self.description()),
             material_name: TraitSchema::get_text(doc, self.material()),
-            sources: doc
-                .get_all(self.sources())
-                .map(|t| IString::from(Rc::from(t.as_text().unwrap())))
-                .collect(),
+            sources: TraitSchema::get_text_all(doc, self.sources()),
             stats,
         }
     }

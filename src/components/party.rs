@@ -5,6 +5,7 @@ use yew_icons::{Icon, IconId};
 
 use data::r#trait::Trait;
 
+use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
 use crate::state::Member;
 
@@ -169,6 +170,9 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         />
                     </li>
                 </ul>
+                <ul>
+                    <li>{"Spell"}</li>
+                </ul>
             </div>
         </div>
     }
@@ -245,7 +249,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                         <span>{c.trait_name.as_str()}</span>
                     </div>
                     <div class="trait-description">
-                        <span>{c.trait_description.as_str()}</span>
+                        <Description value={c.trait_description.to_vec()} />
                     </div>
                 </div>
                 <div class="clear">

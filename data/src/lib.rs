@@ -1,21 +1,28 @@
+extern crate apache_avro;
 extern crate implicit_clone;
 extern crate serde;
 extern crate tantivy;
 
+use std::collections::HashMap;
 use std::io::ErrorKind;
+use std::iter::FromIterator;
 
+use implicit_clone::unsync::IString;
 use tantivy::collector::{DocSetCollector, TopDocs};
 use tantivy::query::{QueryParser, TermQuery};
 use tantivy::schema::IndexRecordOption;
 use tantivy::{Index, Term};
 
+use effect::Effect;
 use r#trait::{Trait, TraitSchema};
 
+pub mod effect;
 pub mod r#trait;
 
 #[derive(Debug, Clone)]
 pub struct Data {
     traits_index: Index,
+    effects: Vec<Effect>,
 }
 
 impl PartialEq for Data {
@@ -25,8 +32,15 @@ impl PartialEq for Data {
 }
 
 impl Data {
-    pub fn from(traits_index: Index) -> Data {
-        Self { traits_index }
+    pub fn from(traits_index: Index, effects: Vec<Effect>) -> Data {
+        let a = effects
+            .iter()
+            .map(|e| (e.name.clone(), e))
+            .collect::<HashMap<_, _>>();
+        Self {
+            traits_index,
+            effects,
+        }
     }
     pub fn traits_index(&self) -> Index {
         self.traits_index.clone()

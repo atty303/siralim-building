@@ -1,3 +1,4 @@
+extern crate apache_avro;
 extern crate csv;
 extern crate data;
 extern crate serde;
@@ -8,10 +9,12 @@ use std::hash::Hash;
 use std::hash::Hasher;
 use std::path::Path;
 
+use apache_avro::AvroSchema;
 use csv::StringRecord;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tantivy::{doc, Document, Index};
 
+use data::effect::EffectAvro;
 use data::r#trait;
 
 #[derive(Debug, Deserialize)]
@@ -55,11 +58,6 @@ impl Hash for CompendiumTraitRecord {
             "{}:{}:{}:{}:{}",
             self.class, self.family, self.creature, self.trait_name, self.material_name
         );
-        // self.class.as_str().hash(state);
-        // self.family.as_str().hash(state);
-        // self.creature.as_str().hash(state);
-        // self.trait_name.as_str().hash(state);
-        // self.material_name.as_str().hash(state);
         t.hash(state)
     }
 }
@@ -90,9 +88,28 @@ impl ApiCreatureRecord {
     }
 }
 
+fn load_effects() -> Vec<EffectAvro> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("siralim-ultimate-api/app/data/status_effects.csv")
+        .unwrap();
+    return reader.deserialize().map(|r| r.unwrap()).collect();
+}
+
+fn tokenize_description(text: String, effects: &Vec<EffectAvro>) -> Vec<String> {
+    let p = effects.iter().fold(text, |acc, e| {
+        acc.replace(&e.name, format!("|{}|", &e.name).as_str())
+    });
+    p.split("|")
+        .filter(|t| !t.is_empty())
+        .map(String::from)
+        .collect()
+}
+
 fn gen_traits() {
     let creatures = ApiCreatureRecord::load();
     let traits = CompendiumTraitRecord::load();
+    let effects = load_effects();
 
     let index_dir = Path::new("embed/traits");
     std::fs::remove_dir_all(index_dir).unwrap();
@@ -118,8 +135,13 @@ fn gen_traits() {
         doc.add_text(schema.family(), r.family.clone());
         doc.add_text(schema.creature(), r.creature.clone());
         doc.add_text(schema.name(), r.trait_name.clone());
-        doc.add_text(schema.description(), r.trait_description.clone());
         doc.add_text(schema.material(), r.material_name.clone());
+
+        tokenize_description(r.trait_description.clone(), &effects)
+            .iter()
+            .for_each(|t| {
+                doc.add_text(schema.description(), t);
+            });
 
         let api_creature = creatures.iter().find(|c| c.name == r.creature);
         if let Some(c) = api_creature {
@@ -142,6 +164,21 @@ fn gen_traits() {
     index_writer.commit().unwrap();
 }
 
+fn gen_effects() {
+    let schema = EffectAvro::get_schema();
+    let file_writer = std::io::BufWriter::new(
+        std::fs::File::create(Path::new("embed/avro/effects.avro")).unwrap(),
+    );
+    let mut writer = apache_avro::Writer::new(&schema, file_writer);
+
+    for r in load_effects() {
+        writer.append_ser(r).unwrap();
+    }
+
+    writer.flush().unwrap();
+}
+
 fn main() {
-    gen_traits();
+    // gen_traits();
+    gen_effects();
 }
