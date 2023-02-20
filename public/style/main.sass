@@ -192,3 +192,27 @@ input[type=text]
   color: #4caf50
 .effect.minion
   color: #ff9800
+
+.tooltip
+  position: relative
+
+.tooltip-text
+  opacity: 0
+  visibility: hidden
+  position: absolute
+  left: 50%
+  transform: translateX(-50%)
+  top: 10px
+  display: inline-block
+  padding: 5px
+  border-radius: 3px
+  transition: 0.3s ease-in
+  min-width: 20rem
+  background: $surface-variant
+  color: $on-surface-variant
+  font-weight: normal
+
+.tooltip:hover .tooltip-text
+  opacity: 1
+  visibility: visible
+  z-index: 1

@@ -5,7 +5,6 @@ extern crate tantivy;
 
 use std::collections::HashMap;
 use std::io::ErrorKind;
-use std::iter::FromIterator;
 
 use implicit_clone::unsync::IString;
 use tantivy::collector::{DocSetCollector, TopDocs};

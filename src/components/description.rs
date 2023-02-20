@@ -1,6 +1,5 @@
 use data::Data;
 use implicit_clone::unsync::IString;
-use std::ops::Deref;
 use std::rc::Rc;
 use yew::prelude::*;
 
@@ -18,7 +17,12 @@ pub fn description(props: &DescriptionProps) -> Html {
             {props.value.iter().map(|t| {
                 if let Some(e) = data.effects.get(t) {
                     html! {
-                        <span class={format!("effect {}", e.category)}>{t.as_str()}</span>
+                        <span class={format!("tooltip effect {}", e.category)}>
+                            <span class="tooltip-text">
+                                {e.description.clone()}
+                            </span>
+                            {t.as_str()}
+                        </span>
                     }
                 } else {
                     html! { <span>{t.as_str()}</span> }
