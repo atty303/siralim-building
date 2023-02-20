@@ -21,6 +21,7 @@ pub fn description(props: &DescriptionProps) -> Html {
                             <span class="tooltip-text">
                                 {e.description.clone()}
                             </span>
+                            <img class="icon" src={format!("status_icons/{}", e.icon)} />
                             {t.as_str()}
                         </span>
                     }

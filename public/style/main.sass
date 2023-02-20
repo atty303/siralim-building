@@ -170,6 +170,7 @@ input[type=text]
           top: 0
           background: $secondary-container
           color: $on-secondary-container
+          z-index: 10
     tbody
       //display: block
       background: $surface
@@ -186,6 +187,9 @@ input[type=text]
 
 .effect
   font-weight: bold
+  .icon
+    width: 1rem
+    height: 1rem
 .effect.debuff
   color: #f44336
 .effect.buff
@@ -202,7 +206,7 @@ input[type=text]
   position: absolute
   left: 50%
   transform: translateX(-50%)
-  top: 10px
+  top: 1.2rem
   display: inline-block
   padding: 5px
   border-radius: 3px
@@ -215,4 +219,4 @@ input[type=text]
 .tooltip:hover .tooltip-text
   opacity: 1
   visibility: visible
-  z-index: 1
+  z-index: 5
