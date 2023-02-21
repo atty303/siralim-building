@@ -16,6 +16,7 @@ use tantivy::{doc, Document, Index};
 
 use data::effect::EffectAvro;
 use data::r#trait;
+use data::spell::SpellSchema;
 
 #[derive(Debug, Deserialize)]
 struct CompendiumTraitRecord {
@@ -86,6 +87,38 @@ impl ApiCreatureRecord {
             .unwrap();
         return reader.deserialize().map(|r| r.unwrap()).collect();
     }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ApiSpellRecord {
+    pub name: String,
+    pub klass: String,
+    pub charges: u8,
+    pub source: String,
+    pub description: String,
+}
+
+impl ApiSpellRecord {
+    fn default_hash(&self) -> u64 {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        self.hash(&mut hasher);
+        hasher.finish()
+    }
+}
+
+impl Hash for ApiSpellRecord {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        let t = format!("{}:{}", self.name, self.klass);
+        t.hash(state)
+    }
+}
+
+fn load_spells() -> Vec<ApiSpellRecord> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("siralim-ultimate-api/app/data/spells.csv")
+        .unwrap();
+    return reader.deserialize().map(|r| r.unwrap()).collect();
 }
 
 fn load_effects() -> Vec<EffectAvro> {
@@ -178,7 +211,49 @@ fn gen_effects() {
     writer.flush().unwrap();
 }
 
+fn gen_spells() {
+    let spells = load_spells();
+    let effects = load_effects();
+
+    let index_dir = Path::new("embed/spells");
+    std::fs::remove_dir_all(index_dir).unwrap();
+    std::fs::create_dir(Path::new(index_dir)).unwrap();
+
+    let schema = SpellSchema::new();
+    let index = Index::create_in_dir(index_dir, schema.schema()).unwrap();
+
+    let mut index_writer = index.writer(3_000_000).unwrap();
+
+    let mut hash_set = BTreeSet::new();
+
+    spells.iter().enumerate().for_each(|(i, r)| {
+        let hash = r.default_hash();
+        if !hash_set.insert(hash) {
+            panic!("hash collided at {}", i);
+        }
+        println!("{}: {} {:?}", i, hash, r);
+
+        let mut doc = Document::default();
+        doc.add_i64(schema.id(), hash as i64);
+        doc.add_text(schema.class(), r.klass.clone());
+        doc.add_text(schema.name(), r.name.clone());
+        doc.add_u64(schema.charges(), r.charges as u64);
+        doc.add_text(schema.source(), r.source.clone());
+
+        tokenize_description(r.description.clone(), &effects)
+            .iter()
+            .for_each(|t| {
+                doc.add_text(schema.description(), t);
+            });
+
+        index_writer.add_document(doc).unwrap();
+    });
+
+    index_writer.commit().unwrap();
+}
+
 fn main() {
     // gen_traits();
-    gen_effects();
+    // gen_effects();
+    gen_spells();
 }

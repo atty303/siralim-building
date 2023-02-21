@@ -16,6 +16,7 @@ use effect::Effect;
 use r#trait::{Trait, TraitSchema};
 
 pub mod effect;
+pub mod spell;
 pub mod r#trait;
 
 #[derive(Debug, Clone)]
