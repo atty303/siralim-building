@@ -55,10 +55,10 @@ impl Save {
     }
 
     pub fn from_string(value: &String) -> anyhow::Result<Save> {
-        let z_bytes = base64::engine::general_purpose::URL_SAFE.decode(value)?;
-        let mut decoder = flate2::read::ZlibDecoder::new(std::io::Cursor::new(z_bytes));
-        let mut bytes: Vec<u8> = Vec::new();
-        decoder.read_to_end(&mut bytes)?;
+        let bytes = base64::engine::general_purpose::URL_SAFE.decode(value)?;
+        // let mut decoder = flate2::read::ZlibDecoder::new(std::io::Cursor::new(z_bytes));
+        // let mut bytes: Vec<u8> = Vec::new();
+        // decoder.read_to_end(&mut bytes)?;
         let avro_value = apache_avro::from_avro_datum(
             &Save::get_schema(),
             &mut std::io::Cursor::new(bytes),
@@ -71,9 +71,9 @@ impl Save {
     pub fn as_string(&self) -> String {
         let save_value = apache_avro::to_value(self).unwrap();
         let bytes = apache_avro::to_avro_datum(&Save::get_schema(), save_value).unwrap();
-        let mut e = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::best());
-        e.write_all(&bytes).unwrap();
-        let c = e.finish().unwrap();
-        base64::engine::general_purpose::URL_SAFE.encode(c)
+        // let mut e = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::best());
+        // e.write_all(&bytes).unwrap();
+        // let c = e.finish().unwrap();
+        base64::engine::general_purpose::URL_SAFE.encode(bytes)
     }
 }
