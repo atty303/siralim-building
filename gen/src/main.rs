@@ -4,9 +4,10 @@ extern crate data;
 extern crate serde;
 extern crate tantivy;
 
+use std::collections::hash_map::DefaultHasher;
 use std::collections::BTreeSet;
 use std::hash::Hash;
-use std::hash::Hasher;
+use std::hash::{BuildHasher, Hasher};
 use std::path::Path;
 
 use apache_avro::AvroSchema;
@@ -17,6 +18,10 @@ use tantivy::{doc, Document, Index};
 use data::effect::EffectAvro;
 use data::r#trait;
 use data::spell::SpellSchema;
+
+trait DefaultHash<S: Ord> {
+    fn default_hash(&self, seed: usize) -> S;
+}
 
 #[derive(Debug, Deserialize)]
 struct CompendiumTraitRecord {
@@ -45,11 +50,12 @@ impl CompendiumTraitRecord {
         ]));
         return reader.deserialize().skip(3).map(|r| r.unwrap()).collect();
     }
-
-    fn default_hash(&self) -> u64 {
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+}
+impl DefaultHash<i32> for CompendiumTraitRecord {
+    fn default_hash(&self, seed: usize) -> i32 {
+        let mut hasher = ahash::RandomState::with_seed(seed).build_hasher();
         self.hash(&mut hasher);
-        hasher.finish()
+        hasher.finish() as i32
     }
 }
 
@@ -98,11 +104,18 @@ pub struct ApiSpellRecord {
     pub description: String,
 }
 
-impl ApiSpellRecord {
-    fn default_hash(&self) -> u64 {
-        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+impl DefaultHash<i16> for ApiSpellRecord {
+    fn default_hash(&self, seed: usize) -> i16 {
+        let mut hasher = ahash::RandomState::with_seed(seed).build_hasher();
+        //let mut hasher = std::collections::hash_map::DefaultHasher::new();
         self.hash(&mut hasher);
-        hasher.finish()
+        let h = hasher.finish();
+        h as i16
+        // let mut r = (h & 0xFFFF) as i16;
+        // r ^= ((h >> 16) & 0xFFFF) as i16;
+        // r ^= ((h >> 32) & 0xFFFF) as i16;
+        // r ^= ((h >> 48) & 0xFFFF) as i16;
+        // r
     }
 }
 
@@ -111,6 +124,24 @@ impl Hash for ApiSpellRecord {
         let t = format!("{}:{}", self.name, self.klass);
         t.hash(state)
     }
+}
+
+fn search_hash_seed<S: Ord, T: DefaultHash<S>>(records: &Vec<T>) -> usize {
+    let mut seed = 0usize;
+    'seed: for s in 0..100000 {
+        let mut set = BTreeSet::new();
+        for r in records {
+            if !set.insert(r.default_hash(s)) {
+                continue 'seed;
+            }
+        }
+        seed = s;
+        break 'seed;
+    }
+    if seed == 100000 {
+        panic!("seed not found")
+    }
+    seed
 }
 
 fn load_spells() -> Vec<ApiSpellRecord> {
@@ -129,13 +160,33 @@ fn load_effects() -> Vec<EffectAvro> {
     return reader.deserialize().map(|r| r.unwrap()).collect();
 }
 
-fn tokenize_description(text: String, effects: &Vec<EffectAvro>) -> Vec<String> {
-    let p = effects.iter().fold(text, |acc, e| {
-        acc.replace(&e.name, format!("|{}|", &e.name).as_str())
+fn tokenize_description(
+    text: String,
+    effects: &Vec<EffectAvro>,
+    spells: &Vec<ApiSpellRecord>,
+) -> Vec<String> {
+    let x = spells.iter().fold(vec![text], |acc, r| {
+        acc.replace(&r.name, format!("|SPELL:{}|", &e.name).as_str())
     });
-    p.split("|")
+    let y = x
+        .split("|")
         .filter(|t| !t.is_empty())
         .map(String::from)
+        .collect::<Vec<_>>();
+    y.iter()
+        .flat_map(|t| {
+            if t.starts_with("SPELL:") {
+                vec![t.replace("SPELL:", "")]
+            } else {
+                let p = effects.iter().fold(t.clone(), |acc, e| {
+                    acc.replace(&e.name, format!("|{}|", &e.name).as_str())
+                });
+                p.split("|")
+                    .filter(|t| !t.is_empty())
+                    .map(String::from)
+                    .collect()
+            }
+        })
         .collect()
 }
 
@@ -143,6 +194,7 @@ fn gen_traits() {
     let creatures = ApiCreatureRecord::load();
     let traits = CompendiumTraitRecord::load();
     let effects = load_effects();
+    let spells = load_spells();
 
     let index_dir = Path::new("embed/traits");
     std::fs::remove_dir_all(index_dir).unwrap();
@@ -153,13 +205,11 @@ fn gen_traits() {
 
     let mut index_writer = index.writer(3_000_000).unwrap();
 
-    let mut hash_set = BTreeSet::new();
+    let seed = search_hash_seed(&traits);
+    println!("using seed: {}", seed);
 
     traits.iter().enumerate().for_each(|(i, r)| {
-        let hash = r.default_hash();
-        if !hash_set.insert(hash) {
-            panic!("hash collided at {}", i);
-        }
+        let hash = r.default_hash(seed);
         println!("{}: {} {:?}", i, hash, r);
 
         let mut doc = Document::default();
@@ -170,7 +220,7 @@ fn gen_traits() {
         doc.add_text(schema.name(), r.trait_name.clone());
         doc.add_text(schema.material(), r.material_name.clone());
 
-        tokenize_description(r.trait_description.clone(), &effects)
+        tokenize_description(r.trait_description.clone(), &effects, &spells)
             .iter()
             .for_each(|t| {
                 doc.add_text(schema.description(), t);
@@ -224,13 +274,11 @@ fn gen_spells() {
 
     let mut index_writer = index.writer(3_000_000).unwrap();
 
-    let mut hash_set = BTreeSet::new();
+    let seed = search_hash_seed(&spells);
+    println!("using seed: {}", seed);
 
     spells.iter().enumerate().for_each(|(i, r)| {
-        let hash = r.default_hash();
-        if !hash_set.insert(hash) {
-            panic!("hash collided at {}", i);
-        }
+        let hash = r.default_hash(seed);
         println!("{}: {} {:?}", i, hash, r);
 
         let mut doc = Document::default();
@@ -253,7 +301,7 @@ fn gen_spells() {
 }
 
 fn main() {
-    // gen_traits();
+    gen_traits();
     // gen_effects();
-    gen_spells();
+    // gen_spells();
 }
