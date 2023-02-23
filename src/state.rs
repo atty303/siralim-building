@@ -13,6 +13,14 @@ pub struct Member {
 }
 
 impl Member {
+    pub fn new() -> Member {
+        Self {
+            primary_trait: None,
+            fused_trait: None,
+            artifact_trait: None,
+        }
+    }
+
     pub fn get_creature(&self, i: usize) -> &Option<Trait> {
         match i {
             0 => &self.primary_trait,
@@ -37,43 +45,15 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(data: &Data) -> State {
+    pub fn new(_data: &Data) -> State {
         State {
             party: vec![
-                Member {
-                    primary_trait: Some(
-                        data.get_trait(17346231099549687105u64 as i64)
-                            .unwrap()
-                            .clone(),
-                    ),
-                    fused_trait: None,
-                    artifact_trait: None,
-                },
-                Member {
-                    primary_trait: None,
-                    fused_trait: None,
-                    artifact_trait: None,
-                },
-                Member {
-                    primary_trait: None,
-                    fused_trait: None,
-                    artifact_trait: None,
-                },
-                Member {
-                    primary_trait: None,
-                    fused_trait: None,
-                    artifact_trait: None,
-                },
-                Member {
-                    primary_trait: None,
-                    fused_trait: None,
-                    artifact_trait: None,
-                },
-                Member {
-                    primary_trait: None,
-                    fused_trait: None,
-                    artifact_trait: None,
-                },
+                Member::new(),
+                Member::new(),
+                Member::new(),
+                Member::new(),
+                Member::new(),
+                Member::new(),
             ],
         }
     }

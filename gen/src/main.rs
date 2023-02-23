@@ -1,6 +1,7 @@
 extern crate apache_avro;
 extern crate csv;
 extern crate data;
+extern crate regex;
 extern crate serde;
 extern crate tantivy;
 
@@ -12,6 +13,7 @@ use std::path::Path;
 
 use apache_avro::AvroSchema;
 use csv::StringRecord;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use tantivy::{doc, Document, Index};
 
@@ -62,8 +64,8 @@ impl DefaultHash<i32> for CompendiumTraitRecord {
 impl Hash for CompendiumTraitRecord {
     fn hash<H: Hasher>(&self, state: &mut H) {
         let t = format!(
-            "{}:{}:{}:{}:{}",
-            self.class, self.family, self.creature, self.trait_name, self.material_name
+            "{}:{}:{}:{}",
+            self.class, self.family, self.creature, self.trait_name
         );
         t.hash(state)
     }
@@ -126,6 +128,37 @@ impl Hash for ApiSpellRecord {
     }
 }
 
+fn load_spells() -> Vec<ApiSpellRecord> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("siralim-ultimate-api/app/data/spells.csv")
+        .unwrap();
+    return reader.deserialize().map(|r| r.unwrap()).collect();
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ApiTraitRecord {
+    pub name: String,
+    pub description: String,
+    pub material_name: String,
+}
+
+fn load_traits() -> Vec<ApiTraitRecord> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("siralim-ultimate-api/app/data/traits.csv")
+        .unwrap();
+    return reader.deserialize().map(|r| r.unwrap()).collect();
+}
+
+fn load_effects() -> Vec<EffectAvro> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("siralim-ultimate-api/app/data/status_effects.csv")
+        .unwrap();
+    return reader.deserialize().map(|r| r.unwrap()).collect();
+}
+
 fn search_hash_seed<S: Ord, T: DefaultHash<S>>(records: &Vec<T>) -> usize {
     let mut seed = 0usize;
     'seed: for s in 0..100000 {
@@ -144,20 +177,9 @@ fn search_hash_seed<S: Ord, T: DefaultHash<S>>(records: &Vec<T>) -> usize {
     seed
 }
 
-fn load_spells() -> Vec<ApiSpellRecord> {
-    let mut reader = csv::ReaderBuilder::new()
-        .has_headers(true)
-        .from_path("siralim-ultimate-api/app/data/spells.csv")
-        .unwrap();
-    return reader.deserialize().map(|r| r.unwrap()).collect();
-}
-
-fn load_effects() -> Vec<EffectAvro> {
-    let mut reader = csv::ReaderBuilder::new()
-        .has_headers(true)
-        .from_path("siralim-ultimate-api/app/data/status_effects.csv")
-        .unwrap();
-    return reader.deserialize().map(|r| r.unwrap()).collect();
+#[memoize::memoize]
+fn word_regex(word: String) -> Regex {
+    Regex::new(format!("\\b{}\\b", word).as_str()).unwrap()
 }
 
 fn tokenize_description(
@@ -165,8 +187,9 @@ fn tokenize_description(
     effects: &Vec<EffectAvro>,
     spells: &Vec<ApiSpellRecord>,
 ) -> Vec<String> {
-    let x = spells.iter().fold(vec![text], |acc, r| {
-        acc.replace(&r.name, format!("|SPELL:{}|", &e.name).as_str())
+    let x = spells.iter().fold(text, |acc, r| {
+        let re = word_regex(r.name.clone());
+        String::from(re.replace(acc.as_str(), format!("|SPELL:{}|", &r.name).as_str()))
     });
     let y = x
         .split("|")
@@ -179,7 +202,8 @@ fn tokenize_description(
                 vec![t.replace("SPELL:", "")]
             } else {
                 let p = effects.iter().fold(t.clone(), |acc, e| {
-                    acc.replace(&e.name, format!("|{}|", &e.name).as_str())
+                    let re = word_regex(e.name.clone());
+                    String::from(re.replace(acc.as_str(), format!("|{}|", &e.name).as_str()))
                 });
                 p.split("|")
                     .filter(|t| !t.is_empty())
@@ -193,6 +217,7 @@ fn tokenize_description(
 fn gen_traits() {
     let creatures = ApiCreatureRecord::load();
     let traits = CompendiumTraitRecord::load();
+    let api_traits = load_traits();
     let effects = load_effects();
     let spells = load_spells();
 
@@ -210,17 +235,39 @@ fn gen_traits() {
 
     traits.iter().enumerate().for_each(|(i, r)| {
         let hash = r.default_hash(seed);
-        println!("{}: {} {:?}", i, hash, r);
+        //println!("{}: {} {:?}", i, hash, r);
+
+        let trait_name = r.trait_name.replace("\n", " ");
+        let trait_name = if trait_name == "Click, Click, Boom" {
+            String::from("Click, Click, Boom!")
+        } else {
+            trait_name
+        };
+        let trait_name = if trait_name == "Sharpnel Blast" {
+            String::from("Shrapnel Blast")
+        } else {
+            trait_name
+        };
+        let (description, material) =
+            if let Some(api_trait) = api_traits.iter().find(|t| t.name == trait_name) {
+                (
+                    api_trait.description.clone(),
+                    api_trait.material_name.clone(),
+                )
+            } else {
+                println!("not found: {}", trait_name);
+                (r.trait_description.clone(), r.material_name.clone())
+            };
 
         let mut doc = Document::default();
         doc.add_i64(schema.id(), hash as i64);
         doc.add_text(schema.class(), r.class.clone());
         doc.add_text(schema.family(), r.family.clone());
         doc.add_text(schema.creature(), r.creature.clone());
-        doc.add_text(schema.name(), r.trait_name.clone());
-        doc.add_text(schema.material(), r.material_name.clone());
+        doc.add_text(schema.name(), trait_name.clone());
+        doc.add_text(schema.material(), material.clone());
 
-        tokenize_description(r.trait_description.clone(), &effects, &spells)
+        tokenize_description(description.clone(), &effects, &spells)
             .iter()
             .for_each(|t| {
                 doc.add_text(schema.description(), t);
@@ -288,7 +335,7 @@ fn gen_spells() {
         doc.add_u64(schema.charges(), r.charges as u64);
         doc.add_text(schema.source(), r.source.clone());
 
-        tokenize_description(r.description.clone(), &effects)
+        tokenize_description(r.description.clone(), &effects, &spells)
             .iter()
             .for_each(|t| {
                 doc.add_text(schema.description(), t);

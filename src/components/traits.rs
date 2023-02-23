@@ -24,7 +24,7 @@ pub struct TraitsModalProps {
 
 #[function_component(TraitsModal)]
 pub fn traits_modal(props: &TraitsModalProps) -> Html {
-    let query = use_state(|| IString::from("class:death"));
+    let query = use_state(|| IString::from("*"));
     let items = use_state(|| Vec::<Trait>::new());
 
     {

@@ -1,5 +1,3 @@
-use std::io::{Read, Write};
-
 use apache_avro::AvroSchema;
 use base64::Engine;
 use serde::{Deserialize, Serialize};
