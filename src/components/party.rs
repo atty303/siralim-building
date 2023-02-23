@@ -170,9 +170,6 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         />
                     </li>
                 </ul>
-                <ul>
-                    <li>{"Spell"}</li>
-                </ul>
             </div>
         </div>
     }
@@ -220,7 +217,9 @@ fn party_trait(props: &PartyTraitProps) -> Html {
 
     let ondrop = {
         let on_drop = props.on_drop.clone();
+        let opacity = opacity.clone();
         Callback::from(move |e| {
+            opacity.set(1.0);
             log::debug!("ondrop: {:?}", e);
             on_drop.emit(());
         })
@@ -239,6 +238,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                     ondragover={ondragover}
                     ondrop={ondrop}
                 >
+                    <div class="handle"><Icon icon_id={IconId::BootstrapGripVertical} /></div>
                     <div class="creature">
                         <span>
                             <ClassIcon value={c.class.clone()} />
@@ -266,7 +266,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                     ondragover={ondragover}
                     ondrop={ondrop}
                 >
-                    {props.empty_text}
+                    <span>{props.empty_text}</span>
                 </div>
                 <div class="clear"></div>
             </>

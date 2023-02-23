@@ -126,7 +126,6 @@ pub fn app(props: &AppProps) -> Html {
                 on_clear={on_member_clear}
             />
             <TraitsModal
-                data={props.data.clone()}
                 show={*show_traits_modal}
                 on_cancel={on_close_traits_modal}
                 on_select={on_select_trait}

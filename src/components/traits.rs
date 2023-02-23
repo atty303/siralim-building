@@ -1,4 +1,5 @@
 use implicit_clone::unsync::IString;
+use std::rc::Rc;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
@@ -16,7 +17,6 @@ pub struct TraitSelectEvent {
 
 #[derive(Properties, PartialEq)]
 pub struct TraitsModalProps {
-    pub data: Data,
     pub show: bool,
     pub on_cancel: Callback<()>,
     pub on_select: Callback<TraitSelectEvent>,
@@ -24,14 +24,15 @@ pub struct TraitsModalProps {
 
 #[function_component(TraitsModal)]
 pub fn traits_modal(props: &TraitsModalProps) -> Html {
+    let data = use_context::<Rc<Data>>().unwrap();
     let query = use_state(|| IString::from("*"));
     let items = use_state(|| Vec::<Trait>::new());
 
     {
-        let data = props.data.clone();
         let items = items.clone();
         use_effect_with_deps(
             move |query| {
+                log::debug!("search: {}", query.as_str());
                 if let Ok(xs) = data.search_trait(query.as_str()) {
                     items.set(xs);
                 }
@@ -72,7 +73,6 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
             </div>
             <div class="table">
                 <TraitTable
-                    data={props.data.clone()}
                     items={(*items).clone()}
                     on_select={on_select}
                 />
@@ -83,7 +83,6 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
 
 #[derive(Properties, PartialEq)]
 struct TraitTableProps {
-    data: Data,
     items: Vec<Trait>,
     on_select: Callback<TraitSelectEvent>,
 }

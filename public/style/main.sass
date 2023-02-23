@@ -17,8 +17,8 @@ $outline: #938F99
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap')
 
 body
-  background: $background
-  color: $on-background
+  background: $surface-variant
+  color: $on-surface-variant
   font-family: 'Roboto', sans-serif
   font-size: 14px
 
@@ -34,7 +34,7 @@ input[type=text]
 
 // -----
 .modal-overlay
-  position: absolute
+  position: fixed
   top: 0
   left: 0
   width: 100%
@@ -63,16 +63,24 @@ input[type=text]
       height: calc(100% - 2rem)
       max-height: calc(100% - 2rem)
 
+.modal-overlay.hidden
+  visibility: hidden
+
+// -----
 .party
   margin: 20px
 
 .party-member
   display: flex
   width: 100%
-  border: 1px solid grey
+  border: 1px solid $outline
+  margin: 10px
+  background-color: $surface
+  color: $on-surface
 
   .left-pane
-    width: 200px
+    max-width: 200px
+    min-width: 200px
     border-right: 1px solid $outline
 
   .right-pane
@@ -87,22 +95,23 @@ input[type=text]
 
       li
         display: flex
-        //height: 4rem
+        min-height: 3rem
         border-bottom: 1px solid $outline
 
         .trait
           flex-grow: 1
-          border-right: 1px solid $outline
+          //border-right: 1px solid $outline
 
         .trait.non-empty
           display: flex
+          align-items: center
           cursor: move
 
           .creature
-            width: 15%
+            width: 20%
             > span
               display: block
-              margin: 15px
+              margin: 5px
               //line-height: calc(4rem - 40px)
               padding: 5px
               background: $surface-variant
@@ -110,30 +119,35 @@ input[type=text]
               > img
                 margin-right: 4px
           .trait-name
-            width: 15%
+            width: 20%
             > span
               //min-height: 4rem
           .trait-description
-            width: 70%
+            width: 60%
             > span
               //line-height: 1rem
 
         .trait.empty
+          display: flex
+          align-items: center
           text-align: center
-          //line-height: 4rem
-          color: #888
+          color: $outline
+          > span
+            flex-grow: 1
 
         .clear
-          min-width: 4rem
-          min-height: 4rem
-          border-right: 1px solid #ccc
+          min-width: 3rem
+          max-width: 3rem
+          min-height: 2rem
+          border-left: 1px solid $outline
+          border-right: 1px solid $outline
 
           button
             background: transparent
             border: none
             width: 100%
             height: 100%
-            color: #888
+            color: $on-background
             cursor: pointer
 
           button:hover
@@ -160,6 +174,7 @@ input[type=text]
     overflow-y: scroll
   table.trait
     position: relative
+    table-layout: fixed
     thead
       //display: block
       tr
@@ -177,6 +192,7 @@ input[type=text]
       color: $on-surface
       tr
         cursor: pointer
+        content-visibility: auto
       tr:nth-child(2n)
         background: #313033
       tr:hover
