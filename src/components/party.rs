@@ -1,4 +1,5 @@
 use std::ops::Deref;
+use web_sys::Element;
 
 use yew::prelude::*;
 use yew_icons::{Icon, IconId};
@@ -202,9 +203,28 @@ fn party_trait(props: &PartyTraitProps) -> Html {
     let ondragstart = {
         let on_drag_start = props.on_drag_start.clone();
         let opacity = opacity.clone();
-        Callback::from(move |_| {
+        Callback::from(move |e: MouseEvent| {
             opacity.set(0.5);
             on_drag_start.emit(());
+            let el: Element = e.target_unchecked_into::<Element>();
+            log::debug!("{:?}", el.parent_element().unwrap().parent_element());
+            el.parent_element()
+                .unwrap()
+                .parent_element()
+                .unwrap()
+                .set_attribute("draggable", "true")
+                .unwrap();
+        })
+    };
+    let onmouseup = {
+        Callback::from(move |e: MouseEvent| {
+            let el: Element = e.target_unchecked_into::<Element>();
+            el.parent_element()
+                .unwrap()
+                .parent_element()
+                .unwrap()
+                .set_attribute("draggable", "false")
+                .unwrap();
         })
     };
 
@@ -231,14 +251,16 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                 <div
                     class="trait non-empty"
                     style={format!("opacity: {}", opacity.deref())}
-                    draggable="true"
-                    onclick={onclick}
-                    ondragstart={ondragstart}
-                    ondragend={ondragend}
                     ondragover={ondragover}
                     ondrop={ondrop}
                 >
-                    <div class="handle"><Icon icon_id={IconId::BootstrapGripVertical} /></div>
+                    <div class="handle"
+                        onmousedown={ondragstart}
+                        onmouseup={onmouseup}
+                        ondragend={ondragend}
+                    >
+                        <Icon icon_id={IconId::BootstrapGripVertical} />
+                    </div>
                     <div class="creature">
                         <span>
                             <ClassIcon value={c.class.clone()} />
