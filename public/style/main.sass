@@ -111,7 +111,7 @@ ul.traits
   margin: 0
   padding-inline: 0
 
-  li
+  > li
     display: flex
     min-height: 3rem
     border-bottom: 1px solid $outline
@@ -254,6 +254,7 @@ ul.traits
 
 .tooltip
   position: relative
+  white-space: nowrap
 
 .tooltip-text
   opacity: 0
@@ -266,12 +267,59 @@ ul.traits
   padding: 5px
   border-radius: 3px
   transition: 0.3s ease-in
-  min-width: 20rem
-  background: $surface-variant
-  color: $on-surface-variant
+  background: #000
+  color: #fff
   font-weight: normal
+  min-width: 20rem
 
 .tooltip:hover .tooltip-text
   opacity: 1
   visibility: visible
   z-index: 5
+
+.creature .tooltip-text
+  display: flex
+  align-items: center
+  padding: 0.5rem 1rem
+
+  ul.stats
+    margin-left: 10px
+    margin-right: 1rem
+    padding: 0 1rem 0 0
+    border-right: 1px solid $outline
+
+    > li
+      display: block
+      white-space: nowrap
+
+      img
+        width: 1rem
+        height: 1rem
+
+  span.creature
+    white-space: nowrap
+    font-weight: bold
+    line-height: 2rem
+  span.family
+    white-space: nowrap
+    > span
+      font-weight: bold
+      color: $outline
+  span.trait
+    white-space: nowrap
+    > span
+      font-weight: bold
+      color: $outline
+  span.material
+    white-space: nowrap
+    > span
+      font-weight: bold
+      color: $outline
+  span.sources
+    > span
+      font-weight: bold
+      color: $outline
+    ul
+      padding-inline-start: 1rem
+      > li
+        white-space: nowrap

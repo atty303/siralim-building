@@ -13,6 +13,7 @@ pub struct Trait {
     pub trait_description: Vec<IString>,
     pub material_name: IString,
     pub sources: Vec<IString>,
+    pub sprite: Option<IString>,
     pub stats: Option<Stats>,
 }
 
@@ -143,6 +144,9 @@ impl TraitSchema {
             trait_description: TraitSchema::get_text_all(doc, self.description()),
             material_name: TraitSchema::get_text(doc, self.material()),
             sources: TraitSchema::get_text_all(doc, self.sources()),
+            sprite: doc
+                .get_first(self.sprite())
+                .map(|x| IString::from(x.as_text().unwrap().to_string())),
             stats,
         }
     }
