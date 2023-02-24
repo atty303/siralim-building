@@ -76,6 +76,11 @@ input[type=text]
 .party
   margin: 20px
 
+  h2
+    font-size: 1rem
+    text-align: center
+    margin: 0
+
 .party-member
   display: flex
   width: 100%
@@ -93,74 +98,82 @@ input[type=text]
     flex-grow: 1
     padding-inline: 0
 
-    ul
+.party-pool
+  width: 100%
+  border: 1px solid $outline
+  margin: 10px
+  background-color: $surface
+  color: $on-surface
+
+ul.traits
+  display: flex
+  flex-direction: column
+  margin: 0
+  padding-inline: 0
+
+  li
+    display: flex
+    min-height: 3rem
+    border-bottom: 1px solid $outline
+
+    .trait
+      flex-grow: 1
+      //border-right: 1px solid $outline
+
+    .trait.non-empty
       display: flex
-      flex-direction: column
-      margin: 0
-      padding-inline: 0
+      align-items: center
 
-      li
-        display: flex
-        min-height: 3rem
-        border-bottom: 1px solid $outline
+      .handle
+        cursor: move
+        color: $primary
 
-        .trait
-          flex-grow: 1
-          //border-right: 1px solid $outline
+      .creature
+        width: 20%
+        > span
+          display: block
+          margin: 5px
+          //line-height: calc(4rem - 40px)
+          padding: 5px
+          background: $surface-variant
+          color: $on-surface-variant
+          > img
+            margin-right: 4px
+      .trait-name
+        width: 20%
+        > span
+          //min-height: 4rem
+      .trait-description
+        width: 60%
+        > span
+          //line-height: 1rem
 
-        .trait.non-empty
-          display: flex
-          align-items: center
+    .trait.empty
+      display: flex
+      align-items: center
+      text-align: center
+      color: $primary
+      > span
+        flex-grow: 1
 
-          .handle
-            cursor: move
+    .clear
+      min-width: 3rem
+      max-width: 3rem
+      min-height: 2rem
+      border-left: 1px solid $outline
+      border-right: 1px solid $outline
 
-          .creature
-            width: 20%
-            > span
-              display: block
-              margin: 5px
-              //line-height: calc(4rem - 40px)
-              padding: 5px
-              background: $surface-variant
-              color: $on-surface-variant
-              > img
-                margin-right: 4px
-          .trait-name
-            width: 20%
-            > span
-              //min-height: 4rem
-          .trait-description
-            width: 60%
-            > span
-              //line-height: 1rem
+      button
+        background: transparent
+        border: none
+        width: 100%
+        height: 100%
+        color: $primary
+        cursor: pointer
 
-        .trait.empty
-          display: flex
-          align-items: center
-          text-align: center
-          color: $outline
-          > span
-            flex-grow: 1
-
-        .clear
-          min-width: 3rem
-          max-width: 3rem
-          min-height: 2rem
-          border-left: 1px solid $outline
-          border-right: 1px solid $outline
-
-          button
-            background: transparent
-            border: none
-            width: 100%
-            height: 100%
-            color: $on-background
-            cursor: pointer
-
-          button:hover
-            background: $error-container
-            color: $on-error-container
+      button:hover
+        background: $error-container
+        color: $on-error-container
 
 .modal.trait
   .content

@@ -121,6 +121,7 @@ pub fn app(props: &AppProps) -> Html {
         <ContextProvider<Rc<data::Data>> context={data}>
             <Party
                 party={state.party.clone()}
+                pool={state.trait_pool.clone()}
                 on_swap={on_swap}
                 on_click={on_member_click}
                 on_clear={on_member_clear}

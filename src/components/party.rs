@@ -32,6 +32,7 @@ impl PartyTraitEvent {
 #[derive(Properties, PartialEq)]
 pub struct PartyProps {
     pub party: Vec<Member>,
+    pub pool: Vec<Option<Trait>>,
     pub on_swap: Callback<PartySwapEvent>,
     pub on_click: Callback<PartyTraitEvent>,
     pub on_clear: Callback<PartyTraitEvent>,
@@ -40,8 +41,10 @@ pub struct PartyProps {
 #[function_component(Party)]
 pub fn party(props: &PartyProps) -> Html {
     let dragging: UseStateHandle<Option<PartyTraitEvent>> = use_state(|| None);
+    let pool_position = props.party.len();
     html! {
         <div class="party">
+            <h2>{"PARTY"}</h2>
             {props.party.iter().enumerate().map(|(i, m)| {
                 let on_click = {
                     let on_click = props.on_click.clone();
@@ -90,6 +93,57 @@ pub fn party(props: &PartyProps) -> Html {
                     </PartyMember>
                 }
             }).collect::<Html>()}
+
+            <h2>{"POOL"}</h2>
+            <div class="party-pool">
+                <ul class="traits">
+                    {props.pool.iter().enumerate().map(|(i, m)| {
+                        let on_click = {
+                            let on_click = props.on_click.clone();
+                            let e = PartyTraitEvent::new(pool_position, i);
+                            Callback::from(move |_| on_click.emit(e.clone()))
+                        };
+                        let on_clear = {
+                            let on_clear = props.on_clear.clone();
+                            let e = PartyTraitEvent::new(pool_position, i);
+                            Callback::from(move |_| on_clear.emit(e.clone()))
+                        };
+                        let on_drag_start = {
+                            let dragging = dragging.clone();
+                            let e = PartyTraitEvent::new(pool_position, i);
+                            Callback::from(move |_|  dragging.set(Some(e.clone())))
+                        };
+                        let on_drop = {
+                            let dragging = dragging.clone();
+                            let on_swap = props.on_swap.clone();
+                            let e = PartyTraitEvent::new(pool_position, i);
+                            Callback::from(move |_| {
+                                if let Some(a) = dragging.as_ref() {
+                                    on_swap.emit(PartySwapEvent {
+                                        from_position: a.position,
+                                        from_index: a.index,
+                                        to_position: e.position,
+                                        to_index: e.index,
+                                    })
+                                }
+                                dragging.set(None);
+                            })
+                        };
+                        html! {
+                            <li>
+                                <PartyTrait
+                                    r#trait={m.clone()}
+                                    empty_text={"Click to add trait"}
+                                    on_click={on_click.clone()}
+                                    on_clear={on_clear.clone()}
+                                    on_drag_start={on_drag_start.clone()}
+                                    on_drop={on_drop.clone()}
+                                />
+                            </li>
+                        }
+                    }).collect::<Html>()}
+                </ul>
+            </div>
         </div>
     }
 }
@@ -139,7 +193,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
         <div class="party-member">
             <div class="left-pane"></div>
             <div class="right-pane">
-                <ul>
+                <ul class="traits">
                     <li>
                         <PartyTrait
                             r#trait={props.member.primary_trait.clone()}
@@ -217,7 +271,9 @@ fn party_trait(props: &PartyTraitProps) -> Html {
         })
     };
     let onmouseup = {
+        let opacity = opacity.clone();
         Callback::from(move |e: MouseEvent| {
+            opacity.set(1.0);
             let el: Element = e.target_unchecked_into::<Element>();
             el.parent_element()
                 .unwrap()

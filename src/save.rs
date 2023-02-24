@@ -10,6 +10,7 @@ use crate::state::{Member, State};
 #[derive(Serialize, Deserialize, AvroSchema, Debug)]
 pub struct Save {
     party: Vec<SaveMember>,
+    trait_pool: Vec<Option<i32>>,
 }
 
 #[derive(Serialize, Deserialize, AvroSchema, Debug)]
@@ -35,6 +36,11 @@ impl Save {
                     artifact_trait: m.artifact_trait.clone().map(|c| c.id),
                 })
                 .collect(),
+            trait_pool: state
+                .trait_pool
+                .iter()
+                .map(|t| t.clone().map(|c| c.id))
+                .collect(),
         }
     }
 
@@ -48,6 +54,11 @@ impl Save {
                     fused_trait: id_to_trait(data, m.fused_trait),
                     artifact_trait: id_to_trait(data, m.artifact_trait),
                 })
+                .collect(),
+            trait_pool: self
+                .trait_pool
+                .iter()
+                .map(|id| id_to_trait(data, id.clone()))
                 .collect(),
         }
     }
