@@ -17,6 +17,24 @@ pub struct Trait {
     pub stats: Option<Stats>,
 }
 
+impl Trait {
+    pub fn health(&self) -> Option<u8> {
+        self.stats.as_ref().map(|x| x.health)
+    }
+    pub fn attack(&self) -> Option<u8> {
+        self.stats.as_ref().map(|x| x.attack)
+    }
+    pub fn intelligence(&self) -> Option<u8> {
+        self.stats.as_ref().map(|x| x.intelligence)
+    }
+    pub fn defense(&self) -> Option<u8> {
+        self.stats.as_ref().map(|x| x.defense)
+    }
+    pub fn speed(&self) -> Option<u8> {
+        self.stats.as_ref().map(|x| x.speed)
+    }
+}
+
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Stats {
     pub health: u8,

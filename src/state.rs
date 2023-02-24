@@ -1,3 +1,4 @@
+use implicit_clone::unsync::IString;
 use std::rc::Rc;
 
 use yew::prelude::*;
@@ -10,6 +11,15 @@ pub struct Member {
     pub primary_trait: Option<Trait>,
     pub fused_trait: Option<Trait>,
     pub artifact_trait: Option<Trait>,
+}
+
+fn flatten_stat(a: Option<u8>, b: Option<u8>) -> Option<u8> {
+    match (a, b) {
+        (Some(x), Some(y)) => Some(((x + y) as f64 / 2f64) as u8),
+        (Some(x), None) => Some(x),
+        (None, Some(y)) => Some(y),
+        (None, None) => None,
+    }
 }
 
 impl Member {
@@ -36,6 +46,45 @@ impl Member {
             2 => self.artifact_trait = c.clone(),
             _ => (),
         }
+    }
+    pub fn class(&self) -> Option<IString> {
+        self.fused_trait.as_ref().map(|x| x.class.clone())
+    }
+    pub fn health(&self) -> Option<u8> {
+        flatten_stat(
+            self.primary_trait.as_ref().map(|a| a.health()).flatten(),
+            self.fused_trait.as_ref().map(|a| a.health()).flatten(),
+        )
+    }
+    pub fn attack(&self) -> Option<u8> {
+        flatten_stat(
+            self.primary_trait.as_ref().map(|a| a.attack()).flatten(),
+            self.fused_trait.as_ref().map(|a| a.attack()).flatten(),
+        )
+    }
+    pub fn intelligence(&self) -> Option<u8> {
+        flatten_stat(
+            self.primary_trait
+                .as_ref()
+                .map(|a| a.intelligence())
+                .flatten(),
+            self.fused_trait
+                .as_ref()
+                .map(|a| a.intelligence())
+                .flatten(),
+        )
+    }
+    pub fn defense(&self) -> Option<u8> {
+        flatten_stat(
+            self.primary_trait.as_ref().map(|a| a.defense()).flatten(),
+            self.fused_trait.as_ref().map(|a| a.defense()).flatten(),
+        )
+    }
+    pub fn speed(&self) -> Option<u8> {
+        flatten_stat(
+            self.primary_trait.as_ref().map(|a| a.speed()).flatten(),
+            self.fused_trait.as_ref().map(|a| a.speed()).flatten(),
+        )
     }
 }
 

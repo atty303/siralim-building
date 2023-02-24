@@ -8,6 +8,7 @@ use data::r#trait::Trait;
 
 use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
+use crate::components::modal::_ModalProps::class;
 use crate::state::Member;
 
 #[derive(Debug)]
@@ -189,9 +190,50 @@ fn party_member(props: &PartyMemberProps) -> Html {
         })
     };
 
+    let sprite = props
+        .member
+        .primary_trait
+        .clone()
+        .map(|t| t.sprite)
+        .flatten();
+    let format_stat = |v: Option<u8>| v.map_or_else(|| "-".to_string(), |n| format!("{}", n));
+
+    let health = props.member.health();
+    let mut left_pane_classes = classes!("left-pane");
+    if let Some(c) = props.member.class() {
+        left_pane_classes.push(c.as_str().to_lowercase().to_string());
+    }
+
     html! {
         <div class="party-member">
-            <div class="left-pane"></div>
+            <div class={left_pane_classes}>
+                <div class="sprite-stat">
+                    {if let Some(sprite) = &sprite {
+                        html! { <img class="sprite" src={format!("battle_sprites/{}", sprite)} /> }
+                    } else {
+                        html! { <div class="sprite"></div> }
+                    }}
+                    <ul class="stats">
+                        <li class="health"><img src="image/health.png" />{format_stat(props.member.health())}</li>
+                        <li class="attack"><img src="image/attack.png" />{format_stat(props.member.attack())}</li>
+                        <li class="intelligence"><img src="image/intelligence.png" />{format_stat(props.member.intelligence())}</li>
+                        <li class="defense"><img src="image/defense.png" />{format_stat(props.member.defense())}</li>
+                        <li class="speed"><img src="image/speed.png" />{format_stat(props.member.speed())}</li>
+                    </ul>
+                </div>
+                <div class="class">
+                    {if let Some(x) = props.member.class() {
+                        html! {
+                            <span>
+                                <ClassIcon value={x.clone()} />
+                                {x.as_str()}
+                            </span>
+                        }
+                    } else {
+                        html! { }
+                    }}
+                </div>
+            </div>
             <div class="right-pane">
                 <ul class="traits">
                     <li>
@@ -313,8 +355,8 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                                     <ul class="stats">
                                         <li class="health"><img src="image/health.png" />{format!("{}", stats.health)}</li>
                                         <li class="attack"><img src="image/attack.png" />{format!("{}", stats.attack)}</li>
-                                        <li class="defense"><img src="image/defense.png" />{format!("{}", stats.defense)}</li>
                                         <li class="intelligence"><img src="image/intelligence.png" />{format!("{}", stats.intelligence)}</li>
+                                        <li class="defense"><img src="image/defense.png" />{format!("{}", stats.defense)}</li>
                                         <li class="speed"><img src="image/speed.png" />{format!("{}", stats.speed)}</li>
                                     </ul>
                                 }
@@ -338,9 +380,6 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                             <ClassIcon value={c.class.clone()} />
                             {c.creature.as_str()}
                         </span>
-                    </div>
-                    <div class="trait-name">
-                        <span>{c.trait_name.as_str()}</span>
                     </div>
                     <div class="trait-description">
                         <Description value={c.trait_description.to_vec()} />
