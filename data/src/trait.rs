@@ -5,7 +5,7 @@ use tantivy::Document;
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Trait {
-    pub id: i64,
+    pub id: i32,
     pub class: IString,
     pub family: IString,
     pub creature: IString,
@@ -135,7 +135,7 @@ impl TraitSchema {
             None
         };
         Trait {
-            id: doc.get_first(self.id()).unwrap().as_i64().unwrap(),
+            id: doc.get_first(self.id()).unwrap().as_i64().unwrap() as i32,
             class: TraitSchema::get_text(doc, self.class()),
             family: TraitSchema::get_text(doc, self.family()),
             creature: TraitSchema::get_text(doc, self.creature()),

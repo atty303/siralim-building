@@ -55,11 +55,11 @@ impl Data {
         self.spell_index.clone()
     }
 
-    pub fn get_trait(&self, id: i64) -> anyhow::Result<Trait> {
+    pub fn get_trait(&self, id: i32) -> anyhow::Result<Trait> {
         let searcher = self.traits_index.reader()?.searcher();
         let schema = TraitSchema::from(self.traits_index.schema());
         let query = TermQuery::new(
-            Term::from_field_i64(schema.id(), id),
+            Term::from_field_i64(schema.id(), id as i64),
             IndexRecordOption::Basic,
         );
         let docs = searcher.search(&query, &DocSetCollector)?;

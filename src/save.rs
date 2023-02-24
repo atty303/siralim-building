@@ -14,12 +14,12 @@ pub struct Save {
 
 #[derive(Serialize, Deserialize, AvroSchema, Debug)]
 struct SaveMember {
-    primary_trait: Option<i64>,
-    fused_trait: Option<i64>,
-    artifact_trait: Option<i64>,
+    primary_trait: Option<i32>,
+    fused_trait: Option<i32>,
+    artifact_trait: Option<i32>,
 }
 
-fn id_to_trait(data: &Data, id: Option<i64>) -> Option<Trait> {
+fn id_to_trait(data: &Data, id: Option<i32>) -> Option<Trait> {
     id.iter().flat_map(|i| data.get_trait(*i).ok()).next()
 }
 
