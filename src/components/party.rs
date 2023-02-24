@@ -242,8 +242,6 @@ pub struct PartyTraitProps {
 
 #[function_component(PartyTrait)]
 fn party_trait(props: &PartyTraitProps) -> Html {
-    let opacity = use_state(|| 1.0);
-
     let onclick = {
         let on_click = props.on_click.clone();
         Callback::from(move |_| on_click.emit(()))
@@ -256,9 +254,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
 
     let ondragstart = {
         let on_drag_start = props.on_drag_start.clone();
-        let opacity = opacity.clone();
         Callback::from(move |e: MouseEvent| {
-            opacity.set(0.5);
             on_drag_start.emit(());
             let el: Element = e.target_unchecked_into::<Element>();
             log::debug!("{:?}", el.parent_element().unwrap().parent_element());
@@ -271,9 +267,7 @@ fn party_trait(props: &PartyTraitProps) -> Html {
         })
     };
     let onmouseup = {
-        let opacity = opacity.clone();
         Callback::from(move |e: MouseEvent| {
-            opacity.set(1.0);
             let el: Element = e.target_unchecked_into::<Element>();
             el.parent_element()
                 .unwrap()
@@ -284,18 +278,11 @@ fn party_trait(props: &PartyTraitProps) -> Html {
         })
     };
 
-    let ondragend = {
-        let opacity = opacity.clone();
-        Callback::from(move |_| opacity.set(1.0))
-    };
-
     let ondragover = { Callback::from(move |e: DragEvent| e.prevent_default()) };
 
     let ondrop = {
         let on_drop = props.on_drop.clone();
-        let opacity = opacity.clone();
         Callback::from(move |e| {
-            opacity.set(1.0);
             log::debug!("ondrop: {:?}", e);
             on_drop.emit(());
         })
@@ -306,14 +293,12 @@ fn party_trait(props: &PartyTraitProps) -> Html {
             <>
                 <div
                     class="trait non-empty"
-                    style={format!("opacity: {}", opacity.deref())}
                     ondragover={ondragover}
                     ondrop={ondrop}
                 >
                     <div class="handle"
                         onmousedown={ondragstart}
                         onmouseup={onmouseup}
-                        ondragend={ondragend}
                     >
                         <Icon icon_id={IconId::BootstrapGripVertical} />
                     </div>
