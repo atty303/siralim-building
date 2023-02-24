@@ -7,16 +7,19 @@ use std::collections::HashMap;
 use std::io::ErrorKind;
 
 use implicit_clone::unsync::IString;
+use tantivy::aggregation::Key;
 use tantivy::collector::{DocSetCollector, TopDocs};
 use tantivy::query::{QueryParser, TermQuery};
 use tantivy::schema::IndexRecordOption;
 use tantivy::{Index, Term};
 
 use effect::Effect;
+use keyword::Keyword;
 use r#trait::{Trait, TraitSchema};
 use spell::{Spell, SpellSchema};
 
 pub mod effect;
+pub mod keyword;
 pub mod spell;
 pub mod r#trait;
 
@@ -25,6 +28,7 @@ pub struct Data {
     traits_index: Index,
     spell_index: Index,
     pub effects: HashMap<IString, Effect>,
+    pub keywords: HashMap<IString, Keyword>,
 }
 
 impl PartialEq for Data {
@@ -35,8 +39,17 @@ impl PartialEq for Data {
 }
 
 impl Data {
-    pub fn from(traits_index: Index, spell_index: Index, effects: Vec<Effect>) -> Data {
+    pub fn from(
+        traits_index: Index,
+        spell_index: Index,
+        effects: Vec<Effect>,
+        keywords: Vec<Keyword>,
+    ) -> Data {
         let map = effects
+            .iter()
+            .map(|e| (e.name.clone(), e.clone()))
+            .collect::<HashMap<_, _>>();
+        let keywords = keywords
             .iter()
             .map(|e| (e.name.clone(), e.clone()))
             .collect::<HashMap<_, _>>();
@@ -44,6 +57,7 @@ impl Data {
             traits_index,
             spell_index,
             effects: map,
+            keywords,
         }
     }
 

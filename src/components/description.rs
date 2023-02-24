@@ -15,7 +15,14 @@ pub fn description(props: &DescriptionProps) -> Html {
     html! {
         <>
             {props.value.iter().map(|t| {
-                if let Some(e) = data.effects.get(t) {
+                if let Some(w) = data.keywords.get(t) {
+                    html! {
+                        <span class={format!("keyword {}", w.category)}>
+                            <img class="icon" src={format!("image/{}", w.icon)} />
+                            {t.as_str()}
+                        </span>
+                    }
+                } else if let Some(e) = data.effects.get(t) {
                     html! {
                         <span class={format!("tooltip effect {}", e.category)}>
                             <span class="tooltip-text">

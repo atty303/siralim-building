@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 use tantivy::{doc, Document, Index};
 
 use data::effect::EffectAvro;
+use data::keyword::Keyword;
 use data::r#trait;
 use data::spell::SpellSchema;
 
@@ -182,33 +183,46 @@ fn word_regex(word: String) -> Regex {
     Regex::new(format!("\\b{}\\b", word).as_str()).unwrap()
 }
 
-fn tokenize_description(
-    text: String,
-    effects: &Vec<EffectAvro>,
+fn build_regex(
     spells: &Vec<ApiSpellRecord>,
-) -> Vec<String> {
-    let x = spells.iter().fold(text, |acc, r| {
-        let re = word_regex(r.name.clone());
-        String::from(re.replace(acc.as_str(), format!("|SPELL:{}|", &r.name).as_str()))
-    });
-    let y = x
-        .split("|")
-        .filter(|t| !t.is_empty())
-        .map(String::from)
-        .collect::<Vec<_>>();
-    y.iter()
-        .flat_map(|t| {
-            if t.starts_with("SPELL:") {
-                vec![t.replace("SPELL:", "")]
+    effects: &Vec<EffectAvro>,
+    keywords: &Vec<Keyword>,
+) -> Vec<Regex> {
+    let tokens = spells
+        .iter()
+        .map(|x| x.name.as_str())
+        .chain(effects.iter().map(|x| x.name.as_str()))
+        .chain(keywords.iter().map(|x| x.name.as_str()))
+        .collect::<Vec<&str>>();
+    tokens
+        .iter()
+        .map(|x| Regex::new(format!("\\b({})\\b", x).as_str()).unwrap())
+        .collect()
+}
+
+fn tokenize_description(text: String, dict: &Vec<Regex>) -> Vec<String> {
+    dict.iter()
+        .fold(vec![text], |acc, re| {
+            acc.iter()
+                .flat_map(|x| {
+                    if x.starts_with(":") {
+                        vec![x.clone()]
+                    } else {
+                        re.replace(x.as_str(), "|:$1|")
+                            .split("|")
+                            .filter(|i| !i.is_empty())
+                            .map(String::from)
+                            .collect::<Vec<String>>()
+                    }
+                })
+                .collect()
+        })
+        .iter()
+        .map(|x| {
+            if x.starts_with(":") {
+                x[1..].to_string()
             } else {
-                let p = effects.iter().fold(t.clone(), |acc, e| {
-                    let re = word_regex(e.name.clone());
-                    String::from(re.replace(acc.as_str(), format!("|{}|", &e.name).as_str()))
-                });
-                p.split("|")
-                    .filter(|t| !t.is_empty())
-                    .map(String::from)
-                    .collect()
+                x.clone()
             }
         })
         .collect()
@@ -220,6 +234,9 @@ fn gen_traits() {
     let api_traits = load_traits();
     let effects = load_effects();
     let spells = load_spells();
+    let keywords = Keyword::load();
+
+    let words = build_regex(&spells, &effects, &keywords);
 
     let index_dir = Path::new("embed/traits");
     std::fs::remove_dir_all(index_dir).unwrap();
@@ -267,7 +284,7 @@ fn gen_traits() {
         doc.add_text(schema.name(), trait_name.clone());
         doc.add_text(schema.material(), material.clone());
 
-        tokenize_description(description.clone(), &effects, &spells)
+        tokenize_description(description.clone(), &words)
             .iter()
             .for_each(|t| {
                 doc.add_text(schema.description(), t);
@@ -288,6 +305,7 @@ fn gen_traits() {
             }
         }
 
+        println!("{}: {:?}", i, schema.to_struct(&doc));
         index_writer.add_document(doc).unwrap();
     });
 
@@ -311,6 +329,9 @@ fn gen_effects() {
 fn gen_spells() {
     let spells = load_spells();
     let effects = load_effects();
+    let keywords = Keyword::load();
+
+    let words = build_regex(&spells, &effects, &keywords);
 
     let index_dir = Path::new("embed/spells");
     std::fs::remove_dir_all(index_dir).unwrap();
@@ -335,12 +356,13 @@ fn gen_spells() {
         doc.add_u64(schema.charges(), r.charges as u64);
         doc.add_text(schema.source(), r.source.clone());
 
-        tokenize_description(r.description.clone(), &effects, &spells)
+        tokenize_description(r.description.clone(), &words)
             .iter()
             .for_each(|t| {
                 doc.add_text(schema.description(), t);
             });
 
+        println!("{}: {:?}", i, schema.to_struct(&doc));
         index_writer.add_document(doc).unwrap();
     });
 
@@ -348,7 +370,7 @@ fn gen_spells() {
 }
 
 fn main() {
-    gen_traits();
+    // gen_traits();
     // gen_effects();
-    // gen_spells();
+    gen_spells();
 }
