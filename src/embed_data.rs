@@ -12,6 +12,10 @@ pub struct EmbedAvro;
 #[folder = "embed/traits/"]
 pub struct EmbedTraits;
 
+#[derive(RustEmbed, Clone)]
+#[folder = "embed/spells/"]
+pub struct EmbedSpells;
+
 fn load_effects() -> Vec<Effect> {
     let reader = apache_avro::Reader::new(std::io::Cursor::new(
         EmbedAvro::get("effects.avro").unwrap().data,
@@ -26,7 +30,8 @@ fn load_effects() -> Vec<Effect> {
 }
 
 pub fn load() -> Data {
-    let index = tantivy::Index::open(EmbedDirectory::new(EmbedTraits)).unwrap();
+    let traits_index = tantivy::Index::open(EmbedDirectory::new(EmbedTraits)).unwrap();
+    let spells_index = tantivy::Index::open(EmbedDirectory::new(EmbedSpells)).unwrap();
 
-    Data::from(index, load_effects())
+    Data::from(traits_index, spells_index, load_effects())
 }

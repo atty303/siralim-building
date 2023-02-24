@@ -25,6 +25,19 @@ pub fn description(props: &DescriptionProps) -> Html {
                             {t.as_str()}
                         </span>
                     }
+                } else if let Ok(s) = data.search_spell(format!("name:\"{}\"", t).as_str()) {
+                    if let Some(x) = s.get(0) {
+                        html! {
+                            <span class={"tooltip spell"}>
+                                <span class="tooltip-text">
+                                    {x.description.clone()}
+                                </span>
+                                {t.as_str()}
+                            </span>
+                        }
+                    } else {
+                        html! { <span>{t.as_str()}</span> }
+                    }
                 } else {
                     html! { <span>{t.as_str()}</span> }
                 }

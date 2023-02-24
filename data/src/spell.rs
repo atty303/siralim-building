@@ -5,7 +5,7 @@ use tantivy::Document;
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Spell {
-    pub id: i64,
+    pub id: i16,
     pub name: IString,
     pub class: IString,
     pub charges: u8,
@@ -71,7 +71,7 @@ impl SpellSchema {
 
     pub fn to_struct(&self, doc: &Document) -> Spell {
         Spell {
-            id: doc.get_first(self.id()).unwrap().as_i64().unwrap(),
+            id: doc.get_first(self.id()).unwrap().as_i64().unwrap() as i16,
             name: SpellSchema::get_text(doc, self.name()),
             class: SpellSchema::get_text(doc, self.class()),
             charges: doc.get_first(self.charges()).unwrap().as_u64().unwrap() as u8,
