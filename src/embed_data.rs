@@ -1,5 +1,6 @@
 use data::effect::{Effect, EffectAvro};
 use data::keyword::Keyword;
+use data::personality::Personality;
 use data::Data;
 use rust_embed::RustEmbed;
 
@@ -34,5 +35,11 @@ pub fn load() -> Data {
     let traits_index = tantivy::Index::open(EmbedDirectory::new(EmbedTraits)).unwrap();
     let spells_index = tantivy::Index::open(EmbedDirectory::new(EmbedSpells)).unwrap();
 
-    Data::from(traits_index, spells_index, load_effects(), Keyword::load())
+    Data::from(
+        traits_index,
+        spells_index,
+        load_effects(),
+        Keyword::load(),
+        Personality::load(),
+    )
 }

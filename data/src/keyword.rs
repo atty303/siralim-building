@@ -1,7 +1,4 @@
-use apache_avro::AvroSchema;
 use implicit_clone::unsync::IString;
-use serde::{Deserialize, Serialize};
-use tantivy::aggregation::Key;
 
 #[derive(Debug, Clone)]
 pub struct Keyword {

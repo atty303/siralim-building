@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use data::personality::Stat;
 use qstring::QString;
 use yew::prelude::*;
 
@@ -45,11 +46,13 @@ pub fn app(props: &AppProps) -> Html {
     };
     let initial_state = loaded_state.unwrap_or_else(|| State::new(&props.data));
 
-    let state = use_reducer(|| initial_state);
+    let data = use_memo(|_| props.data.clone(), ());
 
+    let state = use_reducer(|| initial_state);
+    let d = data.clone();
     use_effect_with_deps(
         move |state| {
-            let save_string = Save::from_state(state).as_string();
+            let save_string = Save::from_state(state, d.as_ref()).as_string();
             history
                 .replace_state_with_url(
                     &wasm_bindgen::JsValue::null(),
@@ -115,7 +118,10 @@ pub fn app(props: &AppProps) -> Html {
         })
     };
 
-    let data = use_memo(|_| props.data.clone(), ());
+    let dispatch_set_personality = {
+        let state = state.clone();
+        Callback::from(move |x: (usize, Stat, bool)| state.dispatch(Action::SetPersonality(x)))
+    };
 
     html! {
         <ContextProvider<Rc<data::Data>> context={data}>
@@ -125,6 +131,7 @@ pub fn app(props: &AppProps) -> Html {
                 on_swap={on_swap}
                 on_click={on_member_click}
                 on_clear={on_member_clear}
+                {dispatch_set_personality}
             />
             <TraitsModal
                 show={*show_traits_modal}

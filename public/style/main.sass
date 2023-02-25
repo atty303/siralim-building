@@ -108,9 +108,37 @@ input[type=text]
       ul.stats
         padding-inline-start: 0
         margin: 0
-        padding: 0 1rem
+        padding: 0 0.5rem 0 1rem
         > li
           display: block
+          > .personality
+            width: 1rem
+            height: 1rem
+          > .personality.positive
+            color: #4caf50
+          > .personality.negative
+            color: #f44336
+        .tooltip-text
+          min-width: auto
+          padding: 1rem
+          text-align: center
+
+          > span
+            display: block
+            margin-bottom: 0.5rem
+          > img
+            width: 1rem
+            height: 1rem
+          > button
+            border-radius: 50%
+            width: 40px
+            height: 40px
+            background-color: $surface-variant
+            color: $on-surface-variant
+            font-size: 24px
+          > button:hover
+            background-color: rgba($primary, 92%)
+            color: $on-primary
 
     > .class
       background-color: #00000080

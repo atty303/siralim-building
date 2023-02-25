@@ -5,7 +5,6 @@ extern crate regex;
 extern crate serde;
 extern crate tantivy;
 
-use std::collections::hash_map::DefaultHasher;
 use std::collections::BTreeSet;
 use std::hash::Hash;
 use std::hash::{BuildHasher, Hasher};
@@ -14,7 +13,7 @@ use std::path::Path;
 use apache_avro::AvroSchema;
 use csv::StringRecord;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use tantivy::{doc, Document, Index};
 
 use data::effect::EffectAvro;
@@ -176,11 +175,6 @@ fn search_hash_seed<S: Ord, T: DefaultHash<S>>(records: &Vec<T>) -> usize {
         panic!("seed not found")
     }
     seed
-}
-
-#[memoize::memoize]
-fn word_regex(word: String) -> Regex {
-    Regex::new(format!("\\b{}\\b", word).as_str()).unwrap()
 }
 
 fn build_regex(
@@ -370,7 +364,7 @@ fn gen_spells() {
 }
 
 fn main() {
-    // gen_traits();
-    // gen_effects();
+    gen_traits();
+    gen_effects();
     gen_spells();
 }

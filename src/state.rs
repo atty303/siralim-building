@@ -3,6 +3,7 @@ use std::rc::Rc;
 
 use yew::prelude::*;
 
+use data::personality::Stat;
 use data::r#trait::Trait;
 use data::Data;
 
@@ -11,6 +12,8 @@ pub struct Member {
     pub primary_trait: Option<Trait>,
     pub fused_trait: Option<Trait>,
     pub artifact_trait: Option<Trait>,
+    pub personality_positive: Option<Stat>,
+    pub personality_negative: Option<Stat>,
 }
 
 fn flatten_stat(a: Option<u8>, b: Option<u8>) -> Option<u8> {
@@ -28,6 +31,8 @@ impl Member {
             primary_trait: None,
             fused_trait: None,
             artifact_trait: None,
+            personality_positive: None,
+            personality_negative: None,
         }
     }
 
@@ -86,6 +91,15 @@ impl Member {
             self.fused_trait.as_ref().map(|a| a.speed()).flatten(),
         )
     }
+    pub fn personality_for(&self, stat: Stat) -> Option<bool> {
+        if self.personality_positive == Some(stat.clone()) {
+            Some(true)
+        } else if self.personality_negative == Some(stat.clone()) {
+            Some(false)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -114,6 +128,7 @@ pub enum Action {
     Set((usize, usize, Trait)),
     Clear((usize, usize)),
     Swap((usize, usize, usize, usize)),
+    SetPersonality((usize, Stat, bool)),
 }
 
 fn normalize_trait_pool(trait_pool: Vec<Option<Trait>>) -> Vec<Option<Trait>> {
@@ -266,6 +281,20 @@ impl Reducible for State {
                         (None, None) => self,
                     }
                 }
+            }
+            Action::SetPersonality((index, stat, positive)) => {
+                let mut party = self.party.clone();
+                let mut m = party.get_mut(index).unwrap();
+                if positive {
+                    m.personality_positive = Some(stat);
+                } else {
+                    m.personality_negative = Some(stat);
+                }
+                State {
+                    party,
+                    trait_pool: self.trait_pool.clone(),
+                }
+                .into()
             }
         }
     }

@@ -1,6 +1,6 @@
-use std::ops::Deref;
 use web_sys::Element;
 
+use data::personality::Stat;
 use yew::prelude::*;
 use yew_icons::{Icon, IconId};
 
@@ -8,7 +8,6 @@ use data::r#trait::Trait;
 
 use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
-use crate::components::modal::_ModalProps::class;
 use crate::state::Member;
 
 #[derive(Debug)]
@@ -37,6 +36,7 @@ pub struct PartyProps {
     pub on_swap: Callback<PartySwapEvent>,
     pub on_click: Callback<PartyTraitEvent>,
     pub on_clear: Callback<PartyTraitEvent>,
+    pub dispatch_set_personality: Callback<(usize, Stat, bool)>,
 }
 
 #[function_component(Party)]
@@ -47,6 +47,7 @@ pub fn party(props: &PartyProps) -> Html {
         <div class="party">
             <h2>{"PARTY"}</h2>
             {props.party.iter().enumerate().map(|(i, m)| {
+                let dispatch_set_personality = props.dispatch_set_personality.clone();
                 let on_click = {
                     let on_click = props.on_click.clone();
                     Callback::from(move |e: PartyTraitEvent| {
@@ -90,6 +91,7 @@ pub fn party(props: &PartyProps) -> Html {
                         on_clear={on_clear}
                         on_drag_start={on_drag_start}
                         on_drop={on_drop}
+                        {dispatch_set_personality}
                     >
                     </PartyMember>
                 }
@@ -157,6 +159,7 @@ struct PartyMemberProps {
     on_clear: Callback<PartyTraitEvent>,
     on_drag_start: Callback<PartyTraitEvent>,
     on_drop: Callback<PartyTraitEvent>,
+    dispatch_set_personality: Callback<(usize, Stat, bool)>,
 }
 
 #[function_component(PartyMember)]
@@ -196,13 +199,17 @@ fn party_member(props: &PartyMemberProps) -> Html {
         .clone()
         .map(|t| t.sprite)
         .flatten();
-    let format_stat = |v: Option<u8>| v.map_or_else(|| "-".to_string(), |n| format!("{}", n));
 
-    let health = props.member.health();
     let mut left_pane_classes = classes!("left-pane");
     if let Some(c) = props.member.class() {
         left_pane_classes.push(c.as_str().to_lowercase().to_string());
     }
+
+    let set_personality = {
+        let dispatch_set_personality = props.dispatch_set_personality.clone();
+        let position = props.position;
+        Callback::from(move |x: (Stat, bool)| dispatch_set_personality.emit((position, x.0, x.1)))
+    };
 
     html! {
         <div class="party-member">
@@ -214,11 +221,11 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         html! { <div class="sprite"></div> }
                     }}
                     <ul class="stats">
-                        <li class="health"><img src="image/health.png" />{format_stat(props.member.health())}</li>
-                        <li class="attack"><img src="image/attack.png" />{format_stat(props.member.attack())}</li>
-                        <li class="intelligence"><img src="image/intelligence.png" />{format_stat(props.member.intelligence())}</li>
-                        <li class="defense"><img src="image/defense.png" />{format_stat(props.member.defense())}</li>
-                        <li class="speed"><img src="image/speed.png" />{format_stat(props.member.speed())}</li>
+                        <PartyStat stat={Stat::Health} value={props.member.health()} personality={props.member.personality_for(Stat::Health)} set_personality={set_personality.clone()} />
+                        <PartyStat stat={Stat::Attack} value={props.member.attack()} personality={props.member.personality_for(Stat::Attack)} set_personality={set_personality.clone()} />
+                        <PartyStat stat={Stat::Intelligence} value={props.member.intelligence()} personality={props.member.personality_for(Stat::Intelligence)} set_personality={set_personality.clone()} />
+                        <PartyStat stat={Stat::Defense} value={props.member.defense()} personality={props.member.personality_for(Stat::Defense)} set_personality={set_personality.clone()} />
+                        <PartyStat stat={Stat::Speed} value={props.member.speed()} personality={props.member.personality_for(Stat::Speed)} set_personality={set_personality.clone()} />
                     </ul>
                 </div>
                 <div class="class">
@@ -404,5 +411,51 @@ fn party_trait(props: &PartyTraitProps) -> Html {
                 <div class="clear"></div>
             </>
         }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct PartyStatProps {
+    stat: Stat,
+    value: Option<u8>,
+    personality: Option<bool>,
+    set_personality: Callback<(Stat, bool)>,
+}
+
+#[function_component(PartyStat)]
+fn party_stat(props: &PartyStatProps) -> Html {
+    let format_stat = |v: Option<u8>| v.map_or_else(|| "-".to_string(), |n| format!("{}", n));
+    let on_positive = {
+        let set_personality = props.set_personality.clone();
+        let stat = props.stat.clone();
+        Callback::from(move |_| {
+            set_personality.emit((stat.clone(), true));
+        })
+    };
+    let on_negative = {
+        let set_personality = props.set_personality.clone();
+        let stat = props.stat.clone();
+        Callback::from(move |_| set_personality.emit((stat.clone(), false)))
+    };
+    html! {
+        <li class={classes!(props.stat.to_string(), "tooltip")}>
+            <span class="tooltip-text">
+                <span>{"Personality: "}<img src={format!("image/{}.png", props.stat)} /></span>
+                <button onclick={on_positive}><Icon icon_id={IconId::BootstrapArrowUpShort} /></button>
+                <button onclick={on_negative}><Icon icon_id={IconId::BootstrapArrowDownShort} /></button>
+            </span>
+            <img src={format!("image/{}.png", props.stat)} />
+            {format_stat(props.value)}
+            {if props.personality == Some(true) {
+                html! { <Icon icon_id={IconId::BootstrapArrowUpShort} class="personality positive" /> }
+            } else {
+                html! {}
+            }}
+            {if props.personality == Some(false) {
+                html! { <Icon icon_id={IconId::BootstrapArrowDownShort} class="personality negative" /> }
+            } else {
+                html! {}
+            }}
+        </li>
     }
 }

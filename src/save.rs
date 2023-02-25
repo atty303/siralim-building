@@ -2,6 +2,7 @@ use apache_avro::AvroSchema;
 use base64::Engine;
 use serde::{Deserialize, Serialize};
 
+use data::personality::Personality;
 use data::r#trait::Trait;
 use data::Data;
 
@@ -18,6 +19,7 @@ struct SaveMember {
     primary_trait: Option<i32>,
     fused_trait: Option<i32>,
     artifact_trait: Option<i32>,
+    personality: Option<i8>,
 }
 
 fn id_to_trait(data: &Data, id: Option<i32>) -> Option<Trait> {
@@ -25,7 +27,7 @@ fn id_to_trait(data: &Data, id: Option<i32>) -> Option<Trait> {
 }
 
 impl Save {
-    pub fn from_state(state: &State) -> Save {
+    pub fn from_state(state: &State, data: &Data) -> Save {
         Save {
             party: state
                 .party
@@ -34,6 +36,12 @@ impl Save {
                     primary_trait: m.primary_trait.clone().map(|c| c.id),
                     fused_trait: m.fused_trait.clone().map(|c| c.id),
                     artifact_trait: m.artifact_trait.clone().map(|c| c.id),
+                    personality: Personality::get_by_stat(
+                        &data.personalities,
+                        &m.personality_positive,
+                        &m.personality_negative,
+                    )
+                    .map(|x| x.id),
                 })
                 .collect(),
             trait_pool: state
@@ -53,6 +61,16 @@ impl Save {
                     primary_trait: id_to_trait(data, m.primary_trait),
                     fused_trait: id_to_trait(data, m.fused_trait),
                     artifact_trait: id_to_trait(data, m.artifact_trait),
+                    personality_positive: m
+                        .personality
+                        .map(|id| Personality::get_by_id(&data.personalities, id))
+                        .flatten()
+                        .map(|x| x.positive),
+                    personality_negative: m
+                        .personality
+                        .map(|id| Personality::get_by_id(&data.personalities, id))
+                        .flatten()
+                        .map(|x| x.negative),
                 })
                 .collect(),
             trait_pool: self
