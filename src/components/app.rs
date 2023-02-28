@@ -27,7 +27,7 @@ pub fn app(props: &AppProps) -> Html {
         show_modal.clone(),
     );
 
-    let show_traits_modal = use_state(|| false);
+    let show_traits_modal = use_state(|| true);
 
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();

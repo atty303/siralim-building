@@ -1,4 +1,5 @@
 use yew::prelude::*;
+use yew_icons::{Icon, IconId};
 
 #[derive(Properties, PartialEq)]
 pub struct ModalProps {
@@ -24,7 +25,10 @@ pub fn modal(props: &ModalProps) -> Html {
         <div class={modal_classes}>
             <div class={class}>
                 <div class="title">
-                    <button onclick={onclick}>{"close"}</button>
+                    <div class="text"></div>
+                    <div class="close">
+                        <button onclick={onclick}><Icon icon_id={IconId::BootstrapXLg} /></button>
+                    </div>
                 </div>
                 <div class="content">
                     { for props.children.iter() }
