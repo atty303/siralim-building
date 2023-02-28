@@ -1,8 +1,10 @@
+use std::collections::BTreeSet;
 use std::rc::Rc;
 
 use implicit_clone::unsync::IString;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
+use yew_icons::{Icon, IconId};
 
 use data::r#trait::Trait;
 use data::Data;
@@ -20,6 +22,7 @@ pub struct TraitSelectEvent {
 #[derive(Properties, PartialEq)]
 pub struct TraitsModalProps {
     pub show: bool,
+    pub selection: BTreeSet<i32>,
     pub on_cancel: Callback<()>,
     pub on_select: Callback<TraitSelectEvent>,
 }
@@ -76,6 +79,7 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
             <div class="table">
                 <TraitTable
                     items={(*items).clone()}
+                    selection={props.selection.clone()}
                     on_select={on_select}
                 />
             </div>
@@ -86,6 +90,7 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
 #[derive(Properties, PartialEq)]
 struct TraitTableProps {
     items: Vec<Trait>,
+    selection: BTreeSet<i32>,
     on_select: Callback<TraitSelectEvent>,
 }
 
@@ -101,6 +106,7 @@ fn trait_table(props: &TraitTableProps) -> Html {
         <table class="trait">
             <thead>
                 <tr>
+                    <th></th>
                     <th>{"Class"}</th>
                     <th>{"Family"}</th>
                     <th>{"Creature"}</th>
@@ -113,23 +119,28 @@ fn trait_table(props: &TraitTableProps) -> Html {
                 </tr>
             </thead>
             <tbody>
-                {props.items.iter().map(|c| html! {
-                    <tr onclick={on_click(c.clone()).clone()}>
-                        <td class="class">
-                            <ClassIcon value={c.class.clone()} />
-                            {c.class.clone()}
-                        </td>
-                        <td class="family">{c.family.clone()}</td>
-                        <td class="creature"><CreatureName r#trait={c.clone()} icon={false} /></td>
-                        <td class="trait_description">
-                            <Description value={c.trait_description.clone()} />
-                        </td>
-                        <td class="stat health"><CreatureStat value={c.stats.as_ref().map(|s| s.health)} /></td>
-                        <td class="stat attack"><CreatureStat value={c.stats.as_ref().map(|s| s.attack)} /></td>
-                        <td class="stat intelligence"><CreatureStat value={c.stats.as_ref().map(|s| s.intelligence)} /></td>
-                        <td class="stat defense"><CreatureStat value={c.stats.as_ref().map(|s| s.defense)} /></td>
-                        <td class="stat speed"><CreatureStat value={c.stats.as_ref().map(|s| s.speed)} /></td>
-                    </tr>
+                {props.items.iter().map(|c| {
+                    let selected = props.selection.contains(&c.id);
+                    let classes = if selected { classes!("selected") } else { Classes::new() };
+                    html! {
+                        <tr class={classes}>
+                            <td class="select" onclick={on_click(c.clone()).clone()}><Icon icon_id={IconId::BootstrapCheckSquareFill} /></td>
+                            <td class="class">
+                                <ClassIcon value={c.class.clone()} />
+                                {c.class.clone()}
+                            </td>
+                            <td class="family">{c.family.clone()}</td>
+                            <td class="creature"><CreatureName r#trait={c.clone()} icon={false} /></td>
+                            <td class="trait_description">
+                                <Description value={c.trait_description.clone()} />
+                            </td>
+                            <td class="stat health"><CreatureStat value={c.stats.as_ref().map(|s| s.health)} /></td>
+                            <td class="stat attack"><CreatureStat value={c.stats.as_ref().map(|s| s.attack)} /></td>
+                            <td class="stat intelligence"><CreatureStat value={c.stats.as_ref().map(|s| s.intelligence)} /></td>
+                            <td class="stat defense"><CreatureStat value={c.stats.as_ref().map(|s| s.defense)} /></td>
+                            <td class="stat speed"><CreatureStat value={c.stats.as_ref().map(|s| s.speed)} /></td>
+                        </tr>
+                    }
                 }).collect::<Html>()}
             </tbody>
         </table>

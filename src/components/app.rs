@@ -27,7 +27,7 @@ pub fn app(props: &AppProps) -> Html {
         show_modal.clone(),
     );
 
-    let show_traits_modal = use_state(|| true);
+    let show_traits_modal = use_state(|| false);
 
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
@@ -135,6 +135,7 @@ pub fn app(props: &AppProps) -> Html {
             />
             <TraitsModal
                 show={*show_traits_modal}
+                selection={state.selection()}
                 on_cancel={on_close_traits_modal}
                 on_select={on_select_trait}
             />

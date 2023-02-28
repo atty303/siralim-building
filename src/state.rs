@@ -1,4 +1,5 @@
 use implicit_clone::unsync::IString;
+use std::collections::BTreeSet;
 use std::rc::Rc;
 
 use yew::prelude::*;
@@ -52,6 +53,19 @@ impl Member {
             _ => (),
         }
     }
+
+    pub fn selection(&self) -> Vec<i32> {
+        vec![
+            self.primary_trait.clone(),
+            self.fused_trait.clone(),
+            self.artifact_trait.clone(),
+        ]
+        .iter()
+        .flatten()
+        .map(|t| t.id)
+        .collect()
+    }
+
     pub fn class(&self) -> Option<IString> {
         self.fused_trait.as_ref().map(|x| x.class.clone())
     }
@@ -121,6 +135,12 @@ impl State {
             ],
             trait_pool: vec![None],
         }
+    }
+
+    pub fn selection(&self) -> BTreeSet<i32> {
+        let a: Vec<i32> = self.party.iter().map(|m| m.selection()).flatten().collect();
+        let b: Vec<i32> = self.trait_pool.iter().flatten().map(|t| t.id).collect();
+        a.into_iter().chain(b).collect()
     }
 }
 
