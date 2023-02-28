@@ -1,11 +1,13 @@
-use implicit_clone::unsync::IString;
 use std::rc::Rc;
+
+use implicit_clone::unsync::IString;
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 use data::r#trait::Trait;
 use data::Data;
 
+use crate::components::creature_name::CreatureName;
 use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
 use crate::components::modal::Modal;
@@ -102,14 +104,12 @@ fn trait_table(props: &TraitTableProps) -> Html {
                     <th>{"Class"}</th>
                     <th>{"Family"}</th>
                     <th>{"Creature"}</th>
-                    <th>{"Trait"}</th>
                     <th>{"Trait Description"}</th>
                     <th><img src="image/health.png" /></th>
                     <th><img src="image/attack.png" /></th>
                     <th><img src="image/intelligence.png" /></th>
                     <th><img src="image/defense.png" /></th>
                     <th><img src="image/speed.png" /></th>
-                    <th>{"Material Name"}</th>
                 </tr>
             </thead>
             <tbody>
@@ -120,8 +120,7 @@ fn trait_table(props: &TraitTableProps) -> Html {
                             {c.class.clone()}
                         </td>
                         <td class="family">{c.family.clone()}</td>
-                        <td class="creature">{c.creature.clone()}</td>
-                        <td class="trait">{c.trait_name.clone()}</td>
+                        <td class="creature"><CreatureName r#trait={c.clone()} icon={false} /></td>
                         <td class="trait_description">
                             <Description value={c.trait_description.clone()} />
                         </td>
@@ -130,7 +129,6 @@ fn trait_table(props: &TraitTableProps) -> Html {
                         <td class="stat intelligence"><CreatureStat value={c.stats.as_ref().map(|s| s.intelligence)} /></td>
                         <td class="stat defense"><CreatureStat value={c.stats.as_ref().map(|s| s.defense)} /></td>
                         <td class="stat speed"><CreatureStat value={c.stats.as_ref().map(|s| s.speed)} /></td>
-                        <td class="material_name">{c.material_name.clone()}</td>
                     </tr>
                 }).collect::<Html>()}
             </tbody>

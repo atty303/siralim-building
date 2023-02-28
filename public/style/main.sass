@@ -203,17 +203,8 @@ ul.traits
         cursor: move
         color: $primary
 
-      .creature
+      .creature-name
         width: 25%
-        > span
-          display: block
-          margin: 5px
-          //line-height: calc(4rem - 40px)
-          padding: 5px
-          background: $surface-variant
-          color: $on-surface-variant
-          > img
-            margin-right: 4px
       .trait-description
         width: 75%
         margin: 0 0.5rem
@@ -246,6 +237,16 @@ ul.traits
       button:hover
         background: $error-container
         color: $on-error-container
+
+.creature-name
+  > span
+    display: block
+    margin: 5px
+    padding: 5px
+    background: $surface-variant
+    color: $on-surface-variant
+    > img
+      margin-right: 4px
 
 .modal.trait
   .content
@@ -349,12 +350,12 @@ ul.traits
   visibility: visible
   z-index: 5
 
-table.trait .tooltip-text
+.trait-description .tooltip-text
   max-width: 20rem
   white-space: normal
   text-align: center
 
-.creature .tooltip-text
+.creature-name .tooltip-text
   display: flex
   align-items: center
   padding: 0.5rem 1rem
