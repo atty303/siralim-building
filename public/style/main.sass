@@ -1,24 +1,7 @@
-$primary: #D0BCFF
-$on-primary: #381E72
-$primary-container: #4F378B
-$on-primary-container: #EADDFF
-$secondary: #625B71
-$on-secondary: #FFFFFF
-$tertiary: #7D5260
-$on-tertiary: #FFFFFF
-$tertiary-container: #FFD8E4
-$on-tertiary-container: #31111D
-$secondary-container: #4A4458
-$on-secondary-container: #E8DEF8
-$error-container: #8C1D18
-$on-error-container: #F9DEDC
-$background: #1C1B1F
-$on-background: #E6E1E5
-$surface: #1C1B1F
-$on-surface: #E6E1E5
-$surface-variant: #49454F
-$on-surface-variant: #CAC4D0
-$outline: #938F99
+@use "modal_overlay"
+@use "modal"
+
+@import "variables"
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap')
 
@@ -37,53 +20,6 @@ input[type=text]
   color: inherit
   padding: 5px
   border-radius: 5px
-
-// -----
-.modal-overlay
-  position: fixed
-  top: 0
-  left: 0
-  width: 100%
-  height: 100%
-  background-color: #00000080
-
-  .modal
-    position: absolute
-    top: 2.5%
-    left: 2.5%
-    right: 2.5%
-    bottom: 2.5%
-    width: 95%
-    height: 95%
-    background: $background
-    box-shadow: 0 0 5px $outline
-
-    > .title
-      width: 100%
-      background: $primary-container
-      color: $on-primary-container
-      height: 2rem
-      text-align: right
-      display: flex
-      > .text
-        flex-grow: 1
-      > .close
-        > button
-          display: block
-          width: 100%
-          height: 100%
-          background-color: inherit
-          color: inherit
-          border: none
-          border-left: 1px solid $outline
-
-    > .content
-      padding: 10px
-      height: calc(100% - 2rem)
-      max-height: calc(100% - 2rem)
-
-.modal-overlay.hidden
-  visibility: hidden
 
 // ----
 .party
@@ -285,6 +221,7 @@ ul.traits, ul.spells
     flex-grow: 1
     height: 100%
     overflow-y: scroll
+    overflow-x: hidden
   table
     position: relative
     table-layout: fixed

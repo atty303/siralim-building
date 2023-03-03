@@ -19,18 +19,21 @@ pub fn modal(props: &ModalProps) -> Html {
     let mut class = props.class.clone();
     class.push("modal");
 
-    let mut modal_classes = Classes::from("modal-overlay");
-    modal_classes.push(if props.show { "visible" } else { "hidden" });
+    let modal_class = if props.show {
+        "modal-overlay--visible"
+    } else {
+        "modal-overlay--hidden"
+    };
     html! {
-        <div class={modal_classes}>
+        <div class={modal_class}>
             <div class={class}>
-                <div class="title">
-                    <div class="text"></div>
-                    <div class="close">
+                <div class="modal__title">
+                    <div class="modal__text"></div>
+                    <div class="modal__close">
                         <button onclick={onclick}><Icon icon_id={IconId::BootstrapXLg} /></button>
                     </div>
                 </div>
-                <div class="content">
+                <div class="modal__content">
                     { for props.children.iter() }
                 </div>
             </div>

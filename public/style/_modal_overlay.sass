@@ -1,0 +1,17 @@
+@import "variables"
+
+%modal-overlay
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  background-color: #00000080
+
+.modal-overlay
+  &--visible
+    @extend %modal-overlay
+    visibility: visible
+  &--hidden
+    @extend %modal-overlay
+    visibility: hidden
