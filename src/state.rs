@@ -6,6 +6,7 @@ use yew::prelude::*;
 
 use data::personality::Stat;
 use data::r#trait::Trait;
+use data::spell::Spell;
 use data::Data;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -15,6 +16,7 @@ pub struct Member {
     pub artifact_trait: Option<Trait>,
     pub personality_positive: Option<Stat>,
     pub personality_negative: Option<Stat>,
+    pub spells: Vec<Spell>,
 }
 
 fn flatten_stat(a: Option<u8>, b: Option<u8>) -> Option<u8> {
@@ -34,6 +36,7 @@ impl Member {
             artifact_trait: None,
             personality_positive: None,
             personality_negative: None,
+            spells: Vec::new(),
         }
     }
 
@@ -114,6 +117,25 @@ impl Member {
             None
         }
     }
+
+    pub fn set_spell(&mut self, i: usize, c: &Option<Spell>) {
+        let spells = if let Some(s) = c {
+            let mut spells = self.spells.to_vec();
+            if i < spells.len() {
+                spells[i] = s.clone();
+            } else {
+                spells.push(s.clone());
+            }
+            spells
+        } else {
+            let mut spells = self.spells.to_vec();
+            if i < spells.len() {
+                spells.remove(i);
+            }
+            spells
+        };
+        self.spells = spells;
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -137,10 +159,14 @@ impl State {
         }
     }
 
-    pub fn selection(&self) -> BTreeSet<i32> {
+    pub fn traits_selection(&self) -> BTreeSet<i32> {
         let a: Vec<i32> = self.party.iter().map(|m| m.selection()).flatten().collect();
         let b: Vec<i32> = self.trait_pool.iter().flatten().map(|t| t.id).collect();
         a.into_iter().chain(b).collect()
+    }
+
+    pub fn spells_selection(&self) -> BTreeSet<i16> {
+        BTreeSet::new()
     }
 }
 
@@ -149,6 +175,8 @@ pub enum Action {
     Clear((usize, usize)),
     Swap((usize, usize, usize, usize)),
     SetPersonality((usize, Stat, bool)),
+    SetSpell((usize, usize, Spell)),
+    ClearSpell((usize, usize)),
 }
 
 fn normalize_trait_pool(trait_pool: Vec<Option<Trait>>) -> Vec<Option<Trait>> {
@@ -315,6 +343,36 @@ impl Reducible for State {
                     trait_pool: self.trait_pool.clone(),
                 }
                 .into()
+            }
+            Action::SetSpell((position, index, spell)) => {
+                if let Some(member) = self.party.get(position) {
+                    let mut member = member.clone();
+                    member.set_spell(index, &Some(spell));
+                    let mut party = self.party.to_vec();
+                    party[position] = member;
+                    State {
+                        party,
+                        trait_pool: self.trait_pool.clone(),
+                    }
+                    .into()
+                } else {
+                    self.into()
+                }
+            }
+            Action::ClearSpell((position, index)) => {
+                if let Some(member) = self.party.get(position) {
+                    let mut member = member.clone();
+                    member.set_spell(index, &None);
+                    let mut party = self.party.to_vec();
+                    party[position] = member;
+                    State {
+                        party,
+                        trait_pool: self.trait_pool.clone(),
+                    }
+                    .into()
+                } else {
+                    self.into()
+                }
             }
         }
     }

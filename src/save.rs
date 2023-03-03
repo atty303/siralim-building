@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use data::personality::Personality;
 use data::r#trait::Trait;
+use data::spell::Spell;
 use data::Data;
 
 use crate::state::{Member, State};
@@ -20,10 +21,15 @@ struct SaveMember {
     fused_trait: Option<i32>,
     artifact_trait: Option<i32>,
     personality: Option<i8>,
+    spells: Vec<i16>,
 }
 
 fn id_to_trait(data: &Data, id: Option<i32>) -> Option<Trait> {
     id.iter().flat_map(|i| data.get_trait(*i).ok()).next()
+}
+
+fn id_to_spell(data: &Data, id: i16) -> Option<Spell> {
+    data.get_spell(id).ok()
 }
 
 impl Save {
@@ -42,6 +48,7 @@ impl Save {
                         &m.personality_negative,
                     )
                     .map(|x| x.id),
+                    spells: m.spells.iter().map(|s| s.id).collect(),
                 })
                 .collect(),
             trait_pool: state
@@ -71,6 +78,12 @@ impl Save {
                         .map(|id| Personality::get_by_id(&data.personalities, id))
                         .flatten()
                         .map(|x| x.negative),
+                    spells: m
+                        .spells
+                        .iter()
+                        .map(|id| id_to_spell(&data, *id))
+                        .flatten()
+                        .collect(),
                 })
                 .collect(),
             trait_pool: self

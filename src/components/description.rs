@@ -17,14 +17,14 @@ pub fn description(props: &DescriptionProps) -> Html {
             {props.value.iter().map(|t| {
                 if let Some(w) = data.keywords.get(t) {
                     html! {
-                        <span class={format!("keyword {}", w.category)}>
+                        <span class={format!("desc-keyword {}", w.category)}>
                             <img class="icon" src={format!("image/{}", w.icon)} />
                             {t.as_str()}
                         </span>
                     }
                 } else if let Some(e) = data.effects.get(t) {
                     html! {
-                        <span class={format!("tooltip effect {}", e.category)}>
+                        <span class={format!("tooltip desc-effect {}", e.category)}>
                             <span class="tooltip-text">
                                 {e.description.clone()}
                             </span>
@@ -35,7 +35,7 @@ pub fn description(props: &DescriptionProps) -> Html {
                 } else if let Ok(s) = data.search_spell(format!("name:\"{}\"", t).as_str()) {
                     if let Some(x) = s.get(0) {
                         html! {
-                            <span class={"tooltip spell"}>
+                            <span class={"tooltip desc-spell"}>
                                 <span class="tooltip-text">
                                     {x.description.clone()}
                                 </span>

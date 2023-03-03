@@ -4,7 +4,8 @@ use data::personality::Stat;
 use qstring::QString;
 use yew::prelude::*;
 
-use crate::components::party::{Party, PartySwapEvent, PartyTraitEvent};
+use crate::components::party::{Party, PartySpellEvent, PartySwapEvent, PartyTraitEvent};
+use crate::components::spells::{SpellSelectEvent, SpellsModal};
 use crate::components::traits::{TraitSelectEvent, TraitsModal};
 use crate::save::Save;
 use crate::state::{Action, State};
@@ -28,6 +29,7 @@ pub fn app(props: &AppProps) -> Html {
     );
 
     let show_traits_modal = use_state(|| false);
+    let show_spells_modal = use_state(|| false);
 
     let location: web_sys::Location = web_sys::window().unwrap().location();
     let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
@@ -123,6 +125,45 @@ pub fn app(props: &AppProps) -> Html {
         Callback::from(move |x: (usize, Stat, bool)| state.dispatch(Action::SetPersonality(x)))
     };
 
+    let clicked_spell_member = use_state(|| None);
+    let on_spell_click = {
+        let clicked_spell_member = clicked_spell_member.clone();
+        let show_modal = show_modal.clone();
+        let show_spells_modal = show_spells_modal.clone();
+        Callback::from(move |e: PartySpellEvent| {
+            clicked_spell_member.set(Some(e));
+            show_modal.set(true);
+            show_spells_modal.set(true);
+        })
+    };
+    let on_spell_clear = {
+        let state = state.clone();
+        Callback::from(move |e: PartySpellEvent| {
+            state.dispatch(Action::ClearSpell((e.position, e.index)));
+        })
+    };
+    let on_close_spells_modal = {
+        let show_modal = show_modal.clone();
+        let show_spells_modal = show_spells_modal.clone();
+        Callback::from(move |_| {
+            show_modal.set(false);
+            show_spells_modal.set(false);
+        })
+    };
+    let on_select_spell = {
+        let show_modal = show_modal.clone();
+        let show_spells_modal = show_spells_modal.clone();
+        let clicked_spell_member = clicked_spell_member.clone();
+        let state = state.clone();
+        Callback::from(move |e: SpellSelectEvent| {
+            show_modal.set(false);
+            show_spells_modal.set(false);
+            if let Some(t) = clicked_spell_member.as_ref() {
+                state.dispatch(Action::SetSpell((t.position, t.index, e.spell)));
+            }
+        })
+    };
+
     html! {
         <ContextProvider<Rc<data::Data>> context={data}>
             <Party
@@ -132,12 +173,20 @@ pub fn app(props: &AppProps) -> Html {
                 on_click={on_member_click}
                 on_clear={on_member_clear}
                 {dispatch_set_personality}
+                {on_spell_click}
+                {on_spell_clear}
             />
             <TraitsModal
                 show={*show_traits_modal}
-                selection={state.selection()}
+                selection={state.traits_selection()}
                 on_cancel={on_close_traits_modal}
                 on_select={on_select_trait}
+            />
+            <SpellsModal
+                show={*show_spells_modal}
+                selection={state.spells_selection()}
+                on_cancel={on_close_spells_modal}
+                on_select={on_select_spell}
             />
         </ContextProvider<Rc<data::Data>>>
     }

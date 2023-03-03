@@ -5,10 +5,12 @@ use yew::prelude::*;
 use yew_icons::{Icon, IconId};
 
 use data::r#trait::Trait;
+use data::spell::Spell;
 
 use crate::components::creature_name::CreatureName;
 use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
+use crate::components::spell_name::SpellName;
 use crate::state::Member;
 
 #[derive(Debug)]
@@ -30,6 +32,17 @@ impl PartyTraitEvent {
     }
 }
 
+#[derive(PartialEq, Clone, Debug)]
+pub struct PartySpellEvent {
+    pub position: usize,
+    pub index: usize,
+}
+impl PartySpellEvent {
+    fn new(position: usize, index: usize) -> PartySpellEvent {
+        Self { position, index }
+    }
+}
+
 #[derive(Properties, PartialEq)]
 pub struct PartyProps {
     pub party: Vec<Member>,
@@ -38,6 +51,8 @@ pub struct PartyProps {
     pub on_click: Callback<PartyTraitEvent>,
     pub on_clear: Callback<PartyTraitEvent>,
     pub dispatch_set_personality: Callback<(usize, Stat, bool)>,
+    pub on_spell_click: Callback<PartySpellEvent>,
+    pub on_spell_clear: Callback<PartySpellEvent>,
 }
 
 #[function_component(Party)]
@@ -84,6 +99,18 @@ pub fn party(props: &PartyProps) -> Html {
                         dragging.set(None);
                     })
                 };
+                let on_spell_click = {
+                    let on_spell_click = props.on_spell_click.clone();
+                    Callback::from(move |e: PartySpellEvent| {
+                        on_spell_click.emit(e.clone());
+                    })
+                };
+                let on_spell_clear = {
+                    let on_spell_clear = props.on_spell_clear.clone();
+                    Callback::from(move |e: PartySpellEvent| {
+                        on_spell_clear.emit(e.clone());
+                    })
+                };
                 html! {
                     <PartyMember
                         position={i}
@@ -93,6 +120,8 @@ pub fn party(props: &PartyProps) -> Html {
                         on_drag_start={on_drag_start}
                         on_drop={on_drop}
                         {dispatch_set_personality}
+                        {on_spell_click}
+                        {on_spell_clear}
                     >
                     </PartyMember>
                 }
@@ -161,6 +190,8 @@ struct PartyMemberProps {
     on_drag_start: Callback<PartyTraitEvent>,
     on_drop: Callback<PartyTraitEvent>,
     dispatch_set_personality: Callback<(usize, Stat, bool)>,
+    on_spell_click: Callback<PartySpellEvent>,
+    on_spell_clear: Callback<PartySpellEvent>,
 }
 
 #[function_component(PartyMember)]
@@ -212,6 +243,19 @@ fn party_member(props: &PartyMemberProps) -> Html {
         Callback::from(move |x: (Stat, bool)| dispatch_set_personality.emit((position, x.0, x.1)))
     };
 
+    let on_spell_click = |index: usize| {
+        let on_spell_click = props.on_spell_click.clone();
+        let e = PartySpellEvent::new(props.position, index);
+        Callback::from(move |_| {
+            on_spell_click.emit(e.clone());
+        })
+    };
+    let on_spell_clear = |index: usize| {
+        let on_spell_clear = props.on_spell_clear.clone();
+        let e = PartySpellEvent::new(props.position, index);
+        Callback::from(move |_| on_spell_clear.emit(e.clone()))
+    };
+
     html! {
         <div class="party-member">
             <div class={left_pane_classes}>
@@ -243,38 +287,64 @@ fn party_member(props: &PartyMemberProps) -> Html {
                 </div>
             </div>
             <div class="right-pane">
-                <ul class="traits">
-                    <li>
-                        <PartyTrait
-                            r#trait={props.member.primary_trait.clone()}
-                            empty_text={"Click to add primary trait"}
-                            on_click={on_click(0).clone()}
-                            on_clear={on_clear(0).clone()}
-                            on_drag_start={on_drag_start(0).clone()}
-                            on_drop={on_drop(0).clone()}
-                        />
-                    </li>
-                    <li>
-                        <PartyTrait
-                            r#trait={props.member.fused_trait.clone()}
-                            empty_text={"Click to add fused trait"}
-                            on_click={on_click(1).clone()}
-                            on_clear={on_clear(1).clone()}
-                            on_drag_start={on_drag_start(1).clone()}
-                            on_drop={on_drop(1).clone()}
-                        />
-                    </li>
-                    <li>
-                        <PartyTrait
-                            r#trait={props.member.artifact_trait.clone()}
-                            empty_text={"Click to add artifact trait"}
-                            on_click={on_click(2).clone()}
-                            on_clear={on_clear(2).clone()}
-                            on_drag_start={on_drag_start(2).clone()}
-                            on_drop={on_drop(2).clone()}
-                        />
-                    </li>
-                </ul>
+                <div class="group">
+                    <div class="side-title">{"TRAITS"}</div>
+                    <ul class="traits">
+                        <li>
+                            <PartyTrait
+                                r#trait={props.member.primary_trait.clone()}
+                                empty_text={"Click to add primary trait"}
+                                on_click={on_click(0).clone()}
+                                on_clear={on_clear(0).clone()}
+                                on_drag_start={on_drag_start(0).clone()}
+                                on_drop={on_drop(0).clone()}
+                            />
+                        </li>
+                        <li>
+                            <PartyTrait
+                                r#trait={props.member.fused_trait.clone()}
+                                empty_text={"Click to add fused trait"}
+                                on_click={on_click(1).clone()}
+                                on_clear={on_clear(1).clone()}
+                                on_drag_start={on_drag_start(1).clone()}
+                                on_drop={on_drop(1).clone()}
+                            />
+                        </li>
+                        <li>
+                            <PartyTrait
+                                r#trait={props.member.artifact_trait.clone()}
+                                empty_text={"Click to add artifact trait"}
+                                on_click={on_click(2).clone()}
+                                on_clear={on_clear(2).clone()}
+                                on_drag_start={on_drag_start(2).clone()}
+                                on_drop={on_drop(2).clone()}
+                            />
+                        </li>
+                    </ul>
+                </div>
+                <div class="group">
+                    <div class="side-title">{"SPELLS"}</div>
+                    <ul class="spells">
+                         {props.member.spells.iter().enumerate().map(|(i, s)| {
+                             html! {
+                                 <li>
+                                     <PartySpell
+                                          spell={s.clone()}
+                                          on_click={on_spell_click(i).clone()}
+                                          on_clear={on_spell_clear(i).clone()}
+                                     />
+                                 </li>
+                             }
+                         }).collect::<Html>()}
+                         <li>
+                             <PartySpell
+                                  spell={None}
+                                  on_click={on_spell_click(props.member.spells.len()).clone()}
+                                  on_clear={on_spell_clear(props.member.spells.len()).clone()}
+                             />
+                         </li>
+                    </ul>
+                </div>
             </div>
         </div>
     }
@@ -421,5 +491,51 @@ fn party_stat(props: &PartyStatProps) -> Html {
                 html! {}
             }}
         </li>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct PartySpellProps {
+    spell: Option<Spell>,
+    on_click: Callback<()>,
+    on_clear: Callback<()>,
+}
+
+#[function_component(PartySpell)]
+fn party_spell(props: &PartySpellProps) -> Html {
+    let onclick = {
+        let on_click = props.on_click.clone();
+        Callback::from(move |_| on_click.emit(()))
+    };
+    let onclear = {
+        let on_clear = props.on_clear.clone();
+        Callback::from(move |_| on_clear.emit(()))
+    };
+    if let Some(c) = &props.spell {
+        html! {
+            <>
+                <div class="spell non-empty">
+                    <SpellName spell={c.clone()} icon={true} />
+                    <div class="spell-description">
+                        <Description value={c.description.to_vec()} />
+                    </div>
+                </div>
+                <div class="clear">
+                    <button onclick={onclear}><Icon icon_id={IconId::BootstrapXLg} /></button>
+                </div>
+            </>
+        }
+    } else {
+        html! {
+            <>
+                <div
+                    class="spell empty"
+                    onclick={onclick}
+                >
+                    <span>{"Click to add spell"}</span>
+                </div>
+                <div class="clear"></div>
+            </>
+        }
     }
 }
