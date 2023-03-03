@@ -69,7 +69,6 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
     html! {
         <Modal
             show={props.show}
-            class={classes!("trait-spell-modal",  "trait")}
             on_request_close={on_cancel}
         >
             <div class="top">

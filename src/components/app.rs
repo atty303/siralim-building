@@ -17,17 +17,6 @@ pub struct AppProps {
 
 #[function_component(App)]
 pub fn app(props: &AppProps) -> Html {
-    let show_modal = use_state(|| false);
-    use_effect_with_deps(
-        move |v| {
-            let class = if **v { "open-modal" } else { "" };
-            let document: web_sys::Document = web_sys::window().unwrap().document().unwrap();
-            let body = document.body().unwrap();
-            body.set_class_name(class);
-        },
-        show_modal.clone(),
-    );
-
     let show_traits_modal = use_state(|| false);
     let show_spells_modal = use_state(|| false);
 
@@ -70,11 +59,9 @@ pub fn app(props: &AppProps) -> Html {
     let clicked_member = use_state(|| None);
     let on_member_click = {
         let clicked_member = clicked_member.clone();
-        let show_modal = show_modal.clone();
         let show_traits_modal = show_traits_modal.clone();
         Callback::from(move |e: PartyTraitEvent| {
             clicked_member.set(Some(e));
-            show_modal.set(true);
             show_traits_modal.set(true);
         })
     };
@@ -99,20 +86,16 @@ pub fn app(props: &AppProps) -> Html {
     };
 
     let on_close_traits_modal = {
-        let show_modal = show_modal.clone();
         let show_traits_modal = show_traits_modal.clone();
         Callback::from(move |_| {
-            show_modal.set(false);
             show_traits_modal.set(false);
         })
     };
     let on_select_trait = {
-        let show_modal = show_modal.clone();
         let show_traits_modal = show_traits_modal.clone();
         let clicked_member = clicked_member.clone();
         let state = state.clone();
         Callback::from(move |e: TraitSelectEvent| {
-            show_modal.set(false);
             show_traits_modal.set(false);
             if let Some(t) = clicked_member.as_ref() {
                 state.dispatch(Action::Set((t.position, t.index, e.r#trait)));
@@ -128,11 +111,9 @@ pub fn app(props: &AppProps) -> Html {
     let clicked_spell_member = use_state(|| None);
     let on_spell_click = {
         let clicked_spell_member = clicked_spell_member.clone();
-        let show_modal = show_modal.clone();
         let show_spells_modal = show_spells_modal.clone();
         Callback::from(move |e: PartySpellEvent| {
             clicked_spell_member.set(Some(e));
-            show_modal.set(true);
             show_spells_modal.set(true);
         })
     };
@@ -143,20 +124,16 @@ pub fn app(props: &AppProps) -> Html {
         })
     };
     let on_close_spells_modal = {
-        let show_modal = show_modal.clone();
         let show_spells_modal = show_spells_modal.clone();
         Callback::from(move |_| {
-            show_modal.set(false);
             show_spells_modal.set(false);
         })
     };
     let on_select_spell = {
-        let show_modal = show_modal.clone();
         let show_spells_modal = show_spells_modal.clone();
         let clicked_spell_member = clicked_spell_member.clone();
         let state = state.clone();
         Callback::from(move |e: SpellSelectEvent| {
-            show_modal.set(false);
             show_spells_modal.set(false);
             if let Some(t) = clicked_spell_member.as_ref() {
                 state.dispatch(Action::SetSpell((t.position, t.index, e.spell)));

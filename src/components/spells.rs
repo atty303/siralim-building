@@ -66,19 +66,20 @@ pub fn spells_modal(props: &SpellsModalProps) -> Html {
     html! {
         <Modal
             show={props.show}
-            class={classes!("trait-spell-modal", "spell")}
             on_request_close={on_cancel}
         >
-            <div class="top">
-                <input type="text" onkeypress={onkeypress}/>
-                <span>{items.len()} {" items"}</span>
-            </div>
-            <div class="table">
-                <SpellTable
-                    items={(*items).clone()}
-                    selection={props.selection.clone()}
-                    on_select={on_select}
-                />
+            <div class="spells-modal">
+                <div class="spells-modal__top">
+                    <input type="text" onkeypress={onkeypress}/>
+                    <span>{items.len()} {" items"}</span>
+                </div>
+                <div class="spells-modal__table">
+                    <SpellTable
+                        items={(*items).clone()}
+                        selection={props.selection.clone()}
+                        on_select={on_select}
+                    />
+                </div>
             </div>
         </Modal>
     }
