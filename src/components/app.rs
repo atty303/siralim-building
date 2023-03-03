@@ -1,60 +1,25 @@
 use std::rc::Rc;
 
 use data::personality::Stat;
-use qstring::QString;
 use yew::prelude::*;
+use yewdux::prelude::use_store;
 
 use crate::components::party::{Party, PartySpellEvent, PartySwapEvent, PartyTraitEvent};
 use crate::components::spells::{SpellSelectEvent, SpellsModal};
 use crate::components::traits::{TraitSelectEvent, TraitsModal};
-use crate::save::Save;
 use crate::state::{Action, State};
 
 #[derive(Properties, PartialEq)]
-pub struct AppProps {
-    pub data: data::Data,
-}
+pub struct AppProps {}
 
 #[function_component(App)]
-pub fn app(props: &AppProps) -> Html {
+pub fn app(_props: &AppProps) -> Html {
     let show_traits_modal = use_state(|| false);
     let show_spells_modal = use_state(|| false);
 
-    let location: web_sys::Location = web_sys::window().unwrap().location();
-    let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
+    let (state, dispatch) = use_store::<State>();
 
-    let qs = QString::from(location.search().unwrap().as_str());
-    let loaded_state = if let Some(s) = qs.get("s") {
-        let maybe_save = Save::from_string(&String::from(s));
-        if let Ok(save) = maybe_save {
-            Some(save.as_state(&props.data))
-        } else {
-            log::warn!("failed to load save: {:?}", maybe_save);
-            None
-        }
-    } else {
-        None
-    };
-    let initial_state = loaded_state.unwrap_or_else(|| State::new(&props.data));
-
-    let data = use_memo(|_| props.data.clone(), ());
-
-    let state = use_reducer(|| initial_state);
-    let d = data.clone();
-    use_effect_with_deps(
-        move |state| {
-            let save_string = Save::from_state(state, d.as_ref()).as_string();
-            history
-                .replace_state_with_url(
-                    &wasm_bindgen::JsValue::null(),
-                    "",
-                    Some(format!("{}?s={}", location.pathname().unwrap(), save_string).as_str()),
-                )
-                .unwrap();
-            || ()
-        },
-        state.clone(),
-    );
+    let data = &state.data;
 
     let clicked_member = use_state(|| None);
     let on_member_click = {
@@ -65,25 +30,12 @@ pub fn app(props: &AppProps) -> Html {
             show_traits_modal.set(true);
         })
     };
-    let on_member_clear = {
-        let state = state.clone();
-        Callback::from(move |e: PartyTraitEvent| {
-            state.dispatch(Action::Clear((e.position, e.index)));
-        })
-    };
+    let on_member_clear =
+        dispatch.apply_callback(|e: PartyTraitEvent| Action::Clear((e.position, e.index)));
 
-    let on_swap = {
-        let state = state.clone();
-        Callback::from(move |e: PartySwapEvent| {
-            log::debug!("on_swap: {:?}", e);
-            state.dispatch(Action::Swap((
-                e.from_position,
-                e.from_index,
-                e.to_position,
-                e.to_index,
-            )));
-        })
-    };
+    let on_swap = dispatch.apply_callback(|e: PartySwapEvent| {
+        Action::Swap((e.from_position, e.from_index, e.to_position, e.to_index))
+    });
 
     let on_close_traits_modal = {
         let show_traits_modal = show_traits_modal.clone();
@@ -94,19 +46,17 @@ pub fn app(props: &AppProps) -> Html {
     let on_select_trait = {
         let show_traits_modal = show_traits_modal.clone();
         let clicked_member = clicked_member.clone();
-        let state = state.clone();
+        let dispatch = dispatch.clone();
         Callback::from(move |e: TraitSelectEvent| {
             show_traits_modal.set(false);
             if let Some(t) = clicked_member.as_ref() {
-                state.dispatch(Action::Set((t.position, t.index, e.r#trait)));
+                dispatch.apply(Action::Set((t.position, t.index, e.r#trait)));
             }
         })
     };
 
-    let dispatch_set_personality = {
-        let state = state.clone();
-        Callback::from(move |x: (usize, Stat, bool)| state.dispatch(Action::SetPersonality(x)))
-    };
+    let dispatch_set_personality =
+        dispatch.apply_callback(|x: (usize, Stat, bool)| Action::SetPersonality(x));
 
     let clicked_spell_member = use_state(|| None);
     let on_spell_click = {
@@ -115,12 +65,6 @@ pub fn app(props: &AppProps) -> Html {
         Callback::from(move |e: PartySpellEvent| {
             clicked_spell_member.set(Some(e));
             show_spells_modal.set(true);
-        })
-    };
-    let on_spell_clear = {
-        let state = state.clone();
-        Callback::from(move |e: PartySpellEvent| {
-            state.dispatch(Action::ClearSpell((e.position, e.index)));
         })
     };
     let on_close_spells_modal = {
@@ -132,11 +76,11 @@ pub fn app(props: &AppProps) -> Html {
     let on_select_spell = {
         let show_spells_modal = show_spells_modal.clone();
         let clicked_spell_member = clicked_spell_member.clone();
-        let state = state.clone();
+        let dispatch = dispatch.clone();
         Callback::from(move |e: SpellSelectEvent| {
             show_spells_modal.set(false);
             if let Some(t) = clicked_spell_member.as_ref() {
-                state.dispatch(Action::SetSpell((t.position, t.index, e.spell)));
+                dispatch.apply(Action::SetSpell((t.position, t.index, e.spell)));
             }
         })
     };
@@ -151,7 +95,6 @@ pub fn app(props: &AppProps) -> Html {
                 on_clear={on_member_clear}
                 {dispatch_set_personality}
                 {on_spell_click}
-                {on_spell_clear}
             />
             <TraitsModal
                 show={*show_traits_modal}

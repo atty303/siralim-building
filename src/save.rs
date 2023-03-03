@@ -1,6 +1,7 @@
 use apache_avro::AvroSchema;
 use base64::Engine;
 use serde::{Deserialize, Serialize};
+use std::rc::Rc;
 
 use data::personality::Personality;
 use data::r#trait::Trait;
@@ -59,15 +60,16 @@ impl Save {
         }
     }
 
-    pub fn as_state(&self, data: &Data) -> State {
+    pub fn as_state(&self, data: Rc<Data>) -> State {
         State {
+            data: data.clone(),
             party: self
                 .party
                 .iter()
                 .map(|m| Member {
-                    primary_trait: id_to_trait(data, m.primary_trait),
-                    fused_trait: id_to_trait(data, m.fused_trait),
-                    artifact_trait: id_to_trait(data, m.artifact_trait),
+                    primary_trait: id_to_trait(&data, m.primary_trait),
+                    fused_trait: id_to_trait(&data, m.fused_trait),
+                    artifact_trait: id_to_trait(&data, m.artifact_trait),
                     personality_positive: m
                         .personality
                         .map(|id| Personality::get_by_id(&data.personalities, id))
@@ -89,7 +91,7 @@ impl Save {
             trait_pool: self
                 .trait_pool
                 .iter()
-                .map(|id| id_to_trait(data, id.clone()))
+                .map(|id| id_to_trait(&data, id.clone()))
                 .collect(),
         }
     }

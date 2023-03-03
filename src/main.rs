@@ -9,9 +9,7 @@ mod state;
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
 
-    let props = AppProps {
-        data: embed_data::load(),
-    };
+    let props = AppProps {};
 
     yew::Renderer::<App>::with_props(props).render();
 }

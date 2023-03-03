@@ -3,6 +3,7 @@ use web_sys::Element;
 use data::personality::Stat;
 use yew::prelude::*;
 use yew_icons::{Icon, IconId};
+use yewdux::prelude::Dispatch;
 
 use data::r#trait::Trait;
 use data::spell::Spell;
@@ -11,7 +12,7 @@ use crate::components::creature_name::CreatureName;
 use crate::components::description::Description;
 use crate::components::icon::ClassIcon;
 use crate::components::spell_name::SpellName;
-use crate::state::Member;
+use crate::state::{Action, Member, State};
 
 #[derive(Debug)]
 pub struct PartySwapEvent {
@@ -52,7 +53,6 @@ pub struct PartyProps {
     pub on_clear: Callback<PartyTraitEvent>,
     pub dispatch_set_personality: Callback<(usize, Stat, bool)>,
     pub on_spell_click: Callback<PartySpellEvent>,
-    pub on_spell_clear: Callback<PartySpellEvent>,
 }
 
 #[function_component(Party)]
@@ -105,12 +105,8 @@ pub fn party(props: &PartyProps) -> Html {
                         on_spell_click.emit(e.clone());
                     })
                 };
-                let on_spell_clear = {
-                    let on_spell_clear = props.on_spell_clear.clone();
-                    Callback::from(move |e: PartySpellEvent| {
-                        on_spell_clear.emit(e.clone());
-                    })
-                };
+                let dispatch = Dispatch::<State>::new();
+                let on_spell_clear = dispatch.apply_callback(|e: PartySpellEvent| Action::ClearSpell((e.position, e.index)));
                 html! {
                     <PartyMember
                         position={i}
@@ -547,7 +543,7 @@ fn party_spell(props: &PartySpellProps) -> Html {
 pub struct SpellPropertyProps {}
 
 #[function_component(SpellProperty)]
-fn spell_property(props: &SpellPropertyProps) -> Html {
+fn spell_property(_props: &SpellPropertyProps) -> Html {
     html! {
         <div class="spell-property">
             <Icon icon_id={IconId::BootstrapPlusCircleDotted} />
