@@ -520,6 +520,9 @@ fn party_spell(props: &PartySpellProps) -> Html {
                         <Description value={c.description.to_vec()} />
                     </div>
                 </div>
+                <SpellProperty />
+                <SpellProperty />
+                <SpellProperty />
                 <div class="clear">
                     <button onclick={onclear}><Icon icon_id={IconId::BootstrapXLg} /></button>
                 </div>
@@ -537,5 +540,17 @@ fn party_spell(props: &PartySpellProps) -> Html {
                 <div class="clear"></div>
             </>
         }
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct SpellPropertyProps {}
+
+#[function_component(SpellProperty)]
+fn spell_property(props: &SpellPropertyProps) -> Html {
+    html! {
+        <div class="spell-property">
+            <Icon icon_id={IconId::BootstrapPlusCircleDotted} />
+        </div>
     }
 }

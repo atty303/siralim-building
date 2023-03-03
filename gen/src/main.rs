@@ -20,6 +20,7 @@ use data::effect::EffectAvro;
 use data::keyword::Keyword;
 use data::r#trait;
 use data::spell::SpellSchema;
+use data::spell_property::SpellPropertyAvro;
 
 trait DefaultHash<S: Ord> {
     fn default_hash(&self, seed: usize) -> S;
@@ -363,8 +364,31 @@ fn gen_spells() {
     index_writer.commit().unwrap();
 }
 
+fn load_spell_properties() -> Vec<SpellPropertyAvro> {
+    let mut reader = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("gen/data/spell_properties.csv")
+        .unwrap();
+    return reader.deserialize().map(|r| r.unwrap()).collect();
+}
+
+fn gen_spell_properties() {
+    let schema = SpellPropertyAvro::get_schema();
+    let file_writer = std::io::BufWriter::new(
+        std::fs::File::create(Path::new("embed/avro/spell_properties.avro")).unwrap(),
+    );
+    let mut writer = apache_avro::Writer::new(&schema, file_writer);
+
+    for r in load_spell_properties() {
+        writer.append_ser(r).unwrap();
+    }
+
+    writer.flush().unwrap();
+}
+
 fn main() {
     gen_traits();
     gen_effects();
     gen_spells();
+    gen_spell_properties();
 }

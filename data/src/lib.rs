@@ -17,11 +17,13 @@ use keyword::Keyword;
 use personality::Personality;
 use r#trait::{Trait, TraitSchema};
 use spell::{Spell, SpellSchema};
+use spell_property::SpellProperty;
 
 pub mod effect;
 pub mod keyword;
 pub mod personality;
 pub mod spell;
+pub mod spell_property;
 pub mod r#trait;
 
 #[derive(Debug, Clone)]
@@ -31,6 +33,7 @@ pub struct Data {
     pub effects: HashMap<IString, Effect>,
     pub keywords: HashMap<IString, Keyword>,
     pub personalities: Vec<Personality>,
+    pub spell_properties: Vec<SpellProperty>,
 }
 
 impl PartialEq for Data {
@@ -47,6 +50,7 @@ impl Data {
         effects: Vec<Effect>,
         keywords: Vec<Keyword>,
         personalities: Vec<Personality>,
+        spell_properties: Vec<SpellProperty>,
     ) -> Data {
         let map = effects
             .iter()
@@ -62,6 +66,7 @@ impl Data {
             effects: map,
             keywords,
             personalities,
+            spell_properties,
         }
     }
 
