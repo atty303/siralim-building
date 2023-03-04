@@ -2,6 +2,7 @@ use data::spell::Spell;
 use yew::prelude::*;
 
 use crate::components::icon::ClassIcon;
+use crate::components::tooltip::Tooltip;
 
 #[derive(Properties, PartialEq)]
 pub struct SpellNameProps {
@@ -12,15 +13,17 @@ pub struct SpellNameProps {
 #[function_component(SpellName)]
 pub fn spell_name(props: &SpellNameProps) -> Html {
     let c = &props.spell;
+
+    let tooltip = html! {
+        <div>
+            <span class="charges"><span>{"Charges: "}</span>{format!("{}", c.charges)}</span><br/>
+            <span class="sources"><span>{"Source:"}</span>{c.source.as_str()}</span>
+        </div>
+    };
+
     html! {
-        <div class="spell-name tooltip">
-            <div class="tooltip-text">
-                <div>
-                    <span class="charges"><span>{"Charges: "}</span>{format!("{}", c.charges)}</span><br/>
-                    <span class="sources"><span>{"Source:"}</span>{c.source.as_str()}</span>
-                </div>
-            </div>
-            <span>
+        <Tooltip {tooltip}>
+            <span class="name-plate">
                 {if props.icon {
                     html! { <ClassIcon value={c.class.clone()} /> }
                 } else {
@@ -28,6 +31,6 @@ pub fn spell_name(props: &SpellNameProps) -> Html {
                 }}
                 {c.name.as_str()}
             </span>
-        </div>
+        </Tooltip>
     }
 }

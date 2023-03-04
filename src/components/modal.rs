@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use yew::prelude::*;
 use yew_icons::{Icon, IconId};
 
@@ -51,3 +52,26 @@ pub fn modal(props: &ModalProps) -> Html {
         </div>
     }
 }
+//
+// pub struct UseModalHandle {
+//     open: Rc<dyn Fn()>,
+// }
+//
+// impl UseModalHandle {
+//     pub fn open(&self) {
+//         (self.open)();
+//     }
+// }
+//
+// pub fn use_modal() -> UseModalHandle {
+//     let show = use_state(|| false);
+//
+//     let open = {
+//         let show = show.clone();
+//         Rc::new(move || {
+//             show.set(true);
+//         })
+//     };
+//
+//     UseModalHandle { open }
+// }

@@ -59,6 +59,7 @@ pub fn party(props: &PartyProps) -> Html {
     let dragging: UseStateHandle<Option<PartyTraitEvent>> = use_state(|| None);
     let pool_position = props.party.len();
     html! {
+        <>
         <div class="party">
             <h2>{"PARTY"}</h2>
             {props.party.iter().enumerate().map(|(i, m)| {
@@ -119,58 +120,58 @@ pub fn party(props: &PartyProps) -> Html {
                     </PartyMember>
                 }
             }).collect::<Html>()}
-
-            <h2>{"POOL"}</h2>
-            <div class="party-pool">
-                <ul class="traits">
-                    {props.pool.iter().enumerate().map(|(i, m)| {
-                        let on_click = {
-                            let on_click = props.on_click.clone();
-                            let e = PartyTraitEvent::new(pool_position, i);
-                            Callback::from(move |_| on_click.emit(e.clone()))
-                        };
-                        let on_clear = {
-                            let on_clear = props.on_clear.clone();
-                            let e = PartyTraitEvent::new(pool_position, i);
-                            Callback::from(move |_| on_clear.emit(e.clone()))
-                        };
-                        let on_drag_start = {
-                            let dragging = dragging.clone();
-                            let e = PartyTraitEvent::new(pool_position, i);
-                            Callback::from(move |_|  dragging.set(Some(e.clone())))
-                        };
-                        let on_drop = {
-                            let dragging = dragging.clone();
-                            let on_swap = props.on_swap.clone();
-                            let e = PartyTraitEvent::new(pool_position, i);
-                            Callback::from(move |_| {
-                                if let Some(a) = dragging.as_ref() {
-                                    on_swap.emit(PartySwapEvent {
-                                        from_position: a.position,
-                                        from_index: a.index,
-                                        to_position: e.position,
-                                        to_index: e.index,
-                                    })
-                                }
-                                dragging.set(None);
-                            })
-                        };
-                        html! {
-                            <li>
-                                <PartyTrait
-                                    r#trait={m.clone()}
-                                    empty_text={"Click to add trait"}
-                                    on_click={on_click.clone()}
-                                    on_clear={on_clear.clone()}
-                                    on_drag_start={on_drag_start.clone()}
-                                    on_drop={on_drop.clone()}
-                                />
-                            </li>
-                        }
-                    }).collect::<Html>()}
-                </ul>
-            </div>
         </div>
+        <div class="party-pool">
+            <h2>{"POOL"}</h2>
+            <ul class="traits">
+                {props.pool.iter().enumerate().map(|(i, m)| {
+                    let on_click = {
+                        let on_click = props.on_click.clone();
+                        let e = PartyTraitEvent::new(pool_position, i);
+                        Callback::from(move |_| on_click.emit(e.clone()))
+                    };
+                    let on_clear = {
+                        let on_clear = props.on_clear.clone();
+                        let e = PartyTraitEvent::new(pool_position, i);
+                        Callback::from(move |_| on_clear.emit(e.clone()))
+                    };
+                    let on_drag_start = {
+                        let dragging = dragging.clone();
+                        let e = PartyTraitEvent::new(pool_position, i);
+                        Callback::from(move |_|  dragging.set(Some(e.clone())))
+                    };
+                    let on_drop = {
+                        let dragging = dragging.clone();
+                        let on_swap = props.on_swap.clone();
+                        let e = PartyTraitEvent::new(pool_position, i);
+                        Callback::from(move |_| {
+                            if let Some(a) = dragging.as_ref() {
+                                on_swap.emit(PartySwapEvent {
+                                    from_position: a.position,
+                                    from_index: a.index,
+                                    to_position: e.position,
+                                    to_index: e.index,
+                                })
+                            }
+                            dragging.set(None);
+                        })
+                    };
+                    html! {
+                        <li>
+                            <PartyTrait
+                                r#trait={m.clone()}
+                                empty_text={"Click to add trait"}
+                                on_click={on_click.clone()}
+                                on_clear={on_clear.clone()}
+                                on_drag_start={on_drag_start.clone()}
+                                on_drop={on_drop.clone()}
+                            />
+                        </li>
+                    }
+                }).collect::<Html>()}
+            </ul>
+        </div>
+        </>
     }
 }
 
@@ -317,10 +318,10 @@ fn party_member(props: &PartyMemberProps) -> Html {
                 </div>
                 <div class="group">
                     <div class="side-title">{"SPELLS"}</div>
-                    <ul class="spells">
+                    <ul class="party-item-container">
                          {props.member.spells.iter().enumerate().map(|(i, s)| {
                              html! {
-                                 <li>
+                                 <li class="party-item-container__item">
                                      <PartySpell
                                           spell={s.clone()}
                                           on_click={on_spell_click(i).clone()}
@@ -329,7 +330,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                                  </li>
                              }
                          }).collect::<Html>()}
-                         <li>
+                         <li class="party-item-container__item">
                              <PartySpell
                                   spell={None}
                                   on_click={on_spell_click(props.member.spells.len()).clone()}
@@ -506,32 +507,30 @@ fn party_spell(props: &PartySpellProps) -> Html {
     };
     if let Some(c) = &props.spell {
         html! {
-            <>
-                <div class="spell non-empty">
-                    <SpellName spell={c.clone()} icon={true} />
-                    <div class="spell-description">
+            <div class="party-spell">
+                <div class="party-spell__spell party-spell__spell--non-empty">
+                    <div class="party-spell__name">
+                        <SpellName spell={c.clone()} icon={true} />
+                    </div>
+                    <div class="party-spell__description">
                         <Description value={c.description.to_vec()} />
                     </div>
                 </div>
                 <SpellProperty />
                 <SpellProperty />
                 <SpellProperty />
-                <div class="clear">
+                <div class="party-spell__clear">
                     <button onclick={onclear}><Icon icon_id={IconId::BootstrapXLg} /></button>
                 </div>
-            </>
+            </div>
         }
     } else {
         html! {
-            <>
-                <div
-                    class="spell empty"
-                    onclick={onclick}
-                >
+            <div class="party-spell">
+                <div class="party-spell__spell party-spell__spell--empty" {onclick}>
                     <span>{"Click to add spell"}</span>
                 </div>
-                <div class="clear"></div>
-            </>
+            </div>
         }
     }
 }
@@ -542,8 +541,10 @@ pub struct SpellPropertyProps {}
 #[function_component(SpellProperty)]
 fn spell_property(_props: &SpellPropertyProps) -> Html {
     html! {
-        <div class="spell-property">
-            <Icon icon_id={IconId::BootstrapPlusCircleDotted} />
+        <div class="party-spell__property">
+            <button>
+                <Icon icon_id={IconId::BootstrapPlusCircleDotted} />
+            </button>
         </div>
     }
 }

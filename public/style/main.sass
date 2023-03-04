@@ -1,5 +1,8 @@
 @use "body"
 @use "modal"
+@use "name-plate"
+@use "tooltip"
+@use "party-spell"
 
 @import "variables"
 
@@ -118,14 +121,25 @@ input[type=text]
         border-bottom: none
 
 
-.party-pool
-  width: 100%
-  border: 1px solid $outline
-  margin: 10px
-  background-color: $surface
-  color: $on-surface
+//.party-pool
+//  width: 100%
+//  border: 1px solid $outline
+//  margin: 10px
+//  background-color: $surface
+//  color: $on-surface
 
-ul.traits, ul.spells
+.party-item-container
+  display: flex
+  flex-direction: column
+  margin: 0
+  padding-inline: 0
+
+  &__item
+    display: block
+    border-bottom: 1px solid $outline
+
+
+ul.traits
   display: flex
   flex-direction: column
   margin: 0
@@ -148,11 +162,8 @@ ul.traits, ul.spells
         cursor: move
         color: $primary
 
-      .creature-name, .spell-name
-        width: 25%
       .trait-description, .spell-description
         width: 75%
-        margin: 0 0.5rem
 
     .trait.empty, .spell.empty
       display: flex
@@ -180,16 +191,6 @@ ul.traits, ul.spells
       button:hover
         background: $error-container
         color: $on-error-container
-
-.creature-name, .spell-name
-  > span
-    display: block
-    margin: 5px
-    padding: 5px
-    background: $surface-variant
-    color: $on-surface-variant
-    > img
-      margin-right: 4px
 
 // ----
 .spells-modal
@@ -301,31 +302,6 @@ ul.traits, ul.spells
 .desc-keyword.action, .desc-keyword.timeline
   color: #aed581
 
-
-.tooltip
-  position: relative
-  white-space: nowrap
-
-.tooltip-text
-  opacity: 0
-  visibility: hidden
-  position: absolute
-  left: 50%
-  transform: translateX(-50%)
-  top: 1.2rem
-  display: inline-block
-  padding: 5px
-  border-radius: 3px
-  transition: 0.1s ease-in
-  background: #000
-  color: #fff
-  font-weight: normal
-  min-width: 20rem
-
-.tooltip:hover .tooltip-text
-  opacity: 1
-  visibility: visible
-  z-index: 100
 
 .trait-description .tooltip-text, .description .tooltip-text
   max-width: 20rem
