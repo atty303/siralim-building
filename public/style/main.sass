@@ -5,6 +5,7 @@
 @use "party-spell"
 @use "creature-name-tooltip"
 @use "desc"
+@use "member-group"
 
 @import "variables"
 
@@ -103,24 +104,6 @@ input[type=text]
     flex-grow: 1
     padding-inline: 0
 
-    .group
-      display: flex
-      > .side-title
-        writing-mode: vertical-lr
-        text-align: center
-        font-weight: bold
-        font-size: 0.5rem
-        padding: 0 5px
-        background-color: $primary-container
-        color: $on-primary-container
-        border-bottom: 1px solid $outline
-        border-right: 1px solid $outline
-      > ul
-        flex-grow: 1
-
-    .group:last-child
-      > .side-title
-        border-bottom: none
 
 
 //.party-pool
@@ -284,7 +267,7 @@ ul.traits
   text-align: center
 
 
-.name .tooltip-text
-  display: flex
-  align-items: center
-  padding: 0.5rem 1rem
+//.name .tooltip-text
+//  display: flex
+//  align-items: center
+//  padding: 0.5rem 1rem

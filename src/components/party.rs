@@ -281,9 +281,9 @@ fn party_member(props: &PartyMemberProps) -> Html {
                 </div>
             </div>
             <div class="right-pane">
-                <div class="group">
-                    <div class="side-title">{"TRAITS"}</div>
-                    <ul class="traits">
+                <div class="member-group">
+                    <div class="member-group__title">{"TRAITS"}</div>
+                    <ul class="member-group__main traits">
                         <li>
                             <PartyTrait
                                 r#trait={props.member.primary_trait.clone()}
@@ -316,9 +316,9 @@ fn party_member(props: &PartyMemberProps) -> Html {
                         </li>
                     </ul>
                 </div>
-                <div class="group">
-                    <div class="side-title">{"SPELLS"}</div>
-                    <ul class="party-item-container">
+                <div class="member-group">
+                    <div class="member-group__title">{"SPELLS"}</div>
+                    <ul class="member-group__main party-item-container">
                          {props.member.spells.iter().enumerate().map(|(i, s)| {
                              html! {
                                  <li class="party-item-container__item">
