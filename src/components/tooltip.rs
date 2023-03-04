@@ -20,13 +20,13 @@ pub fn tooltip(props: &TooltipProps) -> Html {
     };
 
     html! {
-        <div class="tooltip" {onmouseenter} {onmouseleave}>
+        <span class="tooltip" {onmouseenter} {onmouseleave}>
             {if *visible {
                 html! { <div class="tooltip__body">{props.tooltip.clone()}</div> }
             } else {
                 html! {}
             }}
             {props.children.clone()}
-        </div>
+        </span>
     }
 }

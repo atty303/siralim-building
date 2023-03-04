@@ -4,6 +4,7 @@
 @use "tooltip"
 @use "party-spell"
 @use "creature-name-tooltip"
+@use "desc"
 
 @import "variables"
 
@@ -275,33 +276,6 @@ ul.traits
         cursor: pointer
 
 // ----
-
-.desc-effect
-  font-weight: bold
-  .icon
-    width: 1rem
-    height: 1rem
-.desc-effect.debuff
-  color: #f44336
-.desc-effect.buff
-  color: #4caf50
-.desc-effect.minion
-  color: #ff9800
-
-.desc-spell
-  font-weight: bold
-  color: #ba68c8
-
-.desc-keyword
-  font-weight: bold
-  .icon
-    width: 1rem
-    height: 1rem
-
-.desc-keyword.stat
-  color: #fff176
-.desc-keyword.action, .desc-keyword.timeline
-  color: #aed581
 
 
 .trait-description .tooltip-text, .description .tooltip-text
