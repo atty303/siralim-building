@@ -1,4 +1,5 @@
 use data::Data;
+use defy::defy;
 use implicit_clone::unsync::IString;
 use std::rc::Rc;
 use yew::prelude::*;
@@ -12,43 +13,43 @@ pub struct DescriptionProps {
 pub fn description(props: &DescriptionProps) -> Html {
     let data = use_context::<Rc<Data>>().unwrap();
 
-    html! {
-        <>
-            {props.value.iter().map(|t| {
-                if let Some(w) = data.keywords.get(t) {
-                    html! {
-                        <span class={format!("desc-keyword {}", w.category)}>
-                            <img class="icon" src={format!("image/{}", w.icon)} />
-                            {t.as_str()}
-                        </span>
-                    }
-                } else if let Some(e) = data.effects.get(t) {
-                    html! {
-                        <span class={format!("tooltip desc-effect {}", e.category)}>
-                            <span class="tooltip-text">
-                                {e.description.clone()}
-                            </span>
-                            <img class="icon" src={format!("status_icons/{}", e.icon)} />
-                            {t.as_str()}
-                        </span>
-                    }
-                } else if let Ok(s) = data.search_spell(format!("name:\"{}\"", t).as_str()) {
-                    if let Some(x) = s.get(0) {
-                        html! {
-                            <span class={"tooltip desc-spell"}>
-                                <span class="tooltip-text">
-                                    {x.description.clone()}
-                                </span>
-                                {t.as_str()}
-                            </span>
+    defy! {
+        for t in props.value.iter() {
+            if let Some(w) = data.keywords.get(t) {
+                span(class = format!("desc-keyword {}", w.category)) {
+                    img(class = "icon", src = format!("image/{}", w.icon));
+                    + t.as_str();
+                }
+            } else {
+                if let Some(e) = data.effects.get(t) {
+                    span(class = format!("tooltip desc-effect {}", e.category)) {
+                        span(class = "tooltip-text") {
+                            + e.description.clone();
                         }
-                    } else {
-                        html! { <span>{t.as_str()}</span> }
+                        img(class = "icon", src = format!("status_icons/{}", e.icon));
+                        + t.as_str();
                     }
                 } else {
-                    html! { <span>{t.as_str()}</span> }
+                    if let Ok(s) = data.search_spell(format!("name:\"{}\"", t).as_str()) {
+                        if let Some(x) = s.get(0) {
+                            span(class = "tooltip desc-spell") {
+                                span(class = "tooltip-text") {
+                                    + x.description.clone();
+                                }
+                                + t.as_str();
+                            }
+                        } else {
+                            span {
+                                + t.as_str();
+                            }
+                        }
+                    } else {
+                        span {
+                            + t.as_str();
+                        }
+                    }
                 }
-            }).collect::<Vec<Html>>()}
-        </>
+            }
+        }
     }
 }

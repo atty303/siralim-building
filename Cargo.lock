@@ -427,6 +427,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "defy"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "66bc49ff247c6ffdbb514be3f1d96fc4436ab3c7677872a6d9ab181d914df467"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1906,9 +1917,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.107"
+version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f4064b5b16e03ae50984a5a8ed5d4f8803e6bc1fd170a3cda91a1be4b18e3f5"
+checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2412,6 +2423,7 @@ dependencies = [
  "apache-avro",
  "base64 0.21.0",
  "data",
+ "defy",
  "flate2",
  "getrandom",
  "implicit-clone",
