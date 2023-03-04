@@ -247,20 +247,16 @@ impl Reducer<State> for Action {
 
         match self {
             Action::Set((position, index, r#trait)) => {
-                if let Some(member) = state.party.get(position) {
-                    let mut member = member.clone();
+                if let Some(member) = state.party.get_mut(position) {
                     member.set_creature(index, &Some(r#trait));
-                    state.party[position] = member;
                 } else {
                     state.trait_pool[index] = Some(r#trait);
                     state.trait_pool = normalize_trait_pool(state.trait_pool.clone());
                 }
             }
             Action::Clear((position, index)) => {
-                if let Some(member) = state.party.get(position) {
-                    let mut member = member.clone();
+                if let Some(member) = state.party.get_mut(position) {
                     member.set_creature(index, &None);
-                    state.party[position] = member;
                 } else {
                     state.trait_pool[index] = None;
                     state.trait_pool = normalize_trait_pool(state.trait_pool.clone());
@@ -268,15 +264,12 @@ impl Reducer<State> for Action {
             }
             Action::Swap((from_position, from_index, to_position, to_index)) => {
                 if from_position == to_position {
-                    if let Some(member) = state.party.get(from_position) {
-                        let from = member.get_creature(from_index);
-                        let to = member.get_creature(to_index);
+                    if let Some(member) = state.party.get_mut(from_position) {
+                        let from = member.get_creature(from_index).clone();
+                        let to = member.get_creature(to_index).clone();
 
-                        let mut m = member.clone();
-                        m.set_creature(from_index, &to);
-                        m.set_creature(to_index, &from);
-
-                        state.party[from_position] = m;
+                        member.set_creature(from_index, &to);
+                        member.set_creature(to_index, &from);
                     } else {
                         let from = state.trait_pool.get(from_index).unwrap().clone();
                         let to = state.trait_pool.get(to_index).unwrap().clone();
@@ -337,17 +330,13 @@ impl Reducer<State> for Action {
                 }
             }
             Action::SetSpell((position, index, spell)) => {
-                if let Some(member) = state.party.get(position) {
-                    let mut member = member.clone();
+                if let Some(member) = state.party.get_mut(position) {
                     member.set_spell(index, &Some(spell));
-                    state.party[position] = member;
                 }
             }
             Action::ClearSpell((position, index)) => {
-                if let Some(member) = state.party.get(position) {
-                    let mut member = member.clone();
+                if let Some(member) = state.party.get_mut(position) {
                     member.set_spell(index, &None);
-                    state.party[position] = member;
                 }
             }
         };
