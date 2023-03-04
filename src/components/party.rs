@@ -283,8 +283,8 @@ fn party_member(props: &PartyMemberProps) -> Html {
             <div class="right-pane">
                 <div class="member-group">
                     <div class="member-group__title">{"TRAITS"}</div>
-                    <ul class="member-group__main traits">
-                        <li>
+                    <ul class="member-group__main party-item-container">
+                        <li class="party-item-container__item">
                             <PartyTrait
                                 r#trait={props.member.primary_trait.clone()}
                                 empty_text={"Click to add primary trait"}
@@ -294,7 +294,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                                 on_drop={on_drop(0).clone()}
                             />
                         </li>
-                        <li>
+                        <li class="party-item-container__item">
                             <PartyTrait
                                 r#trait={props.member.fused_trait.clone()}
                                 empty_text={"Click to add fused trait"}
@@ -304,7 +304,7 @@ fn party_member(props: &PartyMemberProps) -> Html {
                                 on_drop={on_drop(1).clone()}
                             />
                         </li>
-                        <li>
+                        <li class="party-item-container__item">
                             <PartyTrait
                                 r#trait={props.member.artifact_trait.clone()}
                                 empty_text={"Click to add artifact trait"}
@@ -403,41 +403,39 @@ fn party_trait(props: &PartyTraitProps) -> Html {
     };
     if let Some(c) = &props.r#trait {
         html! {
-            <>
+            <div class="party-trait">
                 <div
-                    class="trait non-empty"
-                    ondragover={ondragover}
-                    ondrop={ondrop}
+                    class="party-trait__main party-trait__main--non-empty"
+                    {ondragover}
+                    {ondrop}
                 >
-                    <div class="handle"
-                        onmousedown={ondragstart}
-                        onmouseup={onmouseup}
-                    >
+                    <div class="party-trait__handle" onmousedown={ondragstart} onmouseup={onmouseup}>
                         <Icon icon_id={IconId::BootstrapGripVertical} />
                     </div>
-                    <CreatureName r#trait={c.clone()} icon={true} />
-                    <div class="trait-description">
+                    <div class="party-trait__name">
+                        <CreatureName r#trait={c.clone()} icon={true} />
+                    </div>
+                    <div class="party-trait__description">
                         <Description value={c.trait_description.to_vec()} />
                     </div>
                 </div>
-                <div class="clear">
+                <div class="party-trait__clear">
                     <button onclick={onclear}><Icon icon_id={IconId::BootstrapXLg} /></button>
                 </div>
-            </>
+            </div>
         }
     } else {
         html! {
-            <>
+            <div class="party-trait">
                 <div
-                    class="trait empty"
+                    class="party-trait__main party-trait__main--empty"
                     onclick={onclick}
                     ondragover={ondragover}
                     ondrop={ondrop}
                 >
                     <span>{props.empty_text}</span>
                 </div>
-                <div class="clear"></div>
-            </>
+            </div>
         }
     }
 }

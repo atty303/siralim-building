@@ -3,6 +3,7 @@
 @use "name-plate"
 @use "tooltip"
 @use "party-spell"
+@use "party-trait"
 @use "creature-name-tooltip"
 @use "desc"
 @use "member-group"
@@ -122,60 +123,6 @@ input[type=text]
   &__item
     display: block
     border-bottom: 1px solid $outline
-
-
-ul.traits
-  display: flex
-  flex-direction: column
-  margin: 0
-  padding-inline: 0
-
-  > li
-    display: flex
-    min-height: 3rem
-    border-bottom: 1px solid $outline
-
-    .trait, .spell
-      flex-grow: 1
-      //border-right: 1px solid $outline
-
-    .trait.non-empty, .spell.non-empty
-      display: flex
-      align-items: center
-
-      .handle
-        cursor: move
-        color: $primary
-
-      .trait-description, .spell-description
-        width: 75%
-
-    .trait.empty, .spell.empty
-      display: flex
-      align-items: center
-      text-align: center
-      color: $primary
-      > span
-        flex-grow: 1
-
-    .clear
-      min-width: 3rem
-      max-width: 3rem
-      min-height: 2rem
-      border-left: 1px solid $outline
-      border-right: 1px solid $outline
-
-      button
-        background: transparent
-        border: none
-        width: 100%
-        height: 100%
-        color: $primary
-        cursor: pointer
-
-      button:hover
-        background: $error-container
-        color: $on-error-container
 
 // ----
 .spells-modal
