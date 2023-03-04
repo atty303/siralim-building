@@ -1,6 +1,5 @@
 use std::rc::Rc;
 
-use data::personality::Stat;
 use yew::prelude::*;
 use yewdux::prelude::use_store;
 
@@ -14,10 +13,10 @@ pub struct AppProps {}
 
 #[function_component(App)]
 pub fn app(_props: &AppProps) -> Html {
+    let (state, dispatch) = use_store::<State>();
+
     let show_traits_modal = use_state(|| false);
     let show_spells_modal = use_state(|| false);
-
-    let (state, dispatch) = use_store::<State>();
 
     let data = &state.data;
 
@@ -55,9 +54,6 @@ pub fn app(_props: &AppProps) -> Html {
         })
     };
 
-    let dispatch_set_personality =
-        dispatch.apply_callback(|x: (usize, Stat, bool)| Action::SetPersonality(x));
-
     let clicked_spell_member = use_state(|| None);
     let on_spell_click = {
         let clicked_spell_member = clicked_spell_member.clone();
@@ -93,7 +89,6 @@ pub fn app(_props: &AppProps) -> Html {
                 on_swap={on_swap}
                 on_click={on_member_click}
                 on_clear={on_member_clear}
-                {dispatch_set_personality}
                 {on_spell_click}
             />
             <TraitsModal

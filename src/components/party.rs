@@ -51,7 +51,6 @@ pub struct PartyProps {
     pub on_swap: Callback<PartySwapEvent>,
     pub on_click: Callback<PartyTraitEvent>,
     pub on_clear: Callback<PartyTraitEvent>,
-    pub dispatch_set_personality: Callback<(usize, Stat, bool)>,
     pub on_spell_click: Callback<PartySpellEvent>,
 }
 
@@ -63,7 +62,7 @@ pub fn party(props: &PartyProps) -> Html {
         <div class="party">
             <h2>{"PARTY"}</h2>
             {props.party.iter().enumerate().map(|(i, m)| {
-                let dispatch_set_personality = props.dispatch_set_personality.clone();
+                let dispatch = Dispatch::<State>::new();
                 let on_click = {
                     let on_click = props.on_click.clone();
                     Callback::from(move |e: PartyTraitEvent| {
@@ -105,7 +104,6 @@ pub fn party(props: &PartyProps) -> Html {
                         on_spell_click.emit(e.clone());
                     })
                 };
-                let dispatch = Dispatch::<State>::new();
                 let on_spell_clear = dispatch.apply_callback(|e: PartySpellEvent| Action::ClearSpell((e.position, e.index)));
                 html! {
                     <PartyMember
@@ -115,7 +113,6 @@ pub fn party(props: &PartyProps) -> Html {
                         on_clear={on_clear}
                         on_drag_start={on_drag_start}
                         on_drop={on_drop}
-                        {dispatch_set_personality}
                         {on_spell_click}
                         {on_spell_clear}
                     >
@@ -185,7 +182,6 @@ struct PartyMemberProps {
     on_clear: Callback<PartyTraitEvent>,
     on_drag_start: Callback<PartyTraitEvent>,
     on_drop: Callback<PartyTraitEvent>,
-    dispatch_set_personality: Callback<(usize, Stat, bool)>,
     on_spell_click: Callback<PartySpellEvent>,
     on_spell_clear: Callback<PartySpellEvent>,
 }
@@ -233,10 +229,11 @@ fn party_member(props: &PartyMemberProps) -> Html {
         left_pane_classes.push(c.as_str().to_lowercase().to_string());
     }
 
+    let dispatch = Dispatch::<State>::new();
+
     let set_personality = {
-        let dispatch_set_personality = props.dispatch_set_personality.clone();
         let position = props.position;
-        Callback::from(move |x: (Stat, bool)| dispatch_set_personality.emit((position, x.0, x.1)))
+        dispatch.apply_callback(move |x: (Stat, bool)| Action::SetPersonality((position, x.0, x.1)))
     };
 
     let on_spell_click = |index: usize| {
