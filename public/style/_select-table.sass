@@ -1,0 +1,41 @@
+@import "variables"
+
+table.select-table
+  position: relative
+  table-layout: fixed
+  thead
+    tr
+      th
+        text-align: left
+        padding: 8px
+        position: sticky
+        top: 0
+        background: $secondary-container
+        color: $on-secondary-container
+        z-index: 10
+  tbody
+    background: $surface
+    color: $on-surface
+    tr
+      content-visibility: auto
+    tr:nth-child(2n)
+      background: #313033
+    tr:hover
+      background: $primary
+      color: $on-primary
+    td
+      padding: 5px
+    td.class
+      white-space: nowrap
+    tr
+      td.select > svg
+        visibility: hidden
+    tr.selected
+      background-color: $tertiary
+      color: $on-tertiary
+      td.select > svg
+        visibility: inherit
+    tr:hover td.select > svg
+      visibility: inherit
+      color: $primary-container
+      cursor: pointer

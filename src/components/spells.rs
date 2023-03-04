@@ -101,7 +101,7 @@ fn spell_table(props: &SpellTableProps) -> Html {
     };
 
     html! {
-        <table class="spell">
+        <table class="select-table">
             <thead>
                 <tr>
                     <th></th>

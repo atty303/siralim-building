@@ -71,16 +71,18 @@ pub fn traits_modal(props: &TraitsModalProps) -> Html {
             show={props.show}
             on_request_close={on_cancel}
         >
-            <div class="top">
-                <input type="text" onkeypress={onkeypress}/>
-                <span>{items.len()} {" items"}</span>
-            </div>
-            <div class="table">
-                <TraitTable
-                    items={(*items).clone()}
-                    selection={props.selection.clone()}
-                    on_select={on_select}
-                />
+            <div class="traits-modal">
+                <div class="traits-modal__top">
+                    <input type="text" onkeypress={onkeypress}/>
+                    <span>{items.len()} {" items"}</span>
+                </div>
+                <div class="traits-modal__table">
+                    <TraitTable
+                        items={(*items).clone()}
+                        selection={props.selection.clone()}
+                        on_select={on_select}
+                    />
+                </div>
             </div>
         </Modal>
     }
@@ -102,7 +104,7 @@ fn trait_table(props: &TraitTableProps) -> Html {
     };
 
     html! {
-        <table class="trait">
+        <table class="select-table">
             <thead>
                 <tr>
                     <th></th>
