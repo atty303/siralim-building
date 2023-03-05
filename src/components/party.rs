@@ -58,6 +58,11 @@ pub struct PartyProps {
 pub fn party(props: &PartyProps) -> Html {
     let dragging: UseStateHandle<Option<PartyTraitEvent>> = use_state(|| None);
     let pool_position = props.party.len();
+    let pool_expand = use_state(|| false);
+    let toggle_pool = {
+        let pool_expand = pool_expand.clone();
+        Callback::from(move |_| pool_expand.set(!*pool_expand))
+    };
     html! {
         <>
         <div class="party">
@@ -121,8 +126,11 @@ pub fn party(props: &PartyProps) -> Html {
                 }
             }).collect::<Html>()}
         </div>
-        <div class="party-pool">
-            <h2 class="party-pool__title">{"POOL"}</h2>
+        <div class={classes!(if *pool_expand { "party-pool--expand" } else { "party-pool--collapse" })}>
+            <h2 class="party-pool__title" onclick={toggle_pool}>
+                {"POOL"}
+                <Icon icon_id={if *pool_expand { IconId::BootstrapChevronDoubleDown } else { IconId::BootstrapChevronDoubleUp }} />
+            </h2>
             <ul class="party-pool__main party-item-container">
                 {props.pool.iter().enumerate().map(|(i, m)| {
                     let on_click = {

@@ -11,6 +11,8 @@
 @use "select-table"
 @use "traits-modal"
 @use "party-pool"
+@use "party"
+@use "party-item-container"
 
 @import "variables"
 
@@ -25,14 +27,6 @@ input[type=text]
   border-radius: 5px
 
 // ----
-.party
-  margin: 20px
-
-  h2
-    font-size: 1rem
-    text-align: center
-    margin: 0
-
 .party-member
   display: flex
   width: 100%
@@ -111,15 +105,6 @@ input[type=text]
   .right-pane
     flex-grow: 1
     padding-inline: 0
-
-.party-item-container
-  display: flex
-  flex-direction: column
-  padding-inline: 0
-  &__item
-    display: block
-    border-bottom: 1px solid $outline
-
 
 .trait-description .tooltip-text, .description .tooltip-text
   max-width: 20rem
