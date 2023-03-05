@@ -10,8 +10,12 @@
 @use "spells-modal"
 @use "select-table"
 @use "traits-modal"
+@use "party-pool"
 
 @import "variables"
+
+ul
+  margin: 0
 
 input[type=text]
   border: 1px solid $outline
@@ -108,21 +112,10 @@ input[type=text]
     flex-grow: 1
     padding-inline: 0
 
-
-
-//.party-pool
-//  width: 100%
-//  border: 1px solid $outline
-//  margin: 10px
-//  background-color: $surface
-//  color: $on-surface
-
 .party-item-container
   display: flex
   flex-direction: column
-  margin: 0
   padding-inline: 0
-
   &__item
     display: block
     border-bottom: 1px solid $outline

@@ -122,8 +122,8 @@ pub fn party(props: &PartyProps) -> Html {
             }).collect::<Html>()}
         </div>
         <div class="party-pool">
-            <h2>{"POOL"}</h2>
-            <ul class="traits">
+            <h2 class="party-pool__title">{"POOL"}</h2>
+            <ul class="party-pool__main party-item-container">
                 {props.pool.iter().enumerate().map(|(i, m)| {
                     let on_click = {
                         let on_click = props.on_click.clone();
@@ -157,7 +157,7 @@ pub fn party(props: &PartyProps) -> Html {
                         })
                     };
                     html! {
-                        <li>
+                        <li class="party-item-container__item">
                             <PartyTrait
                                 r#trait={m.clone()}
                                 empty_text={"Click to add trait"}
