@@ -58,7 +58,7 @@ impl DefaultHash<i32> for CompendiumTraitRecord {
     fn default_hash(&self, seed: usize) -> i32 {
         let mut hasher = ahash::RandomState::with_seed(seed).build_hasher();
         self.hash(&mut hasher);
-        hasher.finish() as i32
+        (hasher.finish() & 0xFFFFF) as i32
     }
 }
 
@@ -261,16 +261,16 @@ fn gen_traits() {
             trait_name
         };
         let (description, material) =
-            if let Some(api_trait) = api_traits.iter().find(|t| t.name == trait_name) {
-                (
-                    api_trait.description.clone(),
-                    api_trait.material_name.clone(),
-                )
-            } else {
-                println!("not found: {}", trait_name);
+            // if let Some(api_trait) = api_traits.iter().find(|t| t.name == trait_name) {
+            //     (
+            //         api_trait.description.clone(),
+            //         api_trait.material_name.clone(),
+            //     )
+            // } else {
+            //     println!("not found: {}", trait_name);
                 (r.trait_description.clone(), r.material_name.clone())
-            };
-
+            // };
+            ;
         let mut doc = Document::default();
         doc.add_i64(schema.id(), hash as i64);
         doc.add_text(schema.class(), r.class.clone());
@@ -388,7 +388,7 @@ fn gen_spell_properties() {
 
 fn main() {
     gen_traits();
-    gen_effects();
-    gen_spells();
-    gen_spell_properties();
+    // gen_effects();
+    // gen_spells();
+    // gen_spell_properties();
 }
