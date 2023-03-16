@@ -97,7 +97,11 @@ impl Data {
     pub fn search_trait(&self, qs: &str) -> anyhow::Result<Vec<Trait>> {
         let searcher = self.traits_index.reader()?.searcher();
         let schema = TraitSchema::from(self.traits_index.schema());
-        let query_parser = QueryParser::for_index(&self.traits_index, vec![schema.description()]);
+        let mut query_parser = QueryParser::for_index(
+            &self.traits_index,
+            vec![schema.creature(), schema.description()],
+        );
+        query_parser.set_conjunction_by_default();
         let query = query_parser.parse_query(qs)?;
         let docs = searcher.search(&query, &TopDocs::with_limit(10_000))?;
         docs.into_iter()
@@ -127,8 +131,9 @@ impl Data {
     pub fn search_spell(&self, qs: &str) -> anyhow::Result<Vec<Spell>> {
         let searcher = self.spell_index.reader()?.searcher();
         let schema = SpellSchema::from(self.spell_index.schema());
-        let query_parser =
+        let mut query_parser =
             QueryParser::for_index(&self.spell_index, vec![schema.name(), schema.description()]);
+        query_parser.set_conjunction_by_default();
         let query = query_parser.parse_query(qs)?;
         let docs = searcher.search(&query, &TopDocs::with_limit(10_000))?;
         docs.into_iter()
