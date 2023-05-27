@@ -1,0 +1,10 @@
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+watch = ["src"]
+
+[[hooks]]
+stage = "build"
+command = "./tailwind-build.bat"

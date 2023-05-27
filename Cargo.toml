@@ -7,35 +7,40 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-data = { path = "./data" }
-yew = { version = "0.20.0", features = [ "csr" ] }
-yewdux = "0.9.2"
-wasm-bindgen = "0.2.84"
-web-sys = { version = "0.3.61", features = [ "Window", "History", "Location" ] }
-log = "0.4.17"
-wasm-logger = "0.2.0"
-rust-embed = { version = "6.4.2", features = [ "debug-embed", "compression" ] }
-serde = "1.0.152"
-serde_json = "1.0.93"
-apache-avro = { version = "0.14.0", features = [ "derive" ] }
-base64 = "0.21.0"
-flate2 = "1.0.25"
-qstring = "0.7.2"
-anyhow = "1.0.69"
-tantivy = { version = "0.19.2", default-features = false, features = [ "lz4-compression" ] }
-getrandom = { version = "0.2.8", features = [ "js" ] }
-implicit-clone = "0.3.5"
-packed_struct = "0.10.1"
+#data = { path = "./data" }
 
-[dependencies.yew_icons]
-version = "0.7.0"
-features = [
-    "BootstrapXLg",
-    "BootstrapGripVertical",
-    "BootstrapArrowDownShort",
-    "BootstrapArrowUpShort",
-    "BootstrapCheckSquareFill",
-    "BootstrapPlusCircleDotted",
-    "BootstrapChevronDoubleDown",
-    "BootstrapChevronDoubleUp",
-]
+dioxus = { git = "https://github.com/DioxusLabs/dioxus.git" }
+dioxus-web = { git = "https://github.com/DioxusLabs/dioxus.git" }
+classes = "1.0.0"
+
+#yew = { version = "0.20.0", features = [ "csr" ] }
+#yewdux = "0.9.2"
+#wasm-bindgen = "0.2.86"
+web-sys = { version = "0.3.61", features = [ "Window", "History", "Location" ] }
+log = "0.4"
+wasm-logger = "0.2.0"
+#rust-embed = { version = "6.4.2", features = [ "debug-embed", "compression" ] }
+#serde = "1.0.152"
+#serde_json = "1.0.93"
+#apache-avro = { version = "0.14.0", features = [ "derive" ] }
+#base64 = "0.21.0"
+#flate2 = "1.0.25"
+#qstring = "0.7.2"
+#anyhow = "1"
+#tantivy = { version = "0.19.2", default-features = false, features = [ "lz4-compression" ] }
+#getrandom = { version = "0.2.8", features = [ "js" ] }
+#implicit-clone = "0.3.5"
+#packed_struct = "0.10.1"
+
+#[dependencies.yew_icons]
+#version = "0.7.0"
+#features = [
+#    "BootstrapXLg",
+#    "BootstrapGripVertical",
+#    "BootstrapArrowDownShort",
+#    "BootstrapArrowUpShort",
+#    "BootstrapCheckSquareFill",
+#    "BootstrapPlusCircleDotted",
+#    "BootstrapChevronDoubleDown",
+#    "BootstrapChevronDoubleUp",
+#]
