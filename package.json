@@ -1,0 +1,14 @@
+{
+  "name": "siralim-building",
+  "version": "1.0.0",
+  "description": "# Running the app locally",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "daisyui": "^2.51.6"
+  }
+}
