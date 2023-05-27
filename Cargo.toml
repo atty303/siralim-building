@@ -25,6 +25,7 @@ anyhow = "1.0.69"
 tantivy = { version = "0.19.2", default-features = false, features = [ "lz4-compression" ] }
 getrandom = { version = "0.2.8", features = [ "js" ] }
 implicit-clone = "0.3.5"
+packed_struct = "0.10.1"
 
 [dependencies.yew_icons]
 version = "0.7.0"

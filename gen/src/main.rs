@@ -226,7 +226,7 @@ fn tokenize_description(text: String, dict: &Vec<Regex>) -> Vec<String> {
 fn gen_traits() {
     let creatures = ApiCreatureRecord::load();
     let traits = CompendiumTraitRecord::load();
-    let api_traits = load_traits();
+    let _api_traits = load_traits();
     let effects = load_effects();
     let spells = load_spells();
     let keywords = Keyword::load();
@@ -388,7 +388,7 @@ fn gen_spell_properties() {
 
 fn main() {
     gen_traits();
-    // gen_effects();
-    // gen_spells();
-    // gen_spell_properties();
+    gen_effects();
+    gen_spells();
+    gen_spell_properties();
 }

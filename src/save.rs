@@ -1,5 +1,7 @@
 use apache_avro::AvroSchema;
 use base64::Engine;
+use bitfield::bitfield;
+use packed_struct::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
@@ -16,7 +18,7 @@ pub struct Save {
     trait_pool: Vec<Option<i32>>,
 }
 
-#[derive(Serialize, Deserialize, AvroSchema, Debug)]
+#[derive(PackedStruct, Serialize, Deserialize, AvroSchema, Debug)]
 struct SaveMember {
     primary_trait: Option<i32>,
     fused_trait: Option<i32>,
