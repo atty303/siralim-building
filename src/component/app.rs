@@ -31,11 +31,15 @@ pub fn App(cx: Scope) -> Element {
                     "PARTY"
                 }
                 div {
-                    class: "card card-bordered card-compact w-full",
+                    class: "card card-bordered card-compact card-side w-full",
+                    figure {
+                        "TRAIT"
+                    }
                     div {
                         class: "card-body",
                         p {
                             "test"
+
                         }
                     }
                 }

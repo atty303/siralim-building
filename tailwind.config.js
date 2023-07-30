@@ -1,11 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["src/**/*.rs"],
+  content: ["src/**/*.rs", "index.html"],
   theme: {
     extend: {
       colors: {
-        primary: "#D0BCFF",
-        // "on-primary": "#381E72",
+        death: "#6a1b9a",
+        nature: "#558b2f",
+        life: "#9e9d24",
+        sorcery: "#283593",
+        chaos: "#c62828",
       }
     },
   },
