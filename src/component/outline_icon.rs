@@ -5,12 +5,12 @@ use dioxus::prelude::*;
 use dioxus_heroicons::{Icon, IconShape};
 
 #[inline_props]
-pub fn OutlineIcon<S: IconShape>(cx: Scope, icon: S) -> Element {
+pub fn OutlineIcon<S: IconShape>(cx: Scope, icon: S, size: Option<u32>) -> Element {
     render! {
         Icon {
             class: "stroke-current stroke-2 inline-block",
             icon: icon.clone(),
-            size: 24,
+            size: size.unwrap_or(24),
             fill: "none",
         }
     }

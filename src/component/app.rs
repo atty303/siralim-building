@@ -3,7 +3,9 @@
 use dioxus::prelude::*;
 
 use crate::component::drag::{DndState, DragHandle, Draggable, Droppable};
+use crate::component::footer::Footer;
 use crate::component::navbar::NavBar;
+use crate::component::party_member::PartyMember;
 use crate::component::party_trait::PartyTrait;
 
 pub fn App(cx: Scope) -> Element {
@@ -11,6 +13,23 @@ pub fn App(cx: Scope) -> Element {
 
     render! {
         NavBar {}
+
+        h2 {
+            class: "text-xl text-center text-secondary my-4",
+            "PARTY"
+        }
+
+        div {
+            class: "mx-4 space-y-4",
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
+        }
+
+        Footer {}
     }
 
     // cx.render(rsx! {
