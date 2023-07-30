@@ -509,6 +509,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-heroicons"
+version = "0.2.0"
+source = "git+https://github.com/atty303/dioxus-heroicons.git?rev=1f729f85d345e424ed8f43a2bfac5d5f9e66183a#1f729f85d345e424ed8f43a2bfac5d5f9e66183a"
+dependencies = [
+ "dioxus",
+]
+
+[[package]]
 name = "dioxus-hooks"
 version = "0.3.1"
 source = "git+https://github.com/DioxusLabs/dioxus.git?rev=b526fa3ebc248b1cf9b56c546f96bba87ce87655#b526fa3ebc248b1cf9b56c546f96bba87ce87655"
@@ -2447,6 +2455,7 @@ dependencies = [
  "classes",
  "data",
  "dioxus",
+ "dioxus-heroicons",
  "dioxus-web",
  "gloo-events",
  "gloo-utils",

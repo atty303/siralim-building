@@ -15,7 +15,7 @@
 </head>
 
 <body>
-<div id="main2"></div>
+<div id="main"></div>
 
 <div id="mock">
     <div class="navbar mb-2 shadow-lg bg-neutral text-neutral-content">
@@ -74,16 +74,25 @@
                 </div>
             </figure>
             <div class="card-body">
-                <div class="card-title flex items-center gap-8">
+                <div class="card-title flex items-center gap-4">
+                    <div class="text-primary hover:text-primary-focus cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.5"
+                             stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                        </svg>
+                    </div>
+
                     <div class="grow">
                         Alexandria / Diabolic Horde
                     </div>
 
-                    <div class="flex items-center">
-                        <button class="btn btn-primary btn-xs mr-4">
+                    <div class="flex items-center whitespace-nowrap">
+                        <button class="btn btn-primary btn-xs mr-2">
                             Stats
                         </button>
-                        <span class="space-x-4">
+                        <span class="space-x-4 text-sm">
 
                         <span class="py-1 px-2 bg-success text-success-content rounded-md"><img src="images/health.png" class="inline">30
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline">
@@ -103,21 +112,21 @@
                     </span>
                     </div>
                     <div class="flex items-center">
-                        <button class="btn btn-primary btn-xs mr-4">
+                        <button class="btn btn-primary btn-xs mr-2">
                             Artifact
                         </button>
-                        <span class="underline decoration-dotted">
-                            <img src="images/boots_0_0.png" class="inline-block">
+                        <span class="underline decoration-dotted whitespace-nowrap">
+                            <img src="images/boots_0_0.png" class="inline">
                             Boots
                         </span>
                     </div>
 
                     <div class="flex items-center">
-                        <button class="btn btn-primary btn-xs mr-4">
+                        <button class="btn btn-primary btn-xs mr-2">
                             Relic
                         </button>
-                        <span class="underline decoration-dotted">
-                            5740-NG, Impenetrable Plate of 4080
+                        <span class="underline decoration-dotted whitespace-nowrap">
+                            5740-NG
                         </span>
                     </div>
                 </div>
@@ -139,7 +148,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="font-bold bg-secondary text-secondary-content p-2 w-64 rounded-md">
+                                <div class="font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md">
                                     <img src="images/death.png" class="inline">
                                     <span class="underline decoration-dotted">
                                         Alexandria
@@ -183,7 +192,10 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="font-bold bg-secondary text-secondary-content p-2 w-64 rounded-md">Short Fuse</div>
+                                    <div class="font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md">
+                                        <img src="images/sorcery.png" class="inline">
+                                        Short Fuse
+                                    </div>
                                 </div>
                                 <div class="grow">
                                     Enemies take damage equal to 100% of the potency of their Bomb debuffs.

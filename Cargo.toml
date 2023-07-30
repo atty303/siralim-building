@@ -11,6 +11,9 @@ data = { path = "./data" }
 
 dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
 dioxus-web = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
+
+dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "1f729f85d345e424ed8f43a2bfac5d5f9e66183a" }
+#dioxus-heroicons = { path = "../../houseabsolute/dioxus-heroicons" }
 classes = "1.0.0"
 
 #yew = { version = "0.20.0", features = [ "csr" ] }
