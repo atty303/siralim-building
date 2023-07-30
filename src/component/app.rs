@@ -3,13 +3,13 @@
 use dioxus::prelude::*;
 
 use crate::component::drag::{DndState, DragHandle, Draggable, Droppable};
+use crate::component::party_trait::PartyTrait;
 
 pub fn App(cx: Scope) -> Element {
     let show = use_state(cx, || false);
 
     cx.render(rsx! {
         div {
-            class: "text-lg bg-slate-100",
             draggable: false,
             ondragstart: move |e| println!("{e:?}"),
             onclick: move |_| show.set(!(show.get())),
@@ -25,6 +25,22 @@ pub fn App(cx: Scope) -> Element {
                     div { "Drop here" }
                 }
             }
+            div {
+                h2 {
+                    class: "text-lg text-center",
+                    "PARTY"
+                }
+                div {
+                    class: "card card-bordered card-compact w-full",
+                    div {
+                        class: "card-body",
+                        p {
+                            "test"
+                        }
+                    }
+                }
+            }
+            PartyTrait { empty_text: "No trait" }
         }
     })
 }

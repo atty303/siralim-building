@@ -2,7 +2,12 @@
 module.exports = {
   content: ["src/**/*.rs"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: "#D0BCFF",
+        // "on-primary": "#381E72",
+      }
+    },
   },
   plugins: [require("daisyui")],
 }
