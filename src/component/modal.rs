@@ -22,37 +22,16 @@ pub fn Modal<'a>(cx: Scope<'a, ModalProps<'a>>) -> Element {
         body.set_class_name(class);
     });
     cx.render(rsx!(
-        div {
-            class: if *cx.props.show {
-                "modal--visible"
-            } else {
-                "modal--hidden"
-            },
-            div {
-                class: "modal__inner",
-                div {
-                    class: "modal__title",
-                    div {
-                        class: "modal__text",
-                    },
-                    div {
-                        class: "modal__close",
-                        button {
-                            onclick: move |e| cx.props.on_request_close.call(()),
-                        }
-                    }
+        div { class: if *cx.props.show { "modal--visible" } else { "modal--hidden" },
+            div { class: "modal__inner",
+                div { class: "modal__title",
+                    div { class: "modal__text" }
+                    div { class: "modal__close", button { onclick: move |e| cx.props.on_request_close.call(()) } }
                 }
             }
-            div {
-                class: "modal__content",
-                &cx.props.children
-            }
+            div { class: "modal__content", &cx.props.children }
         }
     ))
 }
 
-pub fn use_modal(cx: &ScopeState) {
-    let show = use_state(cx, || false);
-    let open = use_callback(cx, move || show.set(true));
-    let close = use_callback(cx, move || show.set(false));
-}
+pub fn use_modal(cx: &ScopeState) {}
