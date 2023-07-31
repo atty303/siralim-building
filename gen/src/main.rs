@@ -3,7 +3,6 @@ extern crate csv;
 extern crate data;
 extern crate regex;
 extern crate serde;
-extern crate tantivy;
 
 use std::collections::BTreeSet;
 use std::hash::Hash;
@@ -14,12 +13,11 @@ use apache_avro::AvroSchema;
 use csv::StringRecord;
 use regex::Regex;
 use serde::Deserialize;
-use tantivy::{doc, Document, Index};
 
 use data::effect::EffectAvro;
 use data::keyword::Keyword;
-use data::r#trait;
-// use data::spell::SpellSchema;
+use data::r#trait::{StatsAvro, TraitAvro};
+use data::spell::SpellAvro;
 use data::spell_property::SpellPropertyAvro;
 
 trait DefaultHash<S: Ord> {
@@ -54,6 +52,7 @@ impl CompendiumTraitRecord {
         return reader.deserialize().skip(3).map(|r| r.unwrap()).collect();
     }
 }
+
 impl DefaultHash<i32> for CompendiumTraitRecord {
     fn default_hash(&self, seed: usize) -> i32 {
         let mut hasher = ahash::RandomState::with_seed(seed).build_hasher();
@@ -83,7 +82,7 @@ struct ApiCreatureRecord {
     intelligence: i32,
     defense: i32,
     speed: i32,
-    total: i32,
+    // total: i32,
     sources: String,
     // r#trait: String,
 }
@@ -223,89 +222,90 @@ fn tokenize_description(text: String, dict: &Vec<Regex>) -> Vec<String> {
         .collect()
 }
 
-// fn gen_traits() {
-//     let creatures = ApiCreatureRecord::load();
-//     let traits = CompendiumTraitRecord::load();
-//     let _api_traits = load_traits();
-//     let effects = load_effects();
-//     let spells = load_spells();
-//     let keywords = Keyword::load();
-//
-//     let words = build_regex(&spells, &effects, &keywords);
-//
-//     let index_dir = Path::new("embed/traits");
-//     std::fs::remove_dir_all(index_dir).unwrap();
-//     std::fs::create_dir(Path::new(index_dir)).unwrap();
-//
-//     let schema = r#trait::TraitSchema::new();
-//     let index = Index::create_in_dir(index_dir, schema.schema()).unwrap();
-//
-//     let mut index_writer = index.writer(3_000_000).unwrap();
-//
-//     let seed = search_hash_seed(&traits);
-//     println!("using seed: {}", seed);
-//
-//     traits.iter().enumerate().for_each(|(i, r)| {
-//         let hash = r.default_hash(seed);
-//         //println!("{}: {} {:?}", i, hash, r);
-//
-//         let trait_name = r.trait_name.replace("\n", " ");
-//         let trait_name = if trait_name == "Click, Click, Boom" {
-//             String::from("Click, Click, Boom!")
-//         } else {
-//             trait_name
-//         };
-//         let trait_name = if trait_name == "Sharpnel Blast" {
-//             String::from("Shrapnel Blast")
-//         } else {
-//             trait_name
-//         };
-//         let (description, material) =
-//             // if let Some(api_trait) = api_traits.iter().find(|t| t.name == trait_name) {
-//             //     (
-//             //         api_trait.description.clone(),
-//             //         api_trait.material_name.clone(),
-//             //     )
-//             // } else {
-//             //     println!("not found: {}", trait_name);
-//                 (r.trait_description.clone(), r.material_name.clone())
-//             // };
-//             ;
-//         let mut doc = Document::default();
-//         doc.add_i64(schema.id(), hash as i64);
-//         doc.add_text(schema.class(), r.class.clone());
-//         doc.add_text(schema.family(), r.family.clone());
-//         doc.add_text(schema.creature(), r.creature.clone());
-//         doc.add_text(schema.name(), trait_name.clone());
-//         doc.add_text(schema.material(), material.clone());
-//
-//         tokenize_description(description.clone(), &words)
-//             .iter()
-//             .for_each(|t| {
-//                 doc.add_text(schema.description(), t);
-//             });
-//
-//         let api_creature = creatures.iter().find(|c| c.name == r.creature);
-//         if let Some(c) = api_creature {
-//             doc.add_text(schema.sprite(), c.battle_sprite.clone());
-//             doc.add_u64(schema.health(), c.health as u64);
-//             doc.add_u64(schema.attack(), c.attack as u64);
-//             doc.add_u64(schema.intelligence(), c.intelligence as u64);
-//             doc.add_u64(schema.defense(), c.defense as u64);
-//             doc.add_u64(schema.speed(), c.speed as u64);
-//             doc.add_u64(schema.total(), c.total as u64);
-//
-//             for s in c.sources.split(",") {
-//                 doc.add_text(schema.sources(), s.trim().to_string())
-//             }
-//         }
-//
-//         println!("{}: {:?}", i, schema.to_struct(&doc));
-//         index_writer.add_document(doc).unwrap();
-//     });
-//
-//     index_writer.commit().unwrap();
-// }
+fn gen_traits() {
+    let creatures = ApiCreatureRecord::load();
+    let traits = CompendiumTraitRecord::load();
+    let _api_traits = load_traits();
+    let effects = load_effects();
+    let spells = load_spells();
+    let keywords = Keyword::load();
+
+    let words = build_regex(&spells, &effects, &keywords);
+
+    let seed = search_hash_seed(&traits);
+    println!("using seed: {}", seed);
+
+    let schema = TraitAvro::get_schema();
+    let file_writer = std::io::BufWriter::new(
+        std::fs::File::create(Path::new("embed/avro/traits.avro")).unwrap(),
+    );
+    let mut writer = apache_avro::Writer::new(&schema, file_writer);
+
+    traits.iter().enumerate().for_each(|(_i, r)| {
+        let hash = r.default_hash(seed);
+        //println!("{}: {} {:?}", i, hash, r);
+
+        let trait_name = r.trait_name.replace("\n", " ");
+        let trait_name = if trait_name == "Click, Click, Boom" {
+            String::from("Click, Click, Boom!")
+        } else {
+            trait_name
+        };
+        let trait_name = if trait_name == "Sharpnel Blast" {
+            String::from("Shrapnel Blast")
+        } else {
+            trait_name
+        };
+        let (description, material) =
+            // if let Some(api_trait) = api_traits.iter().find(|t| t.name == trait_name) {
+            //     (
+            //         api_trait.description.clone(),
+            //         api_trait.material_name.clone(),
+            //     )
+            // } else {
+            //     println!("not found: {}", trait_name);
+                (r.trait_description.clone(), r.material_name.clone())
+            // };
+            ;
+
+        let api_creature = creatures.iter().find(|c| c.name == r.creature);
+
+        let (sprite, sources, stats) = if let Some(c) = api_creature {
+            let s = c
+                .sources
+                .split(",")
+                .map(|s| s.trim().to_string())
+                .collect::<Vec<_>>();
+            let stats = StatsAvro {
+                health: c.health as u8,
+                attack: c.attack as u8,
+                intelligence: c.intelligence as u8,
+                defense: c.defense as u8,
+                speed: c.speed as u8,
+            };
+            (Some(c.battle_sprite.clone()), s, Some(stats))
+        } else {
+            (None, vec![], None)
+        };
+
+        let r = TraitAvro {
+            id: hash,
+            class: r.class.clone(),
+            family: r.family.clone(),
+            creature: r.creature.clone(),
+            trait_name,
+            trait_description: tokenize_description(description.clone(), &words),
+            material_name: material.clone(),
+            sources,
+            sprite,
+            stats,
+        };
+
+        writer.append_ser(r).unwrap();
+    });
+
+    writer.flush().unwrap();
+}
 
 fn gen_effects() {
     let schema = EffectAvro::get_schema();
@@ -321,48 +321,39 @@ fn gen_effects() {
     writer.flush().unwrap();
 }
 
-// fn gen_spells() {
-//     let spells = load_spells();
-//     let effects = load_effects();
-//     let keywords = Keyword::load();
-//
-//     let words = build_regex(&spells, &effects, &keywords);
-//
-//     let index_dir = Path::new("embed/spells");
-//     std::fs::remove_dir_all(index_dir).unwrap();
-//     std::fs::create_dir(Path::new(index_dir)).unwrap();
-//
-//     let schema = SpellSchema::new();
-//     let index = Index::create_in_dir(index_dir, schema.schema()).unwrap();
-//
-//     let mut index_writer = index.writer(3_000_000).unwrap();
-//
-//     let seed = search_hash_seed(&spells);
-//     println!("using seed: {}", seed);
-//
-//     spells.iter().enumerate().for_each(|(i, r)| {
-//         let hash = r.default_hash(seed);
-//         println!("{}: {} {:?}", i, hash, r);
-//
-//         let mut doc = Document::default();
-//         doc.add_i64(schema.id(), hash as i64);
-//         doc.add_text(schema.class(), r.klass.clone());
-//         doc.add_text(schema.name(), r.name.clone());
-//         doc.add_u64(schema.charges(), r.charges as u64);
-//         doc.add_text(schema.source(), r.source.clone());
-//
-//         tokenize_description(r.description.clone(), &words)
-//             .iter()
-//             .for_each(|t| {
-//                 doc.add_text(schema.description(), t);
-//             });
-//
-//         println!("{}: {:?}", i, schema.to_struct(&doc));
-//         index_writer.add_document(doc).unwrap();
-//     });
-//
-//     index_writer.commit().unwrap();
-// }
+fn gen_spells() {
+    let spells = load_spells();
+    let effects = load_effects();
+    let keywords = Keyword::load();
+
+    let words = build_regex(&spells, &effects, &keywords);
+
+    let schema = SpellAvro::get_schema();
+    let file_writer = std::io::BufWriter::new(
+        std::fs::File::create(Path::new("embed/avro/spells.avro")).unwrap(),
+    );
+    let mut writer = apache_avro::Writer::new(&schema, file_writer);
+
+    let seed = search_hash_seed(&spells);
+    println!("using seed: {}", seed);
+
+    spells.iter().enumerate().for_each(|(_i, r)| {
+        let hash = r.default_hash(seed);
+        // println!("{}: {} {:?}", i, hash, r);
+
+        let avro = SpellAvro {
+            id: hash,
+            class: r.klass.clone(),
+            name: r.name.clone(),
+            charges: r.charges,
+            source: r.source.clone(),
+            description: tokenize_description(r.description.clone(), &words),
+        };
+        writer.append_ser(avro).unwrap();
+    });
+
+    writer.flush().unwrap();
+}
 
 fn load_spell_properties() -> Vec<SpellPropertyAvro> {
     let mut reader = csv::ReaderBuilder::new()
@@ -387,8 +378,8 @@ fn gen_spell_properties() {
 }
 
 fn main() {
-    // gen_traits();
+    gen_traits();
     gen_effects();
-    // gen_spells();
+    gen_spells();
     gen_spell_properties();
 }

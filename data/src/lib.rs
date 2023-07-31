@@ -4,13 +4,8 @@ extern crate serde;
 // extern crate tantivy;
 
 use std::collections::HashMap;
-use std::io::ErrorKind;
 
 use implicit_clone::unsync::IString;
-// use tantivy::collector::{DocSetCollector, TopDocs};
-// use tantivy::query::{QueryParser, TermQuery};
-// use tantivy::schema::IndexRecordOption;
-// use tantivy::{Index, Term};
 
 use effect::Effect;
 use keyword::Keyword;
@@ -18,6 +13,11 @@ use personality::Personality;
 // use r#trait::{Trait, TraitSchema};
 // use spell::{Spell, SpellSchema};
 use spell_property::SpellProperty;
+
+// use tantivy::collector::{DocSetCollector, TopDocs};
+// use tantivy::query::{QueryParser, TermQuery};
+// use tantivy::schema::IndexRecordOption;
+// use tantivy::{Index, Term};
 
 pub mod effect;
 pub mod keyword;
