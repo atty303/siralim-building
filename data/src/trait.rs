@@ -1,19 +1,28 @@
 use apache_avro::AvroSchema;
-use implicit_clone::unsync::IString;
+use indicium::simple::Indexable;
 use serde::{Deserialize, Serialize};
 
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]
 pub struct Trait {
     pub id: i32,
-    pub class: IString,
-    pub family: IString,
-    pub creature: IString,
-    pub trait_name: IString,
-    pub trait_description: Vec<IString>,
-    pub material_name: IString,
-    pub sources: Vec<IString>,
-    pub sprite: Option<IString>,
+    pub class: String,
+    pub family: String,
+    pub creature: String,
+    pub trait_name: String,
+    pub trait_description: Vec<String>,
+    pub material_name: String,
+    pub sources: Vec<String>,
+    pub sprite: Option<String>,
     pub stats: Option<Stats>,
+}
+
+#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]
+pub struct Stats {
+    pub health: u8,
+    pub attack: u8,
+    pub intelligence: u8,
+    pub defense: u8,
+    pub speed: u8,
 }
 
 impl Trait {
@@ -34,34 +43,16 @@ impl Trait {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Debug)]
-pub struct Stats {
-    pub health: u8,
-    pub attack: u8,
-    pub intelligence: u8,
-    pub defense: u8,
-    pub speed: u8,
-}
-
-#[derive(Debug, Eq, PartialEq, Serialize, Deserialize, AvroSchema)]
-pub struct TraitAvro {
-    pub id: i32,
-    pub class: String,
-    pub family: String,
-    pub creature: String,
-    pub trait_name: String,
-    pub trait_description: Vec<String>,
-    pub material_name: String,
-    pub sources: Vec<String>,
-    pub sprite: Option<String>,
-    pub stats: Option<StatsAvro>,
-}
-
-#[derive(Debug, Eq, PartialEq, Serialize, Deserialize, AvroSchema)]
-pub struct StatsAvro {
-    pub health: u8,
-    pub attack: u8,
-    pub intelligence: u8,
-    pub defense: u8,
-    pub speed: u8,
+impl Indexable for Trait {
+    fn strings(&self) -> Vec<String> {
+        vec![
+            self.class.clone(),
+            self.family.clone(),
+            self.creature.clone(),
+            self.trait_name.clone(),
+            self.trait_description.join(" "),
+            self.material_name.clone(),
+            self.sources.join(" "),
+        ]
+    }
 }

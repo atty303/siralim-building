@@ -1,23 +1,19 @@
 extern crate apache_avro;
 extern crate implicit_clone;
+extern crate indicium;
 extern crate serde;
-// extern crate tantivy;
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use implicit_clone::unsync::IString;
+use indicium::simple::SearchIndex;
 
 use effect::Effect;
 use keyword::Keyword;
 use personality::Personality;
-// use r#trait::{Trait, TraitSchema};
+use r#trait::Trait;
 // use spell::{Spell, SpellSchema};
 use spell_property::SpellProperty;
-
-// use tantivy::collector::{DocSetCollector, TopDocs};
-// use tantivy::query::{QueryParser, TermQuery};
-// use tantivy::schema::IndexRecordOption;
-// use tantivy::{Index, Term};
 
 pub mod effect;
 pub mod keyword;
@@ -28,7 +24,8 @@ pub mod r#trait;
 
 #[derive(Debug, Clone)]
 pub struct Data {
-    // traits_index: Index,
+    pub traits: BTreeMap<i32, Trait>,
+    pub traits_index: SearchIndex<i32>,
     // spell_index: Index,
     pub effects: HashMap<IString, Effect>,
     pub keywords: HashMap<IString, Keyword>,
@@ -36,22 +33,22 @@ pub struct Data {
     pub spell_properties: Vec<SpellProperty>,
 }
 
-// impl PartialEq for Data {
-//     fn eq(&self, other: &Self) -> bool {
-//         self.traits_index.schema() == other.traits_index.schema()
-//         //&& self.effects. == other.effects
-//     }
-// }
-
 impl Data {
     pub fn from(
-        // traits_index: Index,
+        traits: Vec<Trait>,
         // spell_index: Index,
         effects: Vec<Effect>,
         keywords: Vec<Keyword>,
         personalities: Vec<Personality>,
         spell_properties: Vec<SpellProperty>,
     ) -> Data {
+        let mut traits_map = BTreeMap::new();
+        let mut traits_index = SearchIndex::default();
+        traits.iter().for_each(|t| {
+            traits_map.insert(t.id, t.clone());
+            traits_index.insert(&t.id, t);
+        });
+
         let map = effects
             .iter()
             .map(|e| (e.name.clone(), e.clone()))
@@ -61,7 +58,8 @@ impl Data {
             .map(|e| (e.name.clone(), e.clone()))
             .collect::<HashMap<_, _>>();
         Self {
-            // traits_index,
+            traits: traits_map,
+            traits_index,
             // spell_index,
             effects: map,
             keywords,

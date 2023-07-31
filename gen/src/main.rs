@@ -16,8 +16,8 @@ use serde::Deserialize;
 
 use data::effect::EffectAvro;
 use data::keyword::Keyword;
-use data::r#trait::{StatsAvro, TraitAvro};
-use data::spell::SpellAvro;
+use data::r#trait::{Stats, Trait};
+use data::spell::Spell;
 use data::spell_property::SpellPropertyAvro;
 
 trait DefaultHash<S: Ord> {
@@ -235,7 +235,7 @@ fn gen_traits() {
     let seed = search_hash_seed(&traits);
     println!("using seed: {}", seed);
 
-    let schema = TraitAvro::get_schema();
+    let schema = Trait::get_schema();
     let file_writer = std::io::BufWriter::new(
         std::fs::File::create(Path::new("embed/avro/traits.avro")).unwrap(),
     );
@@ -276,7 +276,7 @@ fn gen_traits() {
                 .split(",")
                 .map(|s| s.trim().to_string())
                 .collect::<Vec<_>>();
-            let stats = StatsAvro {
+            let stats = Stats {
                 health: c.health as u8,
                 attack: c.attack as u8,
                 intelligence: c.intelligence as u8,
@@ -288,7 +288,7 @@ fn gen_traits() {
             (None, vec![], None)
         };
 
-        let r = TraitAvro {
+        let r = Trait {
             id: hash,
             class: r.class.clone(),
             family: r.family.clone(),
@@ -328,7 +328,7 @@ fn gen_spells() {
 
     let words = build_regex(&spells, &effects, &keywords);
 
-    let schema = SpellAvro::get_schema();
+    let schema = Spell::get_schema();
     let file_writer = std::io::BufWriter::new(
         std::fs::File::create(Path::new("embed/avro/spells.avro")).unwrap(),
     );
@@ -341,7 +341,7 @@ fn gen_spells() {
         let hash = r.default_hash(seed);
         // println!("{}: {} {:?}", i, hash, r);
 
-        let avro = SpellAvro {
+        let avro = Spell {
             id: hash,
             class: r.klass.clone(),
             name: r.name.clone(),

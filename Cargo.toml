@@ -11,6 +11,7 @@ data = { path = "./data" }
 
 dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
 dioxus-web = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
+fermi = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
 
 dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "1f729f85d345e424ed8f43a2bfac5d5f9e66183a" }
 #dioxus-heroicons = { path = "../../houseabsolute/dioxus-heroicons" }
@@ -25,15 +26,16 @@ gloo-utils = "0.1.7"
 
 log = "0.4.19"
 wasm-logger = "0.2.0"
-#rust-embed = { version = "6.4.2", features = [ "debug-embed", "compression" ] }
+
+rust-embed = { version = "6.4.2", features = [ "debug-embed", "compression" ] }
+
 #serde = "1.0.152"
 #serde_json = "1.0.93"
-#apache-avro = { version = "0.14.0", features = [ "derive" ] }
+apache-avro = { version = "0.14.0", features = [ "derive" ] }
 #base64 = "0.21.0"
 #flate2 = "1.0.25"
 #qstring = "0.7.2"
 #anyhow = "1"
-#tantivy = { version = "0.19.2", default-features = false, features = [ "lz4-compression" ] }
 #getrandom = { version = "0.2.8", features = [ "js" ] }
 #implicit-clone = "0.3.5"
 #packed_struct = "0.10.1"

@@ -1,17 +1,22 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
+use fermi::{use_init_atom_root, AtomRoot};
 
 use crate::component::drag::{DndState, DragHandle, Draggable, Droppable};
 use crate::component::footer::Footer;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::party_trait::PartyTrait;
+use crate::component::traits_table::TraitsModal;
 
 pub fn App(cx: Scope) -> Element {
     // let show = use_state(cx, || false);
+    use_init_atom_root(cx);
 
     render! {
+        TraitsModal {}
+
         NavBar {}
 
         h2 {
@@ -21,11 +26,6 @@ pub fn App(cx: Scope) -> Element {
 
         div {
             class: "mx-4 space-y-4",
-            PartyMember {}
-            PartyMember {}
-            PartyMember {}
-            PartyMember {}
-            PartyMember {}
             PartyMember {}
         }
 
