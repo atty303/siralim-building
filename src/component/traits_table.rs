@@ -4,31 +4,54 @@ use fermi::use_read;
 use data::Data;
 
 use crate::atom;
+use crate::component::modal::Modal;
 
-pub fn TraitsModal<'a>(cx: Scope<'a>) -> Element<'a> {
+#[inline_props]
+pub fn TraitsModal(cx: Scope, show: bool) -> Element {
     let data: &Data = use_read(cx, &atom::DATA);
     let index = data.traits_index.clone();
     let keys = use_ref(cx, || vec![]);
 
+    let query = use_state(cx, || String::from(""));
+
+    use_effect(cx, (query,), |(query,)| {
+        to_owned![keys];
+        async move {
+            log::debug!("search: {}", query);
+            let results = index.search(query.as_str());
+            let complements = index.autocomplete(query.as_str());
+            log::debug!("completes: {:?}", complements);
+            keys.set(results.iter().map(|i| **i).collect());
+        }
+    });
+
     render! {
-        div {
+        Modal {
+            show: show,
+            on_request_close: move |_| {},
             div {
-                input {
-                    r#type: "text",
-                    oninput: move |e| {
-                        let value = e.value.clone();
-                        let results = index.search(value.as_str());
-                        keys.set(results.iter().map(|i| **i).collect());
+                div {
+                    class: "w-full flex items-center",
+                    input {
+                        class: "input grow",
+                        r#type: "text",
+                        placeholder: "Search monster/traits...",
+                        oninput: move |e| {
+                            let value = e.value.clone();
+                            query.set(e.value.clone());
+                            // let results = index.search(value.as_str());
+                            // keys.set(results.iter().map(|i| **i).collect());
+                        }
+                    }
+                    span {
+                        format!("{} items", keys.read().len())
                     }
                 }
-                span {
-                    format!("{} items", keys.read().len())
-                }
             }
-        }
-        div {
-            TraitsTable {
-                keys: keys.read().clone(),
+            div {
+                TraitsTable {
+                    keys: keys.read().clone(),
+                }
             }
         }
     }
@@ -41,7 +64,7 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>) -> Element {
 
     render! {
         table {
-            class: "table",
+            class: "table w-full max-w-full",
             thead {
                 tr {
                     th { "Class" }

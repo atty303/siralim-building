@@ -11,12 +11,10 @@ use crate::component::party_trait::PartyTrait;
 use crate::component::traits_table::TraitsModal;
 
 pub fn App(cx: Scope) -> Element {
-    // let show = use_state(cx, || false);
+    let show = use_state(cx, || false);
     use_init_atom_root(cx);
 
     render! {
-        TraitsModal {}
-
         NavBar {}
 
         h2 {
@@ -27,9 +25,16 @@ pub fn App(cx: Scope) -> Element {
         div {
             class: "mx-4 space-y-4",
             PartyMember {}
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
         }
 
         Footer {}
+
+        TraitsModal {
+            show: *show.get(),
+        }
     }
 
     // cx.render(rsx! {
