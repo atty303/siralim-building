@@ -17,17 +17,21 @@ pub fn TraitsModal(cx: Scope, show: bool) -> Element {
     let index = data.traits_index.clone();
     let keys = use_ref(cx, || vec![]);
     let total = data.traits.len();
-    let autocomplete_items = use_ref(cx, || vec![String::from("")]);
+    let autocomplete_items = use_ref(cx, || Vec::<String>::new());
 
     let query = use_state(cx, || String::from(""));
 
     use_effect(cx, (query,), |(query,)| {
         to_owned![keys, autocomplete_items];
         async move {
-            log::debug!("search: {}", query);
+            // log::debug!("search: {}", query);
             let results = index.search(query.as_str());
-            let complements = index.autocomplete(query.as_str());
-            log::debug!("completes: {:?}", complements);
+            let complements = index
+                .autocomplete(query.as_str())
+                .into_iter()
+                .filter(|i| query.trim() != *i)
+                .collect();
+            // log::debug!("completes: {:?}", complements);
             keys.set(results.iter().map(|i| **i).collect());
             autocomplete_items.set(complements);
         }
