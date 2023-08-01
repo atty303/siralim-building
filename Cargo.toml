@@ -9,12 +9,11 @@ edition = "2021"
 [dependencies]
 data = { path = "./data" }
 
-dioxus = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
-dioxus-web = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
-fermi = { git = "https://github.com/DioxusLabs/dioxus.git", rev = "b526fa3ebc248b1cf9b56c546f96bba87ce87655" }
+dioxus = "0.4.0"
+dioxus-web = "0.4.0"
+fermi = "0.4.0"
 
-dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "1f729f85d345e424ed8f43a2bfac5d5f9e66183a" }
-#dioxus-heroicons = { path = "../../houseabsolute/dioxus-heroicons" }
+dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "835d5f42c6d5026deffcc515474738a47143ed46" }
 classes = "1.0.0"
 
 #yew = { version = "0.20.0", features = [ "csr" ] }

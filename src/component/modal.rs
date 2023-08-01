@@ -2,10 +2,7 @@
 
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
-use std::ops::DerefMut;
 use wasm_bindgen::JsCast;
-
-//use wasm_bindgen::cast::JsCast;
 
 use crate::component::outline_icon::OutlineIcon;
 
