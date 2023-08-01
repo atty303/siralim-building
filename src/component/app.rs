@@ -14,35 +14,29 @@ use crate::component::traits_table::TraitsModal;
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
-    let traits_modal = use_modal(cx, render! { TraitsModal {} });
-    // let Modal2 = cx.component(
-    //     traits_modal.modal(cx),
-    //     ModalProps {
-    //         children: render! { TraitsModal {} },
-    //     },
-    //     "Modal2",
-    // );
+    let traits_modal_state = use_modal(cx);
+    let TraitModal = traits_modal_state.component(cx, render! { TraitsModal {} });
 
     render! {
-            NavBar {}
+        NavBar {}
 
-            h2 {
-                class: "text-xl text-center text-secondary my-4",
-                "PARTY"
-            }
-
-            div {
-                class: "mx-4 space-y-4",
-                PartyMember {}
-                PartyMember {}
-                PartyMember {}
-                PartyMember {}
-            }
-
-            Footer {}
-
-    //        Modal2
+        h2 {
+            class: "text-xl text-center text-secondary my-4",
+            "PARTY"
         }
+
+        div {
+            class: "mx-4 space-y-4",
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
+            PartyMember {}
+        }
+
+        Footer {}
+
+        TraitModal
+    }
 
     // cx.render(rsx! {
     //     div {
