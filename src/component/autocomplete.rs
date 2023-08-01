@@ -21,6 +21,7 @@ pub fn Autocomplete<'a>(
                 class: "input input-primary w-full",
                 r#type: "text",
                 value: value.as_str(),
+                autofocus: true,
                 oninput: move |e| {
                     oninput.call(e.data.value.clone());
                 },

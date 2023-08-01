@@ -41,7 +41,7 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
         modalRef: modalRef.clone(),
         component: |cx| render! {
             dialog {
-                class: "modal modal-open",
+                class: "modal",
                 onmounted: move |e| {
                     log::debug!("{:?}", e.get_raw_element().unwrap().downcast_ref::<web_sys::Element>());
                     let el = e
@@ -55,14 +55,16 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
 
                     cx.props.modalRef.write().replace(el.clone());
                 },
-                form {
-                    method: "dialog",
+                div {
                     class: "modal-box max-w-full h-full relative",
                     style: "width: calc(100vw - 5em)",
                     button {
                         class: "btn btn-sm btn-circle btn-ghost absolute right-1 top-1",
+                        tabindex: "-1",
                         onclick: move |_| {
-                            // self.close();
+                            if let Some(el) = cx.props.modalRef.read().as_ref() {
+                                el.close();
+                            };
                         },
                         OutlineIcon {
                             icon: Shape::XMark,
@@ -96,6 +98,12 @@ impl ModalState {
             },
             "Modal",
         )
+    }
+
+    pub fn show(&self) {
+        if let Some(el) = self.modalRef.read().as_ref() {
+            el.show();
+        };
     }
 
     //     pub fn modal<'a>(&self, _cx: &'a ScopeState) -> fn(Scope<'a, ModalProps<'a>>) -> Element<'a> {

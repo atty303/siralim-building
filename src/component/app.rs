@@ -22,6 +22,7 @@ pub fn App(cx: Scope) -> Element {
 
         h2 {
             class: "text-xl text-center text-secondary my-4",
+            onclick: move |_| traits_modal_state.show(),
             "PARTY"
         }
 
