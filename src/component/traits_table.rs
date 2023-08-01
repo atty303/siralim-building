@@ -13,14 +13,6 @@ use crate::component::outline_icon::OutlineIcon;
 
 #[inline_props]
 pub fn TraitsModal(cx: Scope) -> Element {
-    let modal = use_modal(cx);
-    use_effect(cx, (), |()| {
-        to_owned![modal];
-        async move {
-            modal.show();
-        }
-    });
-
     let data: &Data = use_read(cx, &atom::DATA);
     let index = data.traits_index.clone();
     let keys = use_ref(cx, || vec![]);
@@ -45,7 +37,7 @@ pub fn TraitsModal(cx: Scope) -> Element {
         }
     });
 
-    let content = render! {
+    render! {
             //div { class: "max-h-64 h-64 overflow-hidden",
             div {
                 class: "flex flex-col gap-4 max-h-full",
@@ -98,17 +90,7 @@ pub fn TraitsModal(cx: Scope) -> Element {
                     }
                 }
             }
-    };
-
-    render! {
-        modal.Modal(cx.scope, content)
-
     }
-    // let props = ModalProps { children: content };
-    // modal.Modal(&Scoped {
-    //     scope: cx,
-    //     props: &props,
-    // })
 }
 
 #[inline_props]
