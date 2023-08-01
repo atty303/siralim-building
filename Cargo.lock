@@ -2124,6 +2124,7 @@ dependencies = [
  "gloo-utils",
  "log",
  "rust-embed",
+ "wasm-bindgen",
  "wasm-logger",
  "web-sys",
 ]

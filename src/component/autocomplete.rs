@@ -1,4 +1,6 @@
-#[allow(non_snake_case)]
+#![allow(non_snake_case)]
+
+use classes::classes;
 use dioxus::prelude::*;
 
 #[inline_props]
@@ -10,7 +12,7 @@ pub fn Autocomplete<'a>(
     placeholder: &'a str,
     oninput: EventHandler<'a, String>,
 ) -> Element<'a> {
-    let dropdown_hidden = if items.is_empty() { "hidden" } else { "" };
+    let dropdown_class = classes!["dropdown-content bg-base-300 max-h-96 overflow-auto flex-col rounded-md z-10 w-full", "hidden"  => items.is_empty()];
 
     render! {
         div {
@@ -26,7 +28,7 @@ pub fn Autocomplete<'a>(
                 tabindex: "0",
             }
             div {
-                class: "dropdown-content bg-base-300 max-h-96 overflow-auto flex-col rounded-md z-10 w-full {dropdown_hidden}",
+                class: "{dropdown_class}",
                 ul {
                     class: "menu",
                     for (i, item) in items.iter().enumerate() {

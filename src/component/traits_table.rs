@@ -1,18 +1,26 @@
-#[allow(non_snake_case)]
+#![allow(non_snake_case)]
+
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 use fermi::use_read;
-use std::ops::Deref;
 
 use data::Data;
 
 use crate::atom;
 use crate::component::autocomplete::Autocomplete;
-use crate::component::modal::Modal;
+use crate::component::modal::use_modal;
 use crate::component::outline_icon::OutlineIcon;
 
 #[inline_props]
-pub fn TraitsModal(cx: Scope, show: bool) -> Element {
+pub fn TraitsModal(cx: Scope) -> Element {
+    let modal = use_modal(cx);
+    use_effect(cx, (), |()| {
+        to_owned![modal];
+        async move {
+            modal.show();
+        }
+    });
+
     let data: &Data = use_read(cx, &atom::DATA);
     let index = data.traits_index.clone();
     let keys = use_ref(cx, || vec![]);
@@ -37,10 +45,7 @@ pub fn TraitsModal(cx: Scope, show: bool) -> Element {
         }
     });
 
-    render! {
-        Modal {
-            show: show,
-            on_request_close: move |_| {},
+    let content = render! {
             //div { class: "max-h-64 h-64 overflow-hidden",
             div {
                 class: "flex flex-col gap-4 max-h-full",
@@ -93,9 +98,17 @@ pub fn TraitsModal(cx: Scope, show: bool) -> Element {
                     }
                 }
             }
-            //    }
-        }
+    };
+
+    render! {
+        modal.Modal(cx.scope, content)
+
     }
+    // let props = ModalProps { children: content };
+    // modal.Modal(&Scoped {
+    //     scope: cx,
+    //     props: &props,
+    // })
 }
 
 #[inline_props]

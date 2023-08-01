@@ -5,14 +5,16 @@ use fermi::{use_init_atom_root, AtomRoot};
 
 use crate::component::drag::{DndState, DragHandle, Draggable, Droppable};
 use crate::component::footer::Footer;
+use crate::component::modal::use_modal;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::party_trait::PartyTrait;
 use crate::component::traits_table::TraitsModal;
 
 pub fn App(cx: Scope) -> Element {
-    let show = use_state(cx, || true);
     use_init_atom_root(cx);
+
+    //    let traits_modal = use_modal(cx);
 
     render! {
         NavBar {}
@@ -33,7 +35,6 @@ pub fn App(cx: Scope) -> Element {
         Footer {}
 
         TraitsModal {
-            show: *show.get(),
         }
     }
 
