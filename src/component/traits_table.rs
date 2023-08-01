@@ -1,27 +1,35 @@
+#[allow(non_snake_case)]
 use dioxus::prelude::*;
+use dioxus_heroicons::outline::Shape;
 use fermi::use_read;
+use std::ops::Deref;
 
 use data::Data;
 
 use crate::atom;
+use crate::component::autocomplete::Autocomplete;
 use crate::component::modal::Modal;
+use crate::component::outline_icon::OutlineIcon;
 
 #[inline_props]
 pub fn TraitsModal(cx: Scope, show: bool) -> Element {
     let data: &Data = use_read(cx, &atom::DATA);
     let index = data.traits_index.clone();
     let keys = use_ref(cx, || vec![]);
+    let total = data.traits.len();
+    let autocomplete_items = use_ref(cx, || vec![String::from("")]);
 
     let query = use_state(cx, || String::from(""));
 
     use_effect(cx, (query,), |(query,)| {
-        to_owned![keys];
+        to_owned![keys, autocomplete_items];
         async move {
             log::debug!("search: {}", query);
             let results = index.search(query.as_str());
             let complements = index.autocomplete(query.as_str());
             log::debug!("completes: {:?}", complements);
             keys.set(results.iter().map(|i| **i).collect());
+            autocomplete_items.set(complements);
         }
     });
 
@@ -29,30 +37,59 @@ pub fn TraitsModal(cx: Scope, show: bool) -> Element {
         Modal {
             show: show,
             on_request_close: move |_| {},
+            //div { class: "max-h-64 h-64 overflow-hidden",
             div {
+                class: "flex flex-col gap-4 max-h-full",
                 div {
-                    class: "w-full flex items-center",
-                    input {
-                        class: "input grow",
-                        r#type: "text",
-                        placeholder: "Search monster/traits...",
-                        oninput: move |e| {
-                            let value = e.value.clone();
-                            query.set(e.value.clone());
-                            // let results = index.search(value.as_str());
-                            // keys.set(results.iter().map(|i| **i).collect());
+                    class: "flex-initial w-full flex items-center space-x-4",
+                    button {
+                        class: "btn btn-primary",
+                        OutlineIcon {
+                            icon: Shape::Bookmark,
                         }
                     }
-                    span {
-                        format!("{} items", keys.read().len())
+                    // input {
+                    //     class: "input input-primary grow",
+                    //     r#type: "text",
+                    //     placeholder: "Search monster/traits...",
+                    //     oninput: move |e| {
+                    //         let value = e.value.clone();
+                    //         query.set(e.value.clone());
+                    //     }
+                    // }
+                    Autocomplete {
+                        class: "grow",
+                        value: query,
+                        items: autocomplete_items.read().clone(),
+                        placeholder: "Search monster/traits...",
+                        oninput: move |value| {
+                            query.set(value);
+                        }
+                    }
+                    div {
+                        span {
+                            class: "font-bold",
+                            format!("{}", keys.read().len())
+                        }
+                        " of "
+                        span {
+                            class: "font-bold",
+                            format!("{}", total)
+                        }
+                        " results"
+                    }
+                }
+                div {
+                    class: "grow overflow-y-auto",
+                    div {
+                        class: "",
+                        TraitsTable {
+                            keys: keys.read().clone(),
+                        }
                     }
                 }
             }
-            div {
-                TraitsTable {
-                    keys: keys.read().clone(),
-                }
-            }
+            //    }
         }
     }
 }
@@ -64,9 +101,10 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>) -> Element {
 
     render! {
         table {
-            class: "table w-full max-w-full",
+            class: "table table-zebra table-pin-rows w-full",
             thead {
                 tr {
+                    // class: "sticky top-0",
                     th { "Class" }
                     th { "Family" }
                     th { "Creature" }
@@ -84,7 +122,10 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>) -> Element {
                         td { t.class.clone() }
                         td { t.family.clone() }
                         td { t.creature.clone() }
-                        td { t.trait_description.join(" ") }
+                        td {
+                            class: "whitespace-normal",
+                            t.trait_description.join(" ")
+                        }
                         td { t.health().map(|v| v.to_string()).unwrap_or("-".to_string()) }
                         td { t.attack().map(|v| v.to_string()).unwrap_or("-".to_string()) }
                         td { t.intelligence().map(|v| v.to_string()).unwrap_or("-".to_string()) }

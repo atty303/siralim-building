@@ -11,7 +11,7 @@ use crate::component::party_trait::PartyTrait;
 use crate::component::traits_table::TraitsModal;
 
 pub fn App(cx: Scope) -> Element {
-    let show = use_state(cx, || false);
+    let show = use_state(cx, || true);
     use_init_atom_root(cx);
 
     render! {

@@ -1,4 +1,5 @@
 pub mod app;
+pub mod autocomplete;
 pub mod drag;
 pub mod footer;
 pub mod modal;
