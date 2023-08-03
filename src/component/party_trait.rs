@@ -8,7 +8,7 @@ pub fn PartyTrait(cx: Scope, r#trait: Option<Trait>, empty_text: &'static str) -
     render! {
         div {
             class: "flex flex-col items-stretch",
-            if let Some(t) = r#trait {
+            if let Some(_t) = r#trait {
                 rsx! {
                     div {
                         class: "flex grow items-center",

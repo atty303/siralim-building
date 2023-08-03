@@ -42,7 +42,7 @@ pub fn DragHandle<'a>(cx: Scope<'a>, children: Element<'a>) -> Element {
     let state = use_dnd_state(cx);
     render! {
         div {
-            onmousedown: move |e: MouseEvent| {
+            onmousedown: move |_| {
                 state.write().dragging = true;
                 let s = state.clone();
                 EventListener::once(&body(), "mouseup", move |_e| {

@@ -1,15 +1,12 @@
 #![allow(non_snake_case)]
 
-use data::spell::Spell;
 use dioxus::prelude::*;
-use fermi::{use_init_atom_root, AtomRoot};
+use fermi::use_init_atom_root;
 
-use crate::component::drag::{DndState, DragHandle, Draggable, Droppable};
 use crate::component::footer::Footer;
-use crate::component::modal::{use_modal, ModalProps};
+use crate::component::modal::use_modal;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
-use crate::component::party_trait::PartyTrait;
 use crate::component::traits_table::TraitsModal;
 
 pub fn App(cx: Scope) -> Element {

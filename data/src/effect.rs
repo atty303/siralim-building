@@ -1,5 +1,4 @@
 use apache_avro::AvroSchema;
-use implicit_clone::unsync::IString;
 use serde::{Deserialize, Serialize};
 
 // TODO: replace with EffectAvro

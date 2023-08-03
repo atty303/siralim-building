@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use dioxus::core::{DynamicNode, IntoDynNode};
+use dioxus::core::DynamicNode;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 use wasm_bindgen::JsCast;
@@ -75,13 +75,14 @@ impl ModalState {
 
     pub fn show(&self) {
         if let Some(el) = self.modalRef.read().as_ref() {
-            el.show_modal();
+            // TODO: error handling?
+            el.show_modal().unwrap();
         };
     }
 
-    pub fn close(&self) {
-        if let Some(el) = self.modalRef.read().as_ref() {
-            el.close();
-        };
-    }
+    // pub fn close(&self) {
+    //     if let Some(el) = self.modalRef.read().as_ref() {
+    //         el.close();
+    //     };
+    // }
 }

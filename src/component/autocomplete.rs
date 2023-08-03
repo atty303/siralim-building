@@ -37,7 +37,7 @@ pub fn Autocomplete<'a>(
                             key: "{i}",
                             tabindex: "{i + 1}",
                             button {
-                                onclick: move |e| {
+                                onclick: move |_| {
                                     oninput.call(item.clone());
                                 },
                                 "{item}"
