@@ -80,7 +80,7 @@ pub fn TraitsModal(cx: Scope) -> Element {
                     div {
                         TraitsTable {
                             keys: keys.read().clone(),
-                            selection: vec![320282],
+                            selection: vec![],
                         }
                     }
                 }
@@ -103,11 +103,11 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                     th { "Family" }
                     th { "Creature" }
                     th { "Trait Description" }
-                    th { img { src: "images/health.png" } }
-                    th { img { src: "images/attack.png" } }
-                    th { img { src: "images/intelligence.png" } }
-                    th { img { src: "images/defense.png" } }
-                    th { img { src: "images/speed.png" } }
+                    th { class: "text-center", img { class: "inline-block", title: "Health", alt: "Health", src: "images/health.png" } }
+                    th { class: "text-center", img { class: "inline-block", title: "Attack", alt: "Attack", src: "images/attack.png" } }
+                    th { class: "text-center", img { class: "inline-block", title: "Intelligence", alt: "Intelligence", src: "images/intelligence.png" } }
+                    th { class: "text-center", img { class: "inline-block", title: "Defense", alt: "Defense", src: "images/defense.png" } }
+                    th { class: "text-center", img { class: "inline-block", title: "Speed", alt: "Speed", src: "images/speed.png" } }
                 }
             }
             tbody {
@@ -142,11 +142,11 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                                 class: "whitespace-normal",
                                 t.trait_description.join(" ")
                             }
-                            td { StatsNumber { range: HEALTH_RANGE, value: t.health() } }
-                            td { StatsNumber { range: ATTACK_RANGE, value: t.attack() } }
-                            td { StatsNumber { range: INTELLIGENCE_RANGE, value: t.intelligence() } }
-                            td { StatsNumber { range: DEFENSE_RANGE, value: t.defense() } }
-                            td { StatsNumber { range: SPEED_RANGE, value: t.speed() } }
+                            td { class: "text-center", StatsNumber { range: HEALTH_RANGE, value: t.health() } }
+                            td { class: "text-center", StatsNumber { range: ATTACK_RANGE, value: t.attack() } }
+                            td { class: "text-center", StatsNumber { range: INTELLIGENCE_RANGE, value: t.intelligence() } }
+                            td { class: "text-center", StatsNumber { range: DEFENSE_RANGE, value: t.defense() } }
+                            td { class: "text-center", StatsNumber { range: SPEED_RANGE, value: t.speed() } }
                         }
                     }
                 })
@@ -172,17 +172,14 @@ fn StatsNumber(cx: Scope, range: Range<u8>, #[props(!optional)] value: Option<u8
 
         render! {
             span {
-                class: "p-1 rounded-md",
+                class: "p-2 rounded-md font-bold",
                 style: "background:{color}",
                 "{value}"
             }
         }
     } else {
         render! {
-            span {
-                class: "text-gray-500",
-                "-"
-            }
+            "-"
         }
     }
 }
