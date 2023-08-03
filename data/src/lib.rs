@@ -5,7 +5,6 @@ extern crate serde;
 
 use std::collections::{BTreeMap, HashMap};
 
-use implicit_clone::unsync::IString;
 use indicium::simple::SearchIndex;
 
 use effect::Effect;
@@ -28,8 +27,8 @@ pub struct Data {
     pub traits: BTreeMap<i32, Trait>,
     pub traits_index: SearchIndex<i32>,
     // spell_index: Index,
-    pub effects: HashMap<IString, Effect>,
-    pub keywords: HashMap<IString, Keyword>,
+    pub effects: HashMap<String, Effect>,
+    pub keywords: HashMap<String, Keyword>,
     pub personalities: Vec<Personality>,
     pub spell_properties: Vec<SpellProperty>,
 }

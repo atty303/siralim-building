@@ -12,6 +12,7 @@ use data::Data;
 use crate::atom;
 use crate::component::autocomplete::Autocomplete;
 use crate::component::class_icon::ClassIcon;
+use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
 
 #[inline_props]
@@ -144,7 +145,9 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                             }
                             td {
                                 class: "whitespace-normal",
-                                t.trait_description.join(" ")
+                                Description {
+                                    value: t.trait_description.clone(),
+                                }
                             }
                             td { class: "text-center", StatsNumber { range: HEALTH_RANGE, value: t.health() } }
                             td { class: "text-center", StatsNumber { range: ATTACK_RANGE, value: t.attack() } }

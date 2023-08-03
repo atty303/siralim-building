@@ -1,6 +1,7 @@
 pub mod app;
 pub mod autocomplete;
 pub mod class_icon;
+pub mod description;
 pub mod drag;
 pub mod footer;
 pub mod modal;
