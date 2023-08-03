@@ -20,6 +20,7 @@ pub mod keyword;
 pub mod personality;
 pub mod spell;
 pub mod spell_property;
+pub mod stats;
 pub mod r#trait;
 
 #[derive(Debug, Clone)]

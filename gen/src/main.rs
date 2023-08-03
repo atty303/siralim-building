@@ -5,8 +5,10 @@ extern crate regex;
 extern crate serde;
 
 use std::collections::BTreeSet;
+use std::fs::File;
 use std::hash::Hash;
 use std::hash::{BuildHasher, Hasher};
+use std::io::{BufWriter, Write};
 use std::path::Path;
 
 use apache_avro::AvroSchema;
@@ -55,7 +57,8 @@ impl CompendiumTraitRecord {
 
 impl DefaultHash<i32> for CompendiumTraitRecord {
     fn default_hash(&self, seed: usize) -> i32 {
-        let mut hasher = ahash::RandomState::with_seed(seed).build_hasher();
+        let s = seed as u64;
+        let mut hasher = ahash::RandomState::with_seeds(s, s, s, s).build_hasher();
         self.hash(&mut hasher);
         (hasher.finish() & 0xFFFFF) as i32
     }
@@ -108,7 +111,8 @@ pub struct ApiSpellRecord {
 
 impl DefaultHash<i16> for ApiSpellRecord {
     fn default_hash(&self, seed: usize) -> i16 {
-        let mut hasher = ahash::RandomState::with_seed(seed).build_hasher();
+        let s = seed as u64;
+        let mut hasher = ahash::RandomState::with_seeds(s, s, s, s).build_hasher();
         //let mut hasher = std::collections::hash_map::DefaultHasher::new();
         self.hash(&mut hasher);
         let h = hasher.finish();
@@ -241,9 +245,27 @@ fn gen_traits() {
     );
     let mut writer = apache_avro::Writer::new(&schema, file_writer);
 
+    let mut stats_max = Stats {
+        health: u8::MIN,
+        attack: u8::MIN,
+        intelligence: u8::MIN,
+        defense: u8::MIN,
+        speed: u8::MIN,
+    };
+    let mut stats_min = Stats {
+        health: u8::MAX,
+        attack: u8::MAX,
+        intelligence: u8::MAX,
+        defense: u8::MAX,
+        speed: u8::MAX,
+    };
+    let mut id_set = BTreeSet::new();
     traits.iter().enumerate().for_each(|(_i, r)| {
         let hash = r.default_hash(seed);
-        //println!("{}: {} {:?}", i, hash, r);
+        if !id_set.insert(r.default_hash(seed)) {
+            panic!("hash collision");
+        }
+        // println!("{}: {} {:?}", _i, hash, r);
 
         let trait_name = r.trait_name.replace("\n", " ");
         let trait_name = if trait_name == "Click, Click, Boom" {
@@ -283,6 +305,16 @@ fn gen_traits() {
                 defense: c.defense as u8,
                 speed: c.speed as u8,
             };
+            stats_min.health = stats_min.health.min(stats.health);
+            stats_max.health = stats_max.health.max(stats.health);
+            stats_min.attack = stats_min.attack.min(stats.attack);
+            stats_max.attack = stats_max.attack.max(stats.attack);
+            stats_min.intelligence = stats_min.intelligence.min(stats.intelligence);
+            stats_max.intelligence = stats_max.intelligence.max(stats.intelligence);
+            stats_min.defense = stats_min.defense.min(stats.defense);
+            stats_max.defense = stats_max.defense.max(stats.defense);
+            stats_min.speed = stats_min.speed.min(stats.speed);
+            stats_max.speed = stats_max.speed.max(stats.speed);
             (Some(c.battle_sprite.clone()), s, Some(stats))
         } else {
             (None, vec![], None)
@@ -305,6 +337,28 @@ fn gen_traits() {
     });
 
     writer.flush().unwrap();
+
+    {
+        let mut writer = BufWriter::new(File::create("data/src/stats.rs").unwrap());
+        writer.write("#![allow(dead_code)]\n".as_bytes()).unwrap();
+
+        let mut write_line = |name, min, max| {
+            writer
+                .write(
+                    format!("const {}: std::ops::Range<u8> = {}..{};\n", name, min, max).as_bytes(),
+                )
+                .unwrap()
+        };
+        write_line("HEALTH_RANGE", stats_min.health, stats_max.health + 1);
+        write_line("ATTACK_RANGE", stats_min.attack, stats_max.attack + 1);
+        write_line(
+            "INTELLIGENCE_RANGE",
+            stats_min.intelligence,
+            stats_max.intelligence + 1,
+        );
+        write_line("DEFENSE_RANGE", stats_min.defense, stats_max.defense + 1);
+        write_line("SPEED_RANGE", stats_min.speed, stats_max.speed + 1);
+    }
 }
 
 fn gen_effects() {
