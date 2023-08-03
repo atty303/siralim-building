@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 use crate::atom;
+use crate::component::card_tooltip::CardTooltip;
 use data::Data;
 use dioxus::prelude::*;
 use fermi::use_read;
@@ -30,27 +31,14 @@ pub fn Description(cx: Scope, value: Vec<String>) -> Element {
                         _ => "text-warning",
                     };
                     rsx! {
-                        div {
-                            class: "dropdown dropdown-hover",
-                            label {
-                                class: "font-bold underline decoration-dotted {color}",
-                                tabindex: 0,
-                                img {
-                                    class: "inline-block w-4 h-4 mr-1",
-                                    src: "status_icons/{e.icon}",
-                                }
-                                "{t}"
+                        CardTooltip {
+                            tip: render! { p { "{e.description}" } },
+                            class: "font-bold underline decoration-dotted {color}",
+                            img {
+                                class: "inline-block w-4 h-4 mr-1",
+                                src: "status_icons/{e.icon}",
                             }
-                            div {
-                                class: "dropdown-content z-[1] card card-compact w-96 shadow bg-neutral text-neutral-content mt-1",
-                                tabindex: 0,
-                                div {
-                                    class: "card-body",
-                                    p {
-                                        "{e.description}"
-                                    }
-                                }
-                            }
+                            "{t}"
                         }
                     }
                 } else {
