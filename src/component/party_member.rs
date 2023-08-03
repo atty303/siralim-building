@@ -10,17 +10,17 @@ use crate::component::outline_icon::OutlineIcon;
 pub fn PartyMember(cx: Scope) -> Element {
     render! {
         div {
-            class: "card card-bordered border-neutral card-side card-compact w-full shadow bg-base-300",
+            class: "card card-bordered border-base-300 card-side card-compact w-full shadow-md shadow-black/50 bg-base-300",
             figure {
                 class: "bg-nature/50 p-4 relative",
                 img {
-                    class: "inline-block",
+                    class: "inline-block w-28 h-28",
                     src: "battle_sprites/spr_crits_battle_2933.png",
                 }
                 div {
-                    class: "badge badge absolute inset-x-2 bottom-2 text-center font-bold w-auto bg-black/25",
+                    class: "badge absolute inset-x-2 bottom-2 text-center font-bold w-auto bg-black/25 text-sm h-8",
                     img {
-                        class: "inline-block",
+                        class: "inline-block mr-1",
                         src: "images/nature.png"
                     }
                     "Nature"
