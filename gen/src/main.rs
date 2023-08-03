@@ -340,12 +340,14 @@ fn gen_traits() {
 
     {
         let mut writer = BufWriter::new(File::create("data/src/stats.rs").unwrap());
-        writer.write("#![allow(dead_code)]\n".as_bytes()).unwrap();
-
         let mut write_line = |name, min, max| {
             writer
                 .write(
-                    format!("const {}: std::ops::Range<u8> = {}..{};\n", name, min, max).as_bytes(),
+                    format!(
+                        "pub const {}: std::ops::Range<u8> = {}..{};\n",
+                        name, min, max
+                    )
+                    .as_bytes(),
                 )
                 .unwrap()
         };

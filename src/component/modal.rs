@@ -14,22 +14,19 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
         modalRef: modalRef.clone(),
         component: |cx| render! {
             dialog {
-                class: "modal",
+                class: "modal backdrop:backdrop-blur",
                 onmounted: move |e| {
                     log::debug!("{:?}", e.get_raw_element().unwrap().downcast_ref::<web_sys::Element>());
                     let el = e
-                    .get_raw_element()
-                    .expect("expecting raw element")
-                    .downcast_ref::<web_sys::Element>()
-                    .expect("expecting Element")
-                    .dyn_ref::<web_sys::HtmlDialogElement>()
-                    .expect("expecting HtmlDialogElement");
-                    log::debug!("{:?}", el);
+                        .get_raw_element().expect("expecting raw element")
+                        .downcast_ref::<web_sys::Element>().expect("expecting Element")
+                        .dyn_ref::<web_sys::HtmlDialogElement>().expect("expecting HtmlDialogElement");
 
                     cx.props.modalRef.write().replace(el.clone());
                 },
-                div {
+                form {
                     class: "modal-box max-w-full h-full relative",
+                    method: "dialog",
                     style: "width: calc(100vw - 5em)",
                     button {
                         class: "btn btn-sm btn-circle btn-ghost absolute right-1 top-1",
@@ -44,6 +41,11 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
                         }
                     }
                     &cx.props.children
+                }
+                form {
+                    class: "modal-backdrop",
+                    method: "dialog",
+                    button { "close" }
                 }
             }
         },
@@ -75,7 +77,7 @@ impl ModalState {
 
     pub fn show(&self) {
         if let Some(el) = self.modalRef.read().as_ref() {
-            el.show();
+            el.show_modal();
         };
     }
 

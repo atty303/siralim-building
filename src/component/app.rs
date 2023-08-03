@@ -22,6 +22,8 @@ pub fn App(cx: Scope) -> Element {
     let SpellModal = spell_modal_state.component(cx, render! { "Spells" });
 
     render! {
+        TraitsModal {}
+
         NavBar {}
 
         h2 {
