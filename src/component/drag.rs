@@ -1,4 +1,4 @@
-#![allow(non_snake_case)]
+#![allow(non_snake_case, dead_code)] // TODO: remove dead_code
 
 use dioxus::prelude::*;
 use gloo_events::EventListener;
@@ -14,7 +14,7 @@ impl Default for State {
     }
 }
 
-pub fn use_dnd_state<'a>(cx: &ScopeState) -> &UseSharedState<State> {
+fn use_dnd_state<'a>(cx: &ScopeState) -> &UseSharedState<State> {
     use_shared_state::<State>(cx).expect("You must provide DndState")
 }
 
