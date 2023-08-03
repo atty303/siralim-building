@@ -25,7 +25,7 @@ pub fn CreatureCard<'a>(cx: Scope<'a>, r#trait: &'a Trait) -> Element<'a> {
             div {
                 class: "card-body !p-0", // divide-y divide-base
                 h2 {
-                    class: "card-title leading-4 !mb-0",
+                    class: "card-title leading-4 !mb-0 whitespace-nowrap",
                     span {
                         class: "badge badge-lg bg-black/25 text-neutral-content",
                         ClassIcon { class: "mr-1", name: t.class.as_str() }

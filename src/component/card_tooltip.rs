@@ -18,7 +18,7 @@ pub fn CardTooltip<'a>(
                 children
             }
             div {
-                class: "dropdown-content z-[1] min-w-max card card-compact card-bordered border-base-300 shadow-lg shadow-black/50 bg-neutral text-neutral-content mt-1",
+                class: "dropdown-content z-[1] card card-compact card-bordered border-base-300 shadow-lg shadow-black/50 bg-neutral text-neutral-content mt-1 min-w-[20em]",
                 tabindex: 0,
                 div {
                     class: "card-body",
