@@ -176,7 +176,7 @@ fn StatsNumber(cx: Scope, range: Range<u8>, #[props(!optional)] value: Option<u8
 
         render! {
             span {
-                class: "p-2 rounded-md font-bold",
+                class: "p-2 rounded-md font-bold inline-block w-8",
                 style: "background:{color}",
                 "{value}"
             }
