@@ -156,7 +156,7 @@ pub fn PartyMember(cx: Scope) -> Element {
                             div {
                                 class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
                                 CardTooltip {
-                                    tip: render! { CreatureCard {} },
+                                    tip: None, //render! { CreatureCard {} },
                                     img {
                                         class: "inline-block mr-2",
                                         src: "images/death.png",

@@ -32,7 +32,11 @@ pub fn TraitsModal(cx: Scope) -> Element {
         to_owned![keys, autocomplete_items];
         async move {
             // log::debug!("search: {}", query);
-            let results = index.search(query.as_str());
+            let results = if query.len() > 1 {
+                index.search(query.as_str())
+            } else {
+                vec![]
+            };
             let complements = index
                 .autocomplete(query.as_str())
                 .into_iter()
@@ -82,9 +86,13 @@ pub fn TraitsModal(cx: Scope) -> Element {
                 div {
                     class: "grow overflow-y-auto",
                     div {
-                        TraitsTable {
-                            keys: keys.read().clone(),
-                            selection: vec![],
+                        if !keys.read().is_empty() {
+                            rsx! {
+                                TraitsTable {
+                                    keys: keys.read().clone(),
+                                    selection: vec![],
+                                }
+                            }
                         }
                     }
                 }
@@ -102,6 +110,7 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
             class: "table table-zebra table-pin-rows w-full",
             thead {
                 tr {
+                    class: "bg-neutral text-neutral-content",
                     th {}
                     th { "Class" }
                     th { "Family" }
@@ -142,7 +151,7 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                             }
                             td {
                                 CardTooltip {
-                                    tip: render! { CreatureCard {} },
+                                    tip: render! { CreatureCard { r#trait: t } },
                                     class: "underline decoration-dotted",
                                     "{t.creature}"
                                 }
