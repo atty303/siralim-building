@@ -43,6 +43,48 @@ pub fn CreatureCard<'a>(cx: Scope<'a>, r#trait: &'a Trait) -> Element<'a> {
                         }
                     }
                 }
+                if let Some(s) = t.stats.as_ref() {
+                    rsx! {
+                        div {
+                            class: "text-sm font-normal col-span-2 leading-6 space-x-2 whitespace-nowrap",
+                            span {
+                                img {
+                                    class: "inline-block w-4 h-4 mr-1",
+                                    src: "images/health.png",
+                                }
+                                "{s.health}"
+                            }
+                            span {
+                                img {
+                                    class: "inline-block w-4 h-4 mr-1",
+                                    src: "images/attack.png",
+                                }
+                                "{s.attack}"
+                            }
+                            span {
+                                img {
+                                    class: "inline-block w-4 h-4 mr-1",
+                                    src: "images/intelligence.png",
+                                }
+                                "{s.intelligence}"
+                            }
+                            span {
+                                img {
+                                    class: "inline-block w-4 h-4 mr-1",
+                                    src: "images/defense.png",
+                                }
+                                "{s.defense}"
+                            }
+                            span {
+                                img {
+                                    class: "inline-block w-4 h-4 mr-1",
+                                    src: "images/speed.png",
+                                }
+                                "{s.speed}"
+                            }
+                        }
+                    }
+                }
                 dl {
                     div {
                         class: "grid grid-cols-3 gap-4",

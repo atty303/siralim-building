@@ -51,7 +51,7 @@ pub fn TraitsModal(cx: Scope) -> Element {
     render! {
             //div { class: "max-h-64 h-64 overflow-hidden",
             div {
-                class: "flex flex-col gap-4 max-h-full",
+                class: "flex flex-col gap-4 min-h-full max-h-full",
                 div {
                     class: "flex-initial w-full flex items-center space-x-4",
                     button {
