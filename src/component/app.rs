@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use data::spell::Spell;
 use dioxus::prelude::*;
 use fermi::{use_init_atom_root, AtomRoot};
 
@@ -14,15 +15,23 @@ use crate::component::traits_table::TraitsModal;
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
-    let traits_modal_state = use_modal(cx);
-    let TraitModal = traits_modal_state.component(cx, render! { TraitsModal {} });
+    let trait_modal_state = use_modal(cx);
+    let TraitModal = trait_modal_state.component(cx, render! { TraitsModal {} });
+
+    let spell_modal_state = use_modal(cx);
+    let SpellModal = spell_modal_state.component(cx, render! { "Spells" });
 
     render! {
         NavBar {}
 
         h2 {
             class: "text-xl text-center text-secondary my-4",
-            onclick: move |_| traits_modal_state.show(),
+            onclick: move |_| trait_modal_state.show(),
+            "PARTY"
+        }
+        h2 {
+            class: "text-xl text-center text-secondary my-4",
+            onclick: move |_| spell_modal_state.show(),
             "PARTY"
         }
 
@@ -37,14 +46,13 @@ pub fn App(cx: Scope) -> Element {
         Footer {}
 
         TraitModal
+        SpellModal
     }
 
     // cx.render(rsx! {
     //     div {
     //         draggable: false,
     //         ondragstart: move |e| println!("{e:?}"),
-    //         onclick: move |_| show.set(!(show.get())),
-    //         // Modal { show: show, on_request_close: move |_| println!("close"), div { "Hello, world!" } },
     //         DndState {
     //             Draggable {
     //                 DragHandle {

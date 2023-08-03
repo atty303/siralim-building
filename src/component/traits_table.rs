@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 use fermi::use_read;
@@ -8,7 +9,7 @@ use data::Data;
 
 use crate::atom;
 use crate::component::autocomplete::Autocomplete;
-use crate::component::modal::use_modal;
+use crate::component::class_icon::ClassIcon;
 use crate::component::outline_icon::OutlineIcon;
 
 #[inline_props]
@@ -49,15 +50,6 @@ pub fn TraitsModal(cx: Scope) -> Element {
                             icon: Shape::Bookmark,
                         }
                     }
-                    // input {
-                    //     class: "input input-primary grow",
-                    //     r#type: "text",
-                    //     placeholder: "Search monster/traits...",
-                    //     oninput: move |e| {
-                    //         let value = e.value.clone();
-                    //         query.set(e.value.clone());
-                    //     }
-                    // }
                     Autocomplete {
                         class: "grow",
                         value: query,
@@ -83,9 +75,9 @@ pub fn TraitsModal(cx: Scope) -> Element {
                 div {
                     class: "grow overflow-y-auto",
                     div {
-                        class: "",
                         TraitsTable {
                             keys: keys.read().clone(),
+                            selection: vec![320282],
                         }
                     }
                 }
@@ -94,7 +86,7 @@ pub fn TraitsModal(cx: Scope) -> Element {
 }
 
 #[inline_props]
-pub fn TraitsTable(cx: Scope, keys: Vec<i32>) -> Element {
+pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
     let data: &Data = use_read(cx, &atom::DATA);
     let items = keys.iter().flat_map(|k| data.traits.get(k));
 
@@ -103,7 +95,7 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>) -> Element {
             class: "table table-zebra table-pin-rows w-full",
             thead {
                 tr {
-                    // class: "sticky top-0",
+                    th {}
                     th { "Class" }
                     th { "Family" }
                     th { "Creature" }
@@ -116,22 +108,42 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>) -> Element {
                 }
             }
             tbody {
-                for t in items {
-                    tr {
-                        td { t.class.clone() }
-                        td { t.family.clone() }
-                        td { t.creature.clone() }
-                        td {
-                            class: "whitespace-normal",
-                            t.trait_description.join(" ")
+                items.map(|t| {
+                    let tr_class = classes!["group", "!bg-secondary/25" => selection.contains(&t.id)];
+                    rsx! {
+                        tr {
+                            key: "{t.id}",
+                            class: "{tr_class}",
+                            td {
+                                input {
+                                    class: "checkbox checkbox-primary invisible group-hover:visible",
+                                    r#type: "checkbox",
+                                    checked: true,
+                                }
+                            }
+                            td {
+                                ClassIcon { class: t.class.as_str() }
+                                t.class.clone()
+                            }
+                            td { t.family.clone() }
+                            td {
+                                span {
+                                    class: "underline decoration-dotted",
+                                    t.creature.clone()
+                                }
+                            }
+                            td {
+                                class: "whitespace-normal",
+                                t.trait_description.join(" ")
+                            }
+                            td { t.health().map(|v| v.to_string()).unwrap_or("-".to_string()) }
+                            td { t.attack().map(|v| v.to_string()).unwrap_or("-".to_string()) }
+                            td { t.intelligence().map(|v| v.to_string()).unwrap_or("-".to_string()) }
+                            td { t.defense().map(|v| v.to_string()).unwrap_or("-".to_string()) }
+                            td { t.speed().map(|v| v.to_string()).unwrap_or("-".to_string()) }
                         }
-                        td { t.health().map(|v| v.to_string()).unwrap_or("-".to_string()) }
-                        td { t.attack().map(|v| v.to_string()).unwrap_or("-".to_string()) }
-                        td { t.intelligence().map(|v| v.to_string()).unwrap_or("-".to_string()) }
-                        td { t.defense().map(|v| v.to_string()).unwrap_or("-".to_string()) }
-                        td { t.speed().map(|v| v.to_string()).unwrap_or("-".to_string()) }
                     }
-                }
+                })
             }
         }
     }
