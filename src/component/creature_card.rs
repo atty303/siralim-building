@@ -11,15 +11,16 @@ pub fn CreatureCard(cx: Scope) -> Element {
             figure {
                 class: "py-2 px-4",
                 img {
+                    class: "w-24 h-24",
                     src: "battle_sprites/spr_crits_battle_2933.png",
                 }
             }
             div {
-                class: "card-body divide-y divide-base !p-0",
+                class: "card-body !p-0", // divide-y divide-base
                 h2 {
                     class: "card-title leading-4 !mb-0",
                     span {
-                        class: "badge badge-lg bg-black/25",
+                        class: "badge badge-lg bg-black/25 text-neutral-content",
                         ClassIcon { class: "mr-1", name: "Death" }
                         "Death"
                     }
