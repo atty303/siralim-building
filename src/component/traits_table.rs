@@ -125,13 +125,17 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                                 }
                             }
                             td {
+                                class: "whitespace-nowrap",
                                 ClassIcon {
                                     class: "mr-1",
                                     name: t.class.as_str()
                                 }
                                 t.class.clone()
                             }
-                            td { t.family.clone() }
+                            td {
+                                class: "whitespace-nowrap",
+                                t.family.clone()
+                            }
                             td {
                                 span {
                                     class: "underline decoration-dotted",
@@ -160,9 +164,6 @@ fn StatsNumber(cx: Scope, range: Range<u8>, #[props(!optional)] value: Option<u8
     if let Some(value) = value {
         let base = value - range.start;
         let percent = base as f32 / range.len() as f32;
-
-        let start = (239, 68, 68);
-        let end = (34, 197, 94);
 
         let color = if percent < 0.5 {
             format!("rgba(239, 68, 68, {})", 1.0 - (percent * 2.0))

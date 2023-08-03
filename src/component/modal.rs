@@ -24,10 +24,8 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
 
                     cx.props.modalRef.write().replace(el.clone());
                 },
-                form {
-                    class: "modal-box max-w-full h-full relative",
-                    method: "dialog",
-                    style: "width: calc(100vw - 5em)",
+                div {
+                    class: "modal-box w-[calc(100vw-5em)] max-w-full h-full relative",
                     button {
                         class: "btn btn-sm btn-circle btn-ghost absolute right-1 top-1",
                         tabindex: "-1",
