@@ -1,5 +1,7 @@
 #![allow(non_snake_case)]
 
+use crate::component::card_tooltip::CardTooltip;
+use crate::component::creature_card::CreatureCard;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
@@ -8,7 +10,7 @@ use crate::component::outline_icon::OutlineIcon;
 pub fn PartyMember(cx: Scope) -> Element {
     render! {
         div {
-            class: "card card-bordered card-side card-compact w-full shadow bg-base-300",
+            class: "card card-bordered border-neutral card-side card-compact w-full shadow bg-base-300",
             figure {
                 class: "bg-nature/50 p-4 relative",
                 img {
@@ -16,7 +18,7 @@ pub fn PartyMember(cx: Scope) -> Element {
                     src: "battle_sprites/spr_crits_battle_2933.png",
                 }
                 div {
-                    class: "absolute inset-x-0 bottom-0 h-8 text-center font-bold",
+                    class: "badge badge absolute inset-x-2 bottom-2 text-center font-bold w-auto bg-black/25",
                     img {
                         class: "inline-block",
                         src: "images/nature.png"
@@ -36,8 +38,15 @@ pub fn PartyMember(cx: Scope) -> Element {
                         }
                     }
                     div {
-                        class: "grow",
-                        "Alexandria / Diabolic Horde"
+                        class: "grow divide-x divide-base",
+                        span {
+                            class: "pr-2",
+                            "Alexandria"
+                        }
+                        span {
+                            class: "text-sm pl-2",
+                            "Diabolic Horde"
+                        }
                     }
 
                     div {
@@ -146,11 +155,14 @@ pub fn PartyMember(cx: Scope) -> Element {
                             }
                             div {
                                 class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/death.png",
+                                CardTooltip {
+                                    tip: render! { CreatureCard {} },
+                                    img {
+                                        class: "inline-block mr-2",
+                                        src: "images/death.png",
+                                    }
+                                    "Alexandria"
                                 }
-                                "Alexandria"
                             }
                             div {
                                 class: "grow",

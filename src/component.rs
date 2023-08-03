@@ -2,6 +2,7 @@ pub mod app;
 pub mod autocomplete;
 pub mod card_tooltip;
 pub mod class_icon;
+pub mod creature_card;
 pub mod description;
 pub mod drag;
 pub mod footer;

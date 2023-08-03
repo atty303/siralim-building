@@ -1,17 +1,20 @@
 #![allow(non_snake_case)]
 
+use std::ops::Range;
+
 use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 use fermi::use_read;
-use std::ops::Range;
 
 use data::stats::{ATTACK_RANGE, DEFENSE_RANGE, HEALTH_RANGE, INTELLIGENCE_RANGE, SPEED_RANGE};
 use data::Data;
 
 use crate::atom;
 use crate::component::autocomplete::Autocomplete;
+use crate::component::card_tooltip::CardTooltip;
 use crate::component::class_icon::ClassIcon;
+use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
 
@@ -138,10 +141,12 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                                 t.family.clone()
                             }
                             td {
-                                span {
+                                CardTooltip {
+                                    tip: render! { CreatureCard {} },
                                     class: "underline decoration-dotted",
-                                    t.creature.clone()
+                                    "{t.creature}"
                                 }
+
                             }
                             td {
                                 class: "whitespace-normal",
