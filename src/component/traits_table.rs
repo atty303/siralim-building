@@ -23,7 +23,7 @@ pub fn TraitsModal(cx: Scope) -> Element {
     let total = data.traits.len();
     let autocomplete_items = use_ref(cx, || Vec::<String>::new());
 
-    let query = use_state(cx, || String::from("bomb"));
+    let query = use_state(cx, || String::from(""));
 
     use_effect(cx, (query,), |(query,)| {
         to_owned![keys, autocomplete_items];

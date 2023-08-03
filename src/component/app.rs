@@ -15,22 +15,15 @@ pub fn App(cx: Scope) -> Element {
     let trait_modal_state = use_modal(cx);
     let TraitModal = trait_modal_state.component(cx, render! { TraitsModal {} });
 
-    let spell_modal_state = use_modal(cx);
-    let SpellModal = spell_modal_state.component(cx, render! { "Spells" });
+    // let spell_modal_state = use_modal(cx);
+    // let SpellModal = spell_modal_state.component(cx, render! { "Spells" });
 
     render! {
-        TraitsModal {}
-
         NavBar {}
 
         h2 {
             class: "text-xl text-center text-secondary my-4",
             onclick: move |_| trait_modal_state.show(),
-            "PARTY"
-        }
-        h2 {
-            class: "text-xl text-center text-secondary my-4",
-            onclick: move |_| spell_modal_state.show(),
             "PARTY"
         }
 
@@ -45,13 +38,11 @@ pub fn App(cx: Scope) -> Element {
         Footer {}
 
         TraitModal
-        SpellModal
+        // SpellModal
     }
 
     // cx.render(rsx! {
     //     div {
-    //         draggable: false,
-    //         ondragstart: move |e| println!("{e:?}"),
     //         DndState {
     //             Draggable {
     //                 DragHandle {

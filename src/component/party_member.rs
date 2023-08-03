@@ -213,20 +213,6 @@ pub fn PartyMember(cx: Scope) -> Element {
                                 }
                             }
                             button {
-                                class: "btn btn-primary btn-circle btn-xs",
-                                OutlineIcon {
-                                    icon: Shape::Plus,
-                                    size: 16,
-                                }
-                            }
-                            button {
-                                class: "btn btn-primary btn-circle btn-xs",
-                                OutlineIcon {
-                                    icon: Shape::Plus,
-                                    size: 16,
-                                }
-                            }
-                            button {
                                 class: "btn btn-primary btn-circle btn-xs ",
                                 OutlineIcon {
                                     icon: Shape::XMark,
