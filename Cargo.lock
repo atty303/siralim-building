@@ -382,7 +382,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "apache-avro",
- "implicit-clone",
  "indicium",
  "serde",
 ]
@@ -924,12 +923,6 @@ dependencies = [
  "typenum",
  "version_check",
 ]
-
-[[package]]
-name = "implicit-clone"
-version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40fc102e70475c320b185cd18c1e48bba2d7210b63970a4d581ef903e4368ef7"
 
 [[package]]
 name = "include-flate"

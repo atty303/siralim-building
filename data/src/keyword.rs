@@ -8,9 +8,9 @@ pub struct Keyword {
 impl Keyword {
     fn new(name: &str, category: &str, icon: &str) -> Keyword {
         Self {
-            name: String::from(String::from(name)),
-            category: String::from(String::from(category)),
-            icon: String::from(String::from(icon)),
+            name: String::from(name),
+            category: String::from(category),
+            icon: String::from(icon),
         }
     }
 

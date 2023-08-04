@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 pub const HEALTH_RANGE: std::ops::Range<u8> = 21..46;
 pub const ATTACK_RANGE: std::ops::Range<u8> = 2..29;
 pub const INTELLIGENCE_RANGE: std::ops::Range<u8> = 5..29;

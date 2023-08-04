@@ -1,5 +1,4 @@
 extern crate apache_avro;
-extern crate implicit_clone;
 extern crate indicium;
 extern crate serde;
 
@@ -17,6 +16,7 @@ use spell_property::SpellProperty;
 pub mod effect;
 pub mod keyword;
 pub mod personality;
+pub mod realm;
 pub mod spell;
 pub mod spell_property;
 pub mod stats;

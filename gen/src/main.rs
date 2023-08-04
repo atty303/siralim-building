@@ -19,6 +19,7 @@ use serde::Deserialize;
 use data::effect::EffectAvro;
 use data::keyword::Keyword;
 use data::r#trait::{Stats, Trait};
+use data::realm::Realm;
 use data::spell::Spell;
 use data::spell_property::SpellPropertyAvro;
 
@@ -233,6 +234,7 @@ fn gen_traits() {
     let effects = load_effects();
     let spells = load_spells();
     let keywords = Keyword::load();
+    let realms = Realm::load();
 
     let words = build_regex(&spells, &effects, &keywords);
 
@@ -297,6 +299,13 @@ fn gen_traits() {
                 .sources
                 .split(",")
                 .map(|s| s.trim().to_string())
+                .map(|s| {
+                    realms
+                        .iter()
+                        .find(|r| s.contains(&r.god))
+                        .map(|r| format!("{} ({})", r.name, s))
+                        .unwrap_or(s)
+                })
                 .collect::<Vec<_>>();
             let stats = Stats {
                 health: c.health as u8,
