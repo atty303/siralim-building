@@ -1,13 +1,19 @@
 #![allow(non_snake_case)]
 
-use crate::component::card_tooltip::CardTooltip;
-use crate::component::creature_card::CreatureCard;
+use data::r#trait::Trait;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
+use crate::component::card_tooltip::CardTooltip;
 use crate::component::outline_icon::OutlineIcon;
+use crate::state::Member;
 
-pub fn PartyMember(cx: Scope) -> Element {
+#[inline_props]
+pub fn PartyMember<'a>(
+    cx: Scope<'a>,
+    member: Member,
+    on_trait_click: EventHandler<'a, usize>,
+) -> Element<'a> {
     render! {
         div {
             class: "card card-bordered border-base-300 card-side card-compact w-full shadow-md shadow-black/50 bg-base-300",
@@ -142,51 +148,27 @@ pub fn PartyMember(cx: Scope) -> Element {
                         class: "[writing-mode:vertical-rl] text-center bg-secondary text-secondary-content rounded-md self-stretch rotate-180",
                         "TRAITS"
                     }
+
                     div {
                         class: "space-y-2",
-
-                        div {
-                            class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
-                            div {
-                                class: "text-primary hover:text-primary-focus cursor-pointer",
-                                OutlineIcon {
-                                    icon: Shape::Bars3,
-                                }
-                            }
-                            div {
-                                class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
-                                CardTooltip {
-                                    tip: None, //render! { CreatureCard {} },
-                                    img {
-                                        class: "inline-block mr-2",
-                                        src: "images/death.png",
-                                    }
-                                    "Alexandria"
-                                }
-                            }
-                            div {
-                                class: "grow",
-                                "After a creature gains or loses stats, its allies gain or lose 15% of those stats as well. This trait does not stack."
-                            }
-                            button {
-                                class: "btn btn-primary btn-circle btn-xs",
-                                OutlineIcon {
-                                    icon: Shape::XMark,
-                                    size: 16,
-                                }
-                            }
+                        MemberTrait {
+                            index: 0,
+                            r#trait: member.traits[0].clone(),
+                            empty_text: "Click to add a primary trait",
+                            on_click: |i| on_trait_click.call(i),
                         }
-
-                        div {
-                            class: "text-center p-2 rounded-md bg-base-100 text-primary cursor-pointer",
-                            "Click to add a trait"
+                        MemberTrait {
+                            index: 1,
+                            r#trait: member.traits[1].clone(),
+                            empty_text: "Click to add a fused trait",
+                            on_click: |i| on_trait_click.call(i),
                         }
-
-                        div {
-                            class: "text-center p-2 rounded-md bg-base-100 text-primary cursor-pointer",
-                            "Click to add a trait"
+                        MemberTrait {
+                            index: 2,
+                            r#trait: member.traits[2].clone(),
+                            empty_text: "Click to add a artifact trait",
+                            on_click: |i| on_trait_click.call(i),
                         }
-
                     }
 
                     div {
@@ -239,6 +221,61 @@ pub fn PartyMember(cx: Scope) -> Element {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+#[derive(Props)]
+struct MemberTraitProps<'a> {
+    index: usize,
+    #[props(!optional)]
+    r#trait: Option<Trait>,
+    empty_text: &'static str,
+    on_click: EventHandler<'a, usize>,
+}
+
+fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
+    if let Some(t) = &cx.props.r#trait {
+        render! {
+            div {
+                class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
+                div {
+                    class: "text-primary hover:text-primary-focus cursor-pointer",
+                    OutlineIcon {
+                        icon: Shape::Bars3,
+                    }
+                }
+                div {
+                    class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
+                    CardTooltip {
+                        tip: None, //render! { CreatureCard {} },
+                        img {
+                            class: "inline-block mr-2",
+                            src: "images/death.png",
+                        }
+                        "{t.trait_name}"
+                    }
+                }
+                div {
+                    class: "grow",
+                    "After a creature gains or loses stats, its allies gain or lose 15% of those stats as well. This trait does not stack."
+                }
+                button {
+                    class: "btn btn-primary btn-circle btn-xs",
+                    OutlineIcon {
+                        icon: Shape::XMark,
+                        size: 16,
+                    }
+                }
+            }
+        }
+    } else {
+        render! {
+            div {
+                class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer",
+                onclick: |_| cx.props.on_click.call(cx.props.index),
+                cx.props.empty_text
             }
         }
     }

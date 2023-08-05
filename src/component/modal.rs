@@ -9,14 +9,15 @@ use crate::component::outline_icon::OutlineIcon;
 
 pub fn use_modal(cx: &ScopeState) -> &ModalState {
     let modalRef: &UseRef<Option<web_sys::HtmlDialogElement>> = use_ref(cx, || None);
+    let done = use_ref(cx, || None);
 
     cx.use_hook(move || ModalState {
         modalRef: modalRef.clone(),
+        done: done.clone(),
         component: |cx| render! {
             dialog {
                 class: "modal backdrop:backdrop-blur",
                 onmounted: move |e| {
-                    log::debug!("{:?}", e.get_raw_element().unwrap().downcast_ref::<web_sys::Element>());
                     let el = e
                         .get_raw_element().expect("expecting raw element")
                         .downcast_ref::<web_sys::Element>().expect("expecting Element")
@@ -28,7 +29,7 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
                     class: "modal-box w-[calc(100vw-5em)] max-w-full h-full relative",
                     button {
                         class: "btn btn-sm btn-circle btn-ghost absolute right-1 top-1",
-                        tabindex: "-1",
+                        tabindex: -1,
                         onclick: move |_| {
                             if let Some(el) = cx.props.modalRef.read().as_ref() {
                                 el.close();
@@ -52,6 +53,7 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
 
 pub struct ModalState {
     pub modalRef: UseRef<Option<web_sys::HtmlDialogElement>>,
+    pub done: UseRef<Option<Box<dyn Fn(i32)>>>,
     pub component: for<'a> fn(Scope<'a, ModalProps<'a>>) -> Element<'a>,
 }
 
@@ -61,22 +63,49 @@ pub struct ModalProps<'a> {
     pub children: Element<'a>,
 }
 
+#[derive(Props)]
+pub struct ModalDialogProps<'a> {
+    pub on_result: EventHandler<'a, i32>,
+}
+
 impl ModalState {
-    pub fn component<'a>(&self, cx: &'a ScopeState, children: Element<'a>) -> DynamicNode<'a> {
+    pub fn component<'a>(
+        &self,
+        cx: &'a ScopeState,
+        child: fn(Scope<'a, ModalDialogProps<'a>>) -> Element<'a>,
+    ) -> DynamicNode<'a> {
+        let modalRef = self.modalRef.clone();
+        let done = self.done.clone();
+
+        let child_component = cx.component(
+            child,
+            ModalDialogProps {
+                on_result: cx.event_handler(move |e| {
+                    if let Some(d) = done.read().as_ref() {
+                        d(e);
+                    }
+                    if let Some(el) = modalRef.read().as_ref() {
+                        el.close();
+                    };
+                }),
+            },
+            "ModalDialog",
+        );
         cx.component(
             self.component,
             ModalProps {
                 modalRef: self.modalRef.clone(),
-                children: children.clone(),
+                children: render! { child_component },
             },
             "Modal",
         )
     }
 
-    pub fn show(&self) {
+    pub fn show_modal(&self, done: impl Fn(i32) -> () + 'static) {
+        *self.done.write() = Some(Box::new(done));
+
         if let Some(el) = self.modalRef.read().as_ref() {
-            // TODO: error handling?
-            el.show_modal().unwrap();
+            el.show_modal().expect("show_modal failed");
         };
     }
 

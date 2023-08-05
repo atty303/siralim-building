@@ -15,11 +15,11 @@ use crate::component::card_tooltip::CardTooltip;
 use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
+use crate::component::modal::ModalDialogProps;
 use crate::component::outline_icon::OutlineIcon;
 use crate::embed_data;
 
-#[inline_props]
-pub fn TraitsModal(cx: Scope) -> Element {
+pub fn TraitsModal<'a>(cx: Scope<'a, ModalDialogProps<'a>>) -> Element<'a> {
     let keys = use_ref(cx, || vec![]);
     let total = embed_data::TRAITS_MAP.len();
     let autocomplete_items = use_ref(cx, || Vec::<String>::new());
@@ -46,59 +46,65 @@ pub fn TraitsModal(cx: Scope) -> Element {
     });
 
     render! {
-            //div { class: "max-h-64 h-64 overflow-hidden",
+        //div { class: "max-h-64 h-64 overflow-hidden",
+        div {
+            class: "flex flex-col gap-4 min-h-full max-h-full",
             div {
-                class: "flex flex-col gap-4 min-h-full max-h-full",
-                div {
-                    class: "flex-initial w-full flex items-center space-x-4",
-                    button {
-                        class: "btn btn-primary",
-                        OutlineIcon {
-                            icon: Shape::Bookmark,
-                        }
+                class: "flex-initial w-full flex items-center space-x-4",
+                button {
+                    class: "btn btn-primary",
+                    OutlineIcon {
+                        icon: Shape::Bookmark,
                     }
-                    Autocomplete {
-                        class: "grow",
-                        value: query,
-                        items: autocomplete_items.read().clone(),
-                        placeholder: "Search monster/traits...",
-                        oninput: move |value| {
-                            query.set(value);
-                        }
-                    }
-                    div {
-                        class: "whitespace-nowrap",
-                        span {
-                            class: "font-bold",
-                            format!("{}", keys.read().len())
-                        }
-                        " of "
-                        span {
-                            class: "font-bold",
-                            format!("{}", total)
-                        }
-                        " results"
+                }
+                Autocomplete {
+                    class: "grow",
+                    value: query,
+                    items: autocomplete_items.read().clone(),
+                    placeholder: "Search monster/traits...",
+                    oninput: move |value| {
+                        query.set(value);
                     }
                 }
                 div {
-                    class: "grow overflow-y-auto",
-                    div {
-                        if !keys.read().is_empty() {
-                            rsx! {
-                                TraitsTable {
-                                    keys: keys.read().clone(),
-                                    selection: vec![],
-                                }
+                    class: "whitespace-nowrap",
+                    span {
+                        class: "font-bold",
+                        format!("{}", keys.read().len())
+                    }
+                    " of "
+                    span {
+                        class: "font-bold",
+                        format!("{}", total)
+                    }
+                    " results"
+                }
+            }
+            div {
+                class: "grow overflow-y-auto",
+                div {
+                    if !keys.read().is_empty() {
+                        rsx! {
+                            TraitsTable {
+                                keys: keys.read().clone(),
+                                selection: vec![],
+                                on_select: |id| cx.props.on_result.call(id),
                             }
                         }
                     }
                 }
             }
+        }
     }
 }
 
 #[inline_props]
-pub fn TraitsTable(cx: Scope, keys: Vec<TraitId>, selection: Vec<TraitId>) -> Element {
+pub fn TraitsTable<'a>(
+    cx: Scope<'a>,
+    keys: Vec<TraitId>,
+    selection: Vec<TraitId>,
+    on_select: EventHandler<'a, TraitId>,
+) -> Element<'a> {
     let items = keys.iter().flat_map(|k| embed_data::TRAITS_MAP.get(k));
 
     render! {
@@ -131,6 +137,8 @@ pub fn TraitsTable(cx: Scope, keys: Vec<TraitId>, selection: Vec<TraitId>) -> El
                                     class: "checkbox checkbox-primary invisible group-hover:visible",
                                     r#type: "checkbox",
                                     checked: true,
+                                    prevent_default: "onclick",
+                                    onclick: move |_| on_select.call(t.id),
                                 }
                             }
                             td {
