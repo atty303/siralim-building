@@ -14,8 +14,7 @@ use crate::component::traits_table::TraitsModal;
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
-    let trait_modal_state = use_modal(cx);
-    let TraitModal = trait_modal_state.component(cx, TraitsModal);
+    let trait_modal = use_modal(cx);
 
     // let spell_modal_state = use_modal(cx);
     // let SpellModal = spell_modal_state.component(cx, render! { "Spells" });
@@ -35,8 +34,7 @@ pub fn App(cx: Scope) -> Element {
                 PartyMember {
                     member: m.clone(),
                     on_trait_click: |trait_index: usize| {
-                        // trait_modal_state.show();
-                        trait_modal_state.show_modal(move |e: TraitId| {
+                        trait_modal.show_modal(move |e: TraitId| {
                             log::debug!("trait_index: {}, {:?}", trait_index, e);
                         });
                     }
@@ -46,7 +44,7 @@ pub fn App(cx: Scope) -> Element {
 
         Footer {}
 
-        TraitModal
+        trait_modal.component(cx, TraitsModal)
         // SpellModal
     }
 
