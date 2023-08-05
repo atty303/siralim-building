@@ -21,6 +21,8 @@ web-sys = { version = "0.3.64", features = [ "Window", "History", "Location", "H
 gloo-events = "0.1.2"
 gloo-utils = "0.1.7"
 gloo-storage = "0.2.2"
+gloo-dialogs = "0.1.1"
+gloo-history = "0.1.5"
 
 log = "0.4.19"
 wasm-logger = "0.2.0"

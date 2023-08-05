@@ -2,11 +2,16 @@
 
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
+use fermi::use_set;
 
+use crate::atom;
 use crate::component::outline_icon::OutlineIcon;
 use crate::hooks::persistent::use_persistent;
+use crate::state::UrlState;
 
 pub fn NavBar(cx: Scope) -> Element {
+    let set_url_state = use_set(cx, &atom::URL_STATE);
+
     render! {
         div {
             class: "navbar mb-2 shadow-lg bg-neutral text-neutral-content",
@@ -32,6 +37,11 @@ pub fn NavBar(cx: Scope) -> Element {
 
                     a {
                         class: "btn btn-ghost btn-sm rounded-btn",
+                        onclick: move |_| {
+                            if gloo_dialogs::confirm("Are you sure you want to reset the build?") {
+                                set_url_state(UrlState::default());
+                            }
+                        },
                         OutlineIcon {
                             icon: Shape::XMark,
                         }

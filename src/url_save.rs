@@ -1,7 +1,9 @@
+use std::collections::HashMap;
 use std::io::{Cursor, Read, Write};
 
 use base64::Engine;
 use bitstream_io::{BitRead, BitReader, BitWrite, BitWriter};
+use gloo_history::History;
 use qstring::QString;
 
 use crate::embed_data::TRAITS_MAP;
@@ -24,7 +26,7 @@ pub fn read_state<'a, R: Read>(r: &mut R) -> anyhow::Result<UrlState<'a>> {
     let mut state = UrlState::default();
     let mut reader = BitReader::endian(r, bitstream_io::BigEndian);
 
-    let version: u8 = reader.read(8)?;
+    let _version: u8 = reader.read(8)?;
     for m in 0..6 {
         for t in 0..3 {
             let id = reader.read(20)?;
@@ -41,20 +43,14 @@ pub fn set_to_url(state: &UrlState) {
 
     // log::debug!("save: {:?} bytes", bytes.len());
     let save_string = base64::engine::general_purpose::URL_SAFE.encode(bytes);
-
-    let location: web_sys::Location = web_sys::window().unwrap().location();
-    let history: web_sys::History = web_sys::window().unwrap().history().unwrap();
+    let history = gloo_history::BrowserHistory::new();
     history
-        .replace_state_with_url(
-            &wasm_bindgen::JsValue::null(),
-            "",
-            Some(format!("{}?s1={}", location.pathname().unwrap(), save_string).as_str()),
-        )
+        .replace_with_query("", HashMap::from([("s1", save_string)]))
         .unwrap();
 }
 
 pub fn get_from_url<'a>() -> Option<UrlState<'a>> {
-    let location: web_sys::Location = web_sys::window().unwrap().location();
+    let location: web_sys::Location = gloo_utils::window().location();
     let qs = QString::from(location.search().unwrap().as_str());
     let r = if let Some(v1) = qs.get("s1") {
         let bytes = base64::engine::general_purpose::URL_SAFE.decode(v1).ok()?;
