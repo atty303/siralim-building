@@ -15,9 +15,9 @@ use crate::component::card_tooltip::CardTooltip;
 use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
-use crate::component::modal::ModalDialogProps;
 use crate::component::outline_icon::OutlineIcon;
 use crate::embed_data;
+use crate::hooks::modal::ModalDialogProps;
 
 pub fn TraitsModal<'a>(cx: Scope<'a, ModalDialogProps<'a, TraitId>>) -> Element<'a> {
     let keys = use_ref(cx, || vec![]);

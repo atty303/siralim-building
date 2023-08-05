@@ -5,11 +5,11 @@ use fermi::{use_atom_state, use_init_atom_root};
 
 use crate::atom;
 use crate::component::footer::Footer;
-use crate::component::modal::use_modal;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::traits_table::TraitsModal;
 use crate::embed_data::TRAITS_MAP;
+use crate::hooks::modal::use_modal;
 use crate::url_save;
 
 pub fn App(cx: Scope) -> Element {

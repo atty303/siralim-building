@@ -6,7 +6,6 @@ pub mod creature_card;
 pub mod description;
 pub mod drag;
 pub mod footer;
-pub mod modal;
 pub mod navbar;
 pub mod outline_icon;
 pub mod party_member;
