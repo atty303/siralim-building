@@ -21,26 +21,6 @@ pub fn NavBar(cx: Scope) -> Element {
                 div {
                     class: "flex items-center space-x-4",
 
-                    div {
-                        class: "flex items-center text-sm font-bold",
-                        input {
-                            class: "toggle mr-2",
-                            r#type: "checkbox",
-                            checked: true,
-                        }
-                        "SHOW TRAITS"
-                    }
-
-                    div {
-                        class: "flex items-center text-sm font-bold",
-                        input {
-                            class: "toggle mr-2",
-                            r#type: "checkbox",
-                            checked: true,
-                        }
-                        "SHOW SPELLS"
-                    }
-
                     a {
                         class: "btn btn-ghost btn-sm rounded-btn",
                         OutlineIcon {

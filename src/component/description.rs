@@ -13,7 +13,7 @@ pub fn Description(cx: Scope, value: Vec<String>) -> Element {
                 if let Some(w) = KEYWORDS_MAP.get(t) {
                     rsx! {
                         span {
-                            class: "font-bold text-accent",
+                            class: "font-bold text-accent whitespace-nowrap",
                             img {
                                 class: "inline-block w-4 h-4 mr-1",
                                 src: "images/{w.icon}",
@@ -30,7 +30,7 @@ pub fn Description(cx: Scope, value: Vec<String>) -> Element {
                     rsx! {
                         CardTooltip {
                             tip: render! { p { "{e.description}" } },
-                            class: "font-bold underline decoration-dotted {color}",
+                            class: "font-bold underline decoration-dotted whitespace-nowrap {color}",
                             img {
                                 class: "inline-block w-4 h-4 mr-1",
                                 src: "status_icons/{e.icon}",

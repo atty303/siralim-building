@@ -1,10 +1,14 @@
 #![allow(non_snake_case)]
 
-use data::r#trait::Trait;
-use data::stat::Stat;
+use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
+use fermi::use_atom_state;
 
+use data::r#trait::Trait;
+use data::stat::Stat;
+
+use crate::atom;
 use crate::component::card_tooltip::CardTooltip;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
@@ -18,6 +22,22 @@ pub fn PartyMember<'a>(
     on_trait_click: EventHandler<'a, usize>,
     on_trait_clear: EventHandler<'a, usize>,
 ) -> Element<'a> {
+    let show_traits = use_atom_state(cx, &atom::SHOW_TRAITS);
+    let traits_class = classes!["space-y-2 grow", "hidden" => !*show_traits.get()];
+    let traits_icon = if *show_traits.get() {
+        Shape::ChevronLeft
+    } else {
+        Shape::ChevronRight
+    };
+
+    let show_spells = use_atom_state(cx, &atom::SHOW_SPELLS);
+    let spells_class = classes!["space-y-2 grow", "hidden" => !*show_spells.get()];
+    let spells_icon = if *show_spells.get() {
+        Shape::ChevronLeft
+    } else {
+        Shape::ChevronRight
+    };
+
     render! {
         div {
             class: "card card-bordered border-base-300 card-side card-compact w-full shadow-sm shadow-black/50 bg-base-300",
@@ -62,13 +82,19 @@ pub fn PartyMember<'a>(
 
                 div {
                     class: "flex items-start gap-2",
-                    div {
-                        class: "[writing-mode:vertical-rl] text-center bg-secondary text-secondary-content rounded-md self-stretch rotate-180",
-                        "TRAITS"
+                    button {
+                        class: "[writing-mode:vertical-rl] bg-primary text-primary-content rounded-md self-stretch rotate-180 flex items-center justify-center px-1 py-8",
+                        onclick: |_| show_traits.modify(|v| !v),
+                        OutlineIcon { icon: traits_icon, size: 20, }
+                        span {
+                            class: "my-2",
+                            "TRAITS"
+                        }
+                        OutlineIcon { icon: traits_icon, size: 20, }
                     }
 
                     div {
-                        class: "space-y-2 grow",
+                        class: "{traits_class}",
                         MemberTrait {
                             index: 0,
                             r#trait: member.traits[0],
@@ -92,13 +118,19 @@ pub fn PartyMember<'a>(
                         }
                     }
 
-                    div {
-                        class: "[writing-mode:vertical-rl] text-center bg-secondary text-secondary-content rounded-md self-stretch rotate-180",
-                        "SPELLS"
+                    button {
+                        class: "[writing-mode:vertical-rl] bg-primary text-primary-content rounded-md self-stretch rotate-180 flex items-center justify-center px-1 py-8",
+                        onclick: |_| show_spells.modify(|v| !v),
+                        OutlineIcon { icon: spells_icon, size: 20, }
+                        span {
+                            class: "my-2",
+                            "SPELLS"
+                        }
+                        OutlineIcon { icon: spells_icon, size: 20, }
                     }
 
                     div {
-                        class: "space-y-2 grow",
+                        class: "{spells_class}",
 
                         div {
                             class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
