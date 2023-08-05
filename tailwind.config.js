@@ -11,9 +11,6 @@ module.exports = {
         sorcery: "#283593",
         chaos: "#c62828",
       },
-      fontFamily: {
-        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
-      },
     },
   },
   plugins: [require("daisyui")],
