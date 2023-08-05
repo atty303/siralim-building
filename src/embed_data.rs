@@ -4,7 +4,7 @@ use data::effect::Effect;
 use data::keyword::Keyword;
 use data::personality::Personality;
 use data::r#trait::Trait;
-use data::spell_property::{SpellProperty, SpellPropertyAvro};
+use data::spell_property::SpellProperty;
 use data::Data;
 
 #[derive(RustEmbed, Clone)]
@@ -44,8 +44,8 @@ fn load_spell_properties() -> Vec<SpellProperty> {
     .unwrap();
     let mut xs = Vec::new();
     for value in reader {
-        let r = apache_avro::from_value::<SpellPropertyAvro>(&value.unwrap()).unwrap();
-        xs.push(SpellProperty::from(&r));
+        let r = apache_avro::from_value::<SpellProperty>(&value.unwrap()).unwrap();
+        xs.push(r);
     }
     xs
 }
