@@ -20,8 +20,8 @@ impl UrlSave {
             for m in &state.party {
                 for t in &m.traits {
                     writer.write(20, t.map(|c| c.id).unwrap_or(0))?;
-                    writer.write(4, 0)?;
                 }
+                writer.write(4, 0)?;
             }
         }
         Ok(UrlSave { bytes })
@@ -36,9 +36,9 @@ impl UrlSave {
             for m in 0..6 {
                 for t in 0..3 {
                     let id = reader.read(20).unwrap();
-                    let _: u8 = reader.read(4).unwrap();
                     state.party[m].traits[t] = TRAITS_MAP.get(&id);
                 }
+                let _: u8 = reader.read(4).unwrap();
             }
         }
 
