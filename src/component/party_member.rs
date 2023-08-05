@@ -350,7 +350,7 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
     } else {
         render! {
             div {
-                class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold",
+                class: "text-center p-4 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold whitespace-nowrap",
                 onclick: |_| cx.props.on_click.call(cx.props.index),
                 cx.props.empty_text
             }
@@ -414,7 +414,7 @@ fn MemberSpell<'a>(cx: Scope<'a, MemberSpellProps<'a>>) -> Element<'a> {
     } else {
         render! {
             div {
-                class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold",
+                class: "text-center p-4 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold whitespace-nowrap",
                 onclick: |_| cx.props.on_click.call(cx.props.index),
                 "Click to add a spell"
             }
