@@ -99,45 +99,11 @@ pub fn PartyMember<'a>(
                         state: show_spells.clone(),
                         text: "SPELLS",
 
-                        div {
-                            class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
-                            div {
-                                class: "text-primary hover:text-primary-focus cursor-pointer",
-                                OutlineIcon {
-                                    icon: Shape::Bars3,
-                                }
-                            }
-                            div {
-                                class: "font-bold bg-secondary text-secondary-content p-2 w-64 rounded-md underline decoration-dotted",
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/chaos.png",
-                                }
-                                "Short Fuse"
-                            }
-                            div {
-                                class: "grow",
-                                "Enemies take damage equal to 100% of the potency of their Bomb debuffs."
-                            }
-                            button {
-                                class: "btn btn-primary btn-circle btn-xs",
-                                OutlineIcon {
-                                    icon: Shape::Cube,
-                                    size: 16,
-                                }
-                            }
-                            button {
-                                class: "btn btn-primary btn-circle btn-xs ",
-                                OutlineIcon {
-                                    icon: Shape::XMark,
-                                    size: 16,
-                                }
-                            }
-                        }
-
-                        div {
-                            class: "text-center p-2 rounded-md bg-base-100 text-primary cursor-pointer",
-                            "Click to add a spell"
+                        MemberSpell {
+                            index: 0,
+                            spell: None,
+                            on_click: |_i| {},
+                            on_clear: |_i| {},
                         }
                     }
                 }
@@ -386,6 +352,70 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                 class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold",
                 onclick: |_| cx.props.on_click.call(cx.props.index),
                 cx.props.empty_text
+            }
+        }
+    }
+}
+
+#[derive(Props)]
+struct MemberSpellProps<'a> {
+    index: usize,
+    #[props(!optional)]
+    spell: Option<&'a Trait>,
+    on_click: EventHandler<'a, usize>,
+    on_clear: EventHandler<'a, usize>,
+}
+
+fn MemberSpell<'a>(cx: Scope<'a, MemberSpellProps<'a>>) -> Element<'a> {
+    if let Some(_s) = cx.props.spell {
+        render! {
+            div {
+                class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
+                div {
+                    class: "text-primary hover:text-primary-focus cursor-pointer",
+                    OutlineIcon {
+                        icon: Shape::Bars3,
+                    }
+                }
+                div {
+                    class: "bg-secondary text-secondary-content py-2 px-4 min-w-max rounded-md",
+                    CardTooltip {
+                        tip: render! { "placeholder" },
+                        class: "font-bold underline decoration-dotted",
+                        img {
+                            class: "inline-block mr-2",
+                            src: "images/chaos.png",
+                        }
+                        "Short Fuse"
+                    }
+                }
+                div {
+                    class: "grow",
+                    "Enemies take damage equal to 100% of the potency of their Bomb debuffs."
+                }
+                button {
+                    class: "btn btn-primary btn-circle btn-xs",
+                    OutlineIcon {
+                        icon: Shape::Cube,
+                        size: 16,
+                    }
+                }
+                button {
+                    class: "btn btn-primary btn-circle btn-xs ",
+                    onclick: move |_| cx.props.on_clear.call(cx.props.index),
+                    OutlineIcon {
+                        icon: Shape::XMark,
+                        size: 16,
+                    }
+                }
+            }
+        }
+    } else {
+        render! {
+            div {
+                class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold",
+                onclick: |_| cx.props.on_click.call(cx.props.index),
+                "Click to add a spell"
             }
         }
     }
