@@ -5,25 +5,23 @@ use std::ops::Range;
 use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
-use fermi::use_read;
 
+use data::personality::Stat;
+use data::r#trait::TraitId;
 use data::stats::{ATTACK_RANGE, DEFENSE_RANGE, HEALTH_RANGE, INTELLIGENCE_RANGE, SPEED_RANGE};
-use data::Data;
 
-use crate::atom;
 use crate::component::autocomplete::Autocomplete;
 use crate::component::card_tooltip::CardTooltip;
 use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
+use crate::embed_data;
 
 #[inline_props]
 pub fn TraitsModal(cx: Scope) -> Element {
-    let data: &Data = use_read(cx, &atom::DATA);
-    let index = data.traits_index.clone();
     let keys = use_ref(cx, || vec![]);
-    let total = data.traits.len();
+    let total = embed_data::TRAITS_MAP.len();
     let autocomplete_items = use_ref(cx, || Vec::<String>::new());
 
     let query = use_state(cx, || String::from(""));
@@ -31,18 +29,17 @@ pub fn TraitsModal(cx: Scope) -> Element {
     use_effect(cx, (query,), |(query,)| {
         to_owned![keys, autocomplete_items];
         async move {
-            // log::debug!("search: {}", query);
-            let results = if query.len() > 1 {
-                index.search(query.as_str())
+            let (results, complements) = if query.len() > 1 {
+                let r = embed_data::TRAITS_INDEX.search(query.as_str());
+                let c = embed_data::TRAITS_INDEX
+                    .autocomplete(query.as_str())
+                    .into_iter()
+                    .filter(|i| query.trim() != *i)
+                    .collect();
+                (r, c)
             } else {
-                vec![]
+                (vec![], vec![])
             };
-            let complements = index
-                .autocomplete(query.as_str())
-                .into_iter()
-                .filter(|i| query.trim() != *i)
-                .collect();
-            // log::debug!("completes: {:?}", complements);
             keys.set(results.iter().map(|i| **i).collect());
             autocomplete_items.set(complements);
         }
@@ -101,9 +98,8 @@ pub fn TraitsModal(cx: Scope) -> Element {
 }
 
 #[inline_props]
-pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
-    let data: &Data = use_read(cx, &atom::DATA);
-    let items = keys.iter().flat_map(|k| data.traits.get(k));
+pub fn TraitsTable(cx: Scope, keys: Vec<TraitId>, selection: Vec<TraitId>) -> Element {
+    let items = keys.iter().flat_map(|k| embed_data::TRAITS_MAP.get(k));
 
     render! {
         table {
@@ -163,11 +159,11 @@ pub fn TraitsTable(cx: Scope, keys: Vec<i32>, selection: Vec<i32>) -> Element {
                                     value: t.trait_description.clone(),
                                 }
                             }
-                            td { class: "text-center", StatsNumber { range: HEALTH_RANGE, value: t.health() } }
-                            td { class: "text-center", StatsNumber { range: ATTACK_RANGE, value: t.attack() } }
-                            td { class: "text-center", StatsNumber { range: INTELLIGENCE_RANGE, value: t.intelligence() } }
-                            td { class: "text-center", StatsNumber { range: DEFENSE_RANGE, value: t.defense() } }
-                            td { class: "text-center", StatsNumber { range: SPEED_RANGE, value: t.speed() } }
+                            td { class: "text-center", StatsNumber { range: HEALTH_RANGE, value: t.stat(Stat::Health) } }
+                            td { class: "text-center", StatsNumber { range: ATTACK_RANGE, value: t.stat(Stat::Attack) } }
+                            td { class: "text-center", StatsNumber { range: INTELLIGENCE_RANGE, value: t.stat(Stat::Intelligence) } }
+                            td { class: "text-center", StatsNumber { range: DEFENSE_RANGE, value: t.stat(Stat::Defense) } }
+                            td { class: "text-center", StatsNumber { range: SPEED_RANGE, value: t.stat(Stat::Speed) } }
                         }
                     }
                 })

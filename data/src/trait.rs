@@ -1,10 +1,19 @@
+use std::collections::BTreeMap;
+use std::io::Read;
+use std::ops::Deref;
+
 use apache_avro::AvroSchema;
-use indicium::simple::Indexable;
+use indicium::simple::{Indexable, SearchIndex};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]
+use personality::Stat;
+
+pub type TraitId = i32;
+pub type StatValue = u8;
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]
 pub struct Trait {
-    pub id: i32,
+    pub id: TraitId,
     pub class: String,
     pub family: String,
     pub creature: String,
@@ -16,30 +25,24 @@ pub struct Trait {
     pub stats: Option<Stats>,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]
 pub struct Stats {
-    pub health: u8,
-    pub attack: u8,
-    pub intelligence: u8,
-    pub defense: u8,
-    pub speed: u8,
+    pub health: StatValue,
+    pub attack: StatValue,
+    pub intelligence: StatValue,
+    pub defense: StatValue,
+    pub speed: StatValue,
 }
 
 impl Trait {
-    pub fn health(&self) -> Option<u8> {
-        self.stats.as_ref().map(|x| x.health)
-    }
-    pub fn attack(&self) -> Option<u8> {
-        self.stats.as_ref().map(|x| x.attack)
-    }
-    pub fn intelligence(&self) -> Option<u8> {
-        self.stats.as_ref().map(|x| x.intelligence)
-    }
-    pub fn defense(&self) -> Option<u8> {
-        self.stats.as_ref().map(|x| x.defense)
-    }
-    pub fn speed(&self) -> Option<u8> {
-        self.stats.as_ref().map(|x| x.speed)
+    pub fn stat(&self, stat: Stat) -> Option<StatValue> {
+        match stat {
+            Stat::Health => self.stats.as_ref().map(|x| x.health),
+            Stat::Attack => self.stats.as_ref().map(|x| x.attack),
+            Stat::Intelligence => self.stats.as_ref().map(|x| x.intelligence),
+            Stat::Defense => self.stats.as_ref().map(|x| x.defense),
+            Stat::Speed => self.stats.as_ref().map(|x| x.speed),
+        }
     }
 }
 
@@ -54,5 +57,50 @@ impl Indexable for Trait {
             self.material_name.clone(),
             self.sources.join(" "),
         ]
+    }
+}
+
+pub struct TraitsMap {
+    inner: BTreeMap<i32, Trait>,
+}
+
+impl TraitsMap {
+    pub fn new<R: Read>(avro_read: R) -> Result<Self, apache_avro::Error> {
+        let reader = apache_avro::Reader::new(avro_read)?;
+        let mut map = BTreeMap::new();
+        for result in reader {
+            let value = result.expect("Failed to read value");
+            let r = apache_avro::from_value::<Trait>(&value).expect("Failed to convert value");
+            map.insert(r.id, r);
+        }
+        Ok(TraitsMap { inner: map })
+    }
+}
+
+impl Deref for TraitsMap {
+    type Target = BTreeMap<i32, Trait>;
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+pub struct TraitsIndex {
+    inner: SearchIndex<i32>,
+}
+
+impl Deref for TraitsIndex {
+    type Target = SearchIndex<i32>;
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl TraitsIndex {
+    pub fn new(traits: &TraitsMap) -> Self {
+        let mut index = SearchIndex::default();
+        traits.values().for_each(|t| {
+            index.insert(&t.id, t);
+        });
+        TraitsIndex { inner: index }
     }
 }
