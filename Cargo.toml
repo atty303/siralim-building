@@ -16,15 +16,15 @@ fermi = "0.4.0"
 dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "835d5f42c6d5026deffcc515474738a47143ed46" }
 classes = "1.0.0"
 
-wasm-bindgen = "0.2.86"
-web-sys = { version = "0.3.61", features = [ "Window", "History", "Location", "HtmlDialogElement" ] }
+wasm-bindgen = "0.2.87"
+web-sys = { version = "0.3.64", features = [ "Window", "History", "Location", "HtmlDialogElement" ] }
 gloo-events = "0.1.2"
 gloo-utils = "0.1.7"
 
 log = "0.4.19"
 wasm-logger = "0.2.0"
 
-rust-embed = { version = "6.4.2", features = [ "debug-embed", "compression" ] }
+rust-embed = { version = "6.8.1", features = [ "debug-embed", "compression" ] }
 
 once_cell = "1.18.0"
 
