@@ -8,6 +8,7 @@ use data::r#trait::Trait;
 use data::stat::Stat;
 
 use crate::component::card_tooltip::CardTooltip;
+use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
@@ -323,9 +324,9 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                     CardTooltip {
                         tip: render! { CreatureCard { r#trait: t } },
                         class: "font-bold underline decoration-dotted",
-                        img {
+                        ClassIcon {
                             class: "inline-block mr-2",
-                            src: "images/death.png",
+                            name: "{t.class}",
                         }
                         "{t.creature}"
                     }
