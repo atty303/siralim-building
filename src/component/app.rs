@@ -10,13 +10,21 @@ use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::traits_table::TraitsModal;
 use crate::embed_data::TRAITS_MAP;
+use crate::url_save::UrlSave;
 
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
     let trait_modal = use_modal(cx);
 
-    let party = use_atom_state(cx, &atom::PARTY);
+    let url_state = use_atom_state(cx, &atom::URL_STATE);
+
+    use_effect(cx, url_state.get(), move |state| {
+        to_owned![state];
+        async move {
+            UrlSave::from_state(&state).unwrap().set_to_url();
+        }
+    });
 
     render! {
         NavBar {}
@@ -28,13 +36,15 @@ pub fn App(cx: Scope) -> Element {
 
         div {
             class: "mx-4 space-y-4",
-            for (i, m) in party.get().iter().enumerate() {
+            for (i, m) in url_state.get().party.iter().enumerate() {
                 PartyMember {
                     member: m.clone(),
                     on_trait_click: move |trait_index: usize| {
-                        let p = party.clone();
+                        let us = url_state.clone();
                         trait_modal.show_modal(move |e| {
-                            p.with_mut(|p| p[i].traits[trait_index] = Some(&TRAITS_MAP[&e]));
+                            us.with_mut(|us| {
+                                us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
+                            });
                         });
                     }
                 }

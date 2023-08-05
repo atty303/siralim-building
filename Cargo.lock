@@ -41,6 +41,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.72"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b13c32d80ecc7ab747b80c3784bce54ee8a7a0cc4fbda9bf4cda2cf6fe90854"
+
+[[package]]
 name = "apache-avro"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1261,6 +1267,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "qstring"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d464fae65fff2680baf48019211ce37aaec0c78e9264c84a3e484717f965104e"
+dependencies = [
+ "percent-encoding",
+]
+
+[[package]]
 name = "quad-rand"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2046,7 +2061,9 @@ dependencies = [
 name = "web"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "apache-avro",
+ "base64",
  "classes",
  "data",
  "dioxus",
@@ -2057,7 +2074,9 @@ dependencies = [
  "gloo-utils",
  "log",
  "once_cell",
+ "qstring",
  "rust-embed",
+ "serde",
  "wasm-bindgen",
  "wasm-logger",
  "web-sys",
