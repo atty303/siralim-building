@@ -162,7 +162,7 @@ fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
 
     render! {
         figure {
-            class: "{class_color} p-4 relative",
+            class: "{class_color} p-8 relative w-64 max-w-max",
             if let Some(sprite) = member.sprite() {
                 rsx! {
                     img {
