@@ -1,10 +1,7 @@
 use fermi::Atom;
 
 use crate::state::UrlState;
-use crate::url_save::UrlSave;
+use crate::url_save;
 
-pub const URL_STATE: Atom<UrlState> = Atom(|_| {
-    UrlSave::get_from_url()
-        .map(|s| s.to_state())
-        .unwrap_or(UrlState::default())
-});
+pub const URL_STATE: Atom<UrlState> =
+    Atom(|_| url_save::get_from_url().unwrap_or(UrlState::default()));

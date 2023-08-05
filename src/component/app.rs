@@ -10,7 +10,7 @@ use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::traits_table::TraitsModal;
 use crate::embed_data::TRAITS_MAP;
-use crate::url_save::UrlSave;
+use crate::url_save;
 
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
@@ -22,7 +22,7 @@ pub fn App(cx: Scope) -> Element {
     use_effect(cx, url_state.get(), move |state| {
         to_owned![state];
         async move {
-            UrlSave::from_state(&state).unwrap().set_to_url();
+            url_save::set_to_url(&state);
         }
     });
 
