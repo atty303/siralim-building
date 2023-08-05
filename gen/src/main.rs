@@ -13,10 +13,10 @@ use std::path::Path;
 
 use apache_avro::AvroSchema;
 use csv::StringRecord;
+use data::effect::Effect;
 use regex::Regex;
 use serde::Deserialize;
 
-use data::effect::EffectAvro;
 use data::keyword::Keyword;
 use data::r#trait::{Stats, Trait};
 use data::realm::Realm;
@@ -156,7 +156,7 @@ fn load_traits() -> Vec<ApiTraitRecord> {
     return reader.deserialize().map(|r| r.unwrap()).collect();
 }
 
-fn load_effects() -> Vec<EffectAvro> {
+fn load_effects() -> Vec<Effect> {
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(true)
         .from_path("siralim-ultimate-api/app/data/status_effects.csv")
@@ -184,7 +184,7 @@ fn search_hash_seed<S: Ord, T: DefaultHash<S>>(records: &Vec<T>) -> usize {
 
 fn build_regex(
     spells: &Vec<ApiSpellRecord>,
-    effects: &Vec<EffectAvro>,
+    effects: &Vec<Effect>,
     keywords: &Vec<Keyword>,
 ) -> Vec<Regex> {
     let tokens = spells
@@ -373,7 +373,7 @@ fn gen_traits() {
 }
 
 fn gen_effects() {
-    let schema = EffectAvro::get_schema();
+    let schema = Effect::get_schema();
     let file_writer = std::io::BufWriter::new(
         std::fs::File::create(Path::new("embed/avro/effects.avro")).unwrap(),
     );

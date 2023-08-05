@@ -1,10 +1,11 @@
-use data::effect::{Effect, EffectAvro};
+use rust_embed::RustEmbed;
+
+use data::effect::Effect;
 use data::keyword::Keyword;
 use data::personality::Personality;
 use data::r#trait::Trait;
 use data::spell_property::{SpellProperty, SpellPropertyAvro};
 use data::Data;
-use rust_embed::RustEmbed;
 
 #[derive(RustEmbed, Clone)]
 #[folder = "embed/avro/"]
@@ -30,8 +31,8 @@ fn load_effects() -> Vec<Effect> {
     .unwrap();
     let mut effects = Vec::new();
     for value in reader {
-        let r = apache_avro::from_value::<EffectAvro>(&value.unwrap()).unwrap();
-        effects.push(Effect::from(&r));
+        let r = apache_avro::from_value::<Effect>(&value.unwrap()).unwrap();
+        effects.push(r);
     }
     effects
 }
