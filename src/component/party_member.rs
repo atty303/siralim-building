@@ -7,6 +7,7 @@ use dioxus_heroicons::outline::Shape;
 
 use crate::component::card_tooltip::CardTooltip;
 use crate::component::creature_card::CreatureCard;
+use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
 use crate::state::Member;
 
@@ -310,7 +311,7 @@ struct MemberTraitProps<'a> {
 }
 
 fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
-    if let Some(t) = &cx.props.r#trait {
+    if let Some(t) = cx.props.r#trait {
         render! {
             div {
                 class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
@@ -321,9 +322,10 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                     }
                 }
                 div {
-                    class: "font-bold bg-secondary text-secondary-content p-2 w-64 rounded-md underline decoration-dotted",
+                    class: "bg-secondary text-secondary-content py-2 px-4 min-w-max rounded-md ",
                     CardTooltip {
-                        tip: render! { CreatureCard { r#trait: *t } },
+                        tip: render! { CreatureCard { r#trait: t } },
+                        class: "font-bold underline decoration-dotted",
                         img {
                             class: "inline-block mr-2",
                             src: "images/death.png",
@@ -333,7 +335,9 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                 }
                 div {
                     class: "grow",
-                    "After a creature gains or loses stats, its allies gain or lose 15% of those stats as well. This trait does not stack."
+                    Description {
+                        value: t.trait_description.clone(),
+                    }
                 }
                 button {
                     class: "btn btn-primary btn-circle btn-xs",
@@ -348,7 +352,7 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
     } else {
         render! {
             div {
-                class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer",
+                class: "text-center p-2 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold",
                 onclick: |_| cx.props.on_click.call(cx.props.index),
                 cx.props.empty_text
             }
