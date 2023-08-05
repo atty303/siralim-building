@@ -9,6 +9,8 @@ use crate::state::UrlState;
 
 pub fn write_state<W: Write>(w: &mut W, state: &UrlState) -> anyhow::Result<()> {
     let mut writer = BitWriter::endian(w, bitstream_io::BigEndian);
+
+    writer.write(8, 1)?; // version
     for m in &state.party {
         for t in &m.traits {
             writer.write(20, t.map(|c| c.id).unwrap_or(0))?;
@@ -21,6 +23,8 @@ pub fn write_state<W: Write>(w: &mut W, state: &UrlState) -> anyhow::Result<()> 
 pub fn read_state<'a, R: Read>(r: &mut R) -> anyhow::Result<UrlState<'a>> {
     let mut state = UrlState::default();
     let mut reader = BitReader::endian(r, bitstream_io::BigEndian);
+
+    let version: u8 = reader.read(8)?;
     for m in 0..6 {
         for t in 0..3 {
             let id = reader.read(20)?;
@@ -35,7 +39,7 @@ pub fn set_to_url(state: &UrlState) {
     let mut bytes = Vec::new();
     write_state(&mut bytes, state).unwrap();
 
-    log::debug!("save: {:?} bytes", bytes.len());
+    // log::debug!("save: {:?} bytes", bytes.len());
     let save_string = base64::engine::general_purpose::URL_SAFE.encode(bytes);
 
     let location: web_sys::Location = web_sys::window().unwrap().location();
