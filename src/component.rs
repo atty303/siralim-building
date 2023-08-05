@@ -9,5 +9,4 @@ pub mod footer;
 pub mod navbar;
 pub mod outline_icon;
 pub mod party_member;
-pub mod party_trait;
 pub mod traits_table;

@@ -212,7 +212,7 @@ fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
             if let Some(c) = class_name {
                 rsx! {
                     div {
-                        class: "badge absolute inset-x-2 bottom-2 text-center font-bold w-auto bg-black/25 text-sm h-8",
+                        class: "badge absolute inset-x-2 bottom-2 text-center font-bold w-auto !bg-base-100/50 text-sm h-8",
                         img {
                             class: "inline-block mr-1",
                             src: "images/{c}.png"
