@@ -15,6 +15,7 @@ pub fn PartyMember<'a>(
     cx: Scope<'a>,
     member: Member<'a>,
     on_trait_click: EventHandler<'a, usize>,
+    on_trait_clear: EventHandler<'a, usize>,
 ) -> Element<'a> {
     render! {
         div {
@@ -74,18 +75,21 @@ pub fn PartyMember<'a>(
                             r#trait: member.traits[0],
                             empty_text: "Click to add a primary trait",
                             on_click: |i| on_trait_click.call(i),
+                            on_clear: |i| on_trait_clear.call(i),
                         }
                         MemberTrait {
                             index: 1,
                             r#trait: member.traits[1],
                             empty_text: "Click to add a fused trait",
                             on_click: |i| on_trait_click.call(i),
+                            on_clear: |i| on_trait_clear.call(i),
                         }
                         MemberTrait {
                             index: 2,
                             r#trait: member.traits[2],
                             empty_text: "Click to add a artifact trait",
                             on_click: |i| on_trait_click.call(i),
+                            on_clear: |i| on_trait_clear.call(i),
                         }
                     }
 
@@ -304,6 +308,7 @@ struct MemberTraitProps<'a> {
     r#trait: Option<&'a Trait>,
     empty_text: &'static str,
     on_click: EventHandler<'a, usize>,
+    on_clear: EventHandler<'a, usize>,
 }
 
 fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
@@ -334,6 +339,7 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                 }
                 button {
                     class: "btn btn-primary btn-circle btn-xs",
+                    onclick: move |_| cx.props.on_clear.call(cx.props.index),
                     OutlineIcon {
                         icon: Shape::XMark,
                         size: 16,

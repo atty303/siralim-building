@@ -39,14 +39,20 @@ pub fn App(cx: Scope) -> Element {
             for (i, m) in url_state.get().party.iter().enumerate() {
                 PartyMember {
                     member: m.clone(),
-                    on_trait_click: move |trait_index: usize| {
+                    on_trait_click: move |trait_index| {
                         let us = url_state.clone();
                         trait_modal.show_modal(move |e| {
                             us.with_mut(|us| {
                                 us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
                             });
                         });
-                    }
+                    },
+                    on_trait_clear: move |trait_index| {
+                        let us = url_state.clone();
+                        us.with_mut(|us| {
+                            us.party[i].traits[trait_index] = None;
+                        });
+                    },
                 }
             }
         }
