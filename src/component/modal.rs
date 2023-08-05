@@ -7,11 +7,11 @@ use wasm_bindgen::JsCast;
 
 use crate::component::outline_icon::OutlineIcon;
 
-pub fn use_modal<T: 'static>(cx: &ScopeState) -> &ModalState<T> {
+pub fn use_modal<T: 'static>(cx: &ScopeState) -> &UseModal<T> {
     let modalRef: &UseRef<Option<web_sys::HtmlDialogElement>> = use_ref(cx, || None);
     let done = use_ref(cx, || None);
 
-    cx.use_hook(move || ModalState {
+    cx.use_hook(move || UseModal {
         modalRef: modalRef.clone(),
         done: done.clone(),
         component: |cx| render! {
@@ -51,7 +51,7 @@ pub fn use_modal<T: 'static>(cx: &ScopeState) -> &ModalState<T> {
     })
 }
 
-pub struct ModalState<T: 'static> {
+pub struct UseModal<T: 'static> {
     pub modalRef: UseRef<Option<web_sys::HtmlDialogElement>>,
     pub done: UseRef<Option<Box<dyn Fn(T)>>>,
     pub component: for<'a> fn(Scope<'a, ModalProps<'a>>) -> Element<'a>,
@@ -68,7 +68,7 @@ pub struct ModalDialogProps<'a, T: 'static> {
     pub on_result: EventHandler<'a, T>,
 }
 
-impl<T> ModalState<T> {
+impl<T> UseModal<T> {
     pub fn component<'a>(
         &self,
         cx: &'a ScopeState,
