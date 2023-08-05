@@ -17,7 +17,7 @@ pub fn PartyMember<'a>(
 ) -> Element<'a> {
     render! {
         div {
-            class: "card card-bordered border-base-300 card-side card-compact w-full shadow-md shadow-black/50 bg-base-300",
+            class: "card card-bordered border-base-300 card-side card-compact w-full shadow-sm shadow-black/50 bg-base-300",
             figure {
                 class: "bg-nature/50 p-4 relative",
                 img {
