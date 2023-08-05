@@ -33,11 +33,9 @@ serde = "1.0"
 apache-avro = { version = "0.15.0", features = [ "derive" ] }
 base64 = "0.21"
 qstring = "0.7.2"
-#flate2 = "1.0.25"
 
 anyhow = "1"
 
 #getrandom = { version = "0.2.8", features = [ "js" ] }
 
-#packed_struct = "0.10.1"
 bitstream-io = "1.7.0"

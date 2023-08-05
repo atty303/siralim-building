@@ -47,17 +47,11 @@ impl UrlSave {
 
     pub fn from_string(value: &str) -> anyhow::Result<UrlSave> {
         let bytes = base64::engine::general_purpose::URL_SAFE.decode(value)?;
-        // let mut decoder = flate2::read::ZlibDecoder::new(std::io::Cursor::new(z_bytes));
-        // let mut bytes: Vec<u8> = Vec::new();
-        // decoder.read_to_end(&mut bytes)?;
         Ok(UrlSave { bytes })
     }
 
     pub fn to_string(&self) -> String {
         log::debug!("save: {:?} bytes", self.bytes.len());
-        // let mut e = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::best());
-        // e.write_all(&bytes).unwrap();
-        // let c = e.finish().unwrap();
         base64::engine::general_purpose::URL_SAFE.encode(&self.bytes)
     }
 
