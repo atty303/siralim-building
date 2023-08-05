@@ -150,7 +150,7 @@ pub fn PartyMember<'a>(
                     }
 
                     div {
-                        class: "space-y-2",
+                        class: "space-y-2 grow",
                         MemberTrait {
                             index: 0,
                             r#trait: member.traits[0].clone(),
@@ -177,7 +177,7 @@ pub fn PartyMember<'a>(
                     }
 
                     div {
-                        class: "space-y-2",
+                        class: "space-y-2 grow",
 
                         div {
                             class: "flex items-center p-2 gap-2 rounded-md bg-base-100",

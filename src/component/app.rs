@@ -34,7 +34,7 @@ pub fn App(cx: Scope) -> Element {
                 PartyMember {
                     member: m.clone(),
                     on_trait_click: |trait_index: usize| {
-                        trait_modal.show_modal(move |e: TraitId| {
+                        trait_modal.show_modal(move |e| {
                             log::debug!("trait_index: {}, {:?}", trait_index, e);
                         });
                     }
