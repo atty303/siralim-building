@@ -1,15 +1,12 @@
 #[derive(Debug, Clone)]
 pub struct Realm {
-    pub name: String,
-    pub god: String,
+    pub name: &'static str,
+    pub god: &'static str,
 }
 
 impl Realm {
-    pub fn new(name: &str, god: &str) -> Realm {
-        Realm {
-            name: name.to_string(),
-            god: god.to_string(),
-        }
+    pub fn new(name: &'static str, god: &'static str) -> Realm {
+        Realm { name, god }
     }
 
     pub fn load() -> Vec<Realm> {

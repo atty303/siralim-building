@@ -1,30 +1,14 @@
-use std::fmt::{Display, Formatter};
+use std::collections::BTreeMap;
+use std::ops::Deref;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Stat {
-    Health,
-    Attack,
-    Intelligence,
-    Defense,
-    Speed,
-}
+use stat::Stat;
 
-impl Display for Stat {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Stat::Health => f.write_str("health"),
-            Stat::Attack => f.write_str("attack"),
-            Stat::Intelligence => f.write_str("intelligence"),
-            Stat::Defense => f.write_str("defense"),
-            Stat::Speed => f.write_str("speed"),
-        }
-    }
-}
+pub type PersonalityId = i8;
 
 #[derive(Debug, Clone)]
 pub struct Personality {
-    pub id: i8,
-    pub name: String,
+    pub id: PersonalityId,
+    pub name: &'static str,
     pub positive: Stat,
     pub negative: Stat,
 }
@@ -33,7 +17,7 @@ impl Personality {
     fn new(id: i8, name: &'static str, positive: Stat, negative: Stat) -> Personality {
         Self {
             id,
-            name: name.to_string(),
+            name,
             positive,
             negative,
         }
@@ -62,27 +46,30 @@ impl Personality {
             ("Shy", Stat::Speed, Stat::Intelligence),
             ("Timid", Stat::Speed, Stat::Defense),
         ];
-        xs.iter()
+        xs.into_iter()
             .enumerate()
-            .map(|(i, x)| Personality::new((i + 1) as i8, x.0, x.1.clone(), x.2.clone()))
+            .map(|(i, x)| Personality::new((i + 1) as PersonalityId, x.0, x.1, x.2))
             .collect()
     }
+}
 
-    pub fn get_by_id(xs: &Vec<Personality>, id: i8) -> Option<Personality> {
-        xs.iter().find(|x| x.id == id).map(|x| x.clone())
-    }
+pub struct PersonalitiesMap {
+    inner: BTreeMap<PersonalityId, Personality>,
+}
 
-    pub fn get_by_stat(
-        xs: &Vec<Personality>,
-        positive: &Option<Stat>,
-        negative: &Option<Stat>,
-    ) -> Option<Personality> {
-        match (positive, negative) {
-            (Some(p), Some(n)) => xs
-                .iter()
-                .find(|x| x.positive == *p && x.negative == *n)
-                .map(|x| x.clone()),
-            _ => None,
+impl PersonalitiesMap {
+    pub fn new() -> PersonalitiesMap {
+        let mut inner = BTreeMap::new();
+        for x in Personality::load() {
+            inner.insert(x.id, x);
         }
+        PersonalitiesMap { inner }
+    }
+}
+
+impl Deref for PersonalitiesMap {
+    type Target = BTreeMap<PersonalityId, Personality>;
+    fn deref(&self) -> &Self::Target {
+        &self.inner
     }
 }

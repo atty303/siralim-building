@@ -6,8 +6,8 @@ use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
-use data::personality::Stat;
 use data::r#trait::TraitId;
+use data::stat::Stat;
 use data::stats::{ATTACK_RANGE, DEFENSE_RANGE, HEALTH_RANGE, INTELLIGENCE_RANGE, SPEED_RANGE};
 
 use crate::component::autocomplete::Autocomplete;

@@ -5,8 +5,7 @@ use std::ops::Deref;
 use apache_avro::AvroSchema;
 use indicium::simple::{Indexable, SearchIndex};
 use serde::{Deserialize, Serialize};
-
-use personality::Stat;
+use stat::Stat;
 
 pub type TraitId = i32;
 pub type StatValue = u8;
@@ -61,7 +60,7 @@ impl Indexable for Trait {
 }
 
 pub struct TraitsMap {
-    inner: BTreeMap<i32, Trait>,
+    inner: BTreeMap<TraitId, Trait>,
 }
 
 impl TraitsMap {
@@ -78,18 +77,18 @@ impl TraitsMap {
 }
 
 impl Deref for TraitsMap {
-    type Target = BTreeMap<i32, Trait>;
+    type Target = BTreeMap<TraitId, Trait>;
     fn deref(&self) -> &Self::Target {
         &self.inner
     }
 }
 
 pub struct TraitsIndex {
-    inner: SearchIndex<i32>,
+    inner: SearchIndex<TraitId>,
 }
 
 impl Deref for TraitsIndex {
-    type Target = SearchIndex<i32>;
+    type Target = SearchIndex<TraitId>;
     fn deref(&self) -> &Self::Target {
         &self.inner
     }

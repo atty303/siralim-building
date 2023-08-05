@@ -3,12 +3,9 @@ use std::io::Cursor;
 use once_cell::sync::Lazy;
 use rust_embed::RustEmbed;
 
-use data::effect::Effect;
-use data::keyword::Keyword;
-use data::personality::Personality;
+use data::effect::EffectsMap;
+use data::keyword::KeywordsMap;
 use data::r#trait::{TraitsIndex, TraitsMap};
-use data::spell_property::SpellProperty;
-use data::Data;
 
 #[derive(RustEmbed, Clone)]
 #[folder = "embed/avro/"]
@@ -25,36 +22,22 @@ pub static TRAITS_MAP: Lazy<TraitsMap> = Lazy::new(|| {
 
 pub static TRAITS_INDEX: Lazy<TraitsIndex> = Lazy::new(|| TraitsIndex::new(&TRAITS_MAP));
 
-fn load_effects() -> Vec<Effect> {
-    let reader =
-        apache_avro::Reader::new(Cursor::new(EmbedAvro::get("effects.avro").unwrap().data))
-            .unwrap();
-    let mut effects = Vec::new();
-    for value in reader {
-        let r = apache_avro::from_value::<Effect>(&value.unwrap()).unwrap();
-        effects.push(r);
-    }
-    effects
-}
+pub static EFFECTS_MAP: Lazy<EffectsMap> = Lazy::new(|| {
+    let cursor = Cursor::new(
+        EmbedAvro::get("effects.avro")
+            .expect("effects.avro not found")
+            .data,
+    );
+    EffectsMap::new(cursor).expect("Failed to load effects")
+});
 
-fn load_spell_properties() -> Vec<SpellProperty> {
-    let reader = apache_avro::Reader::new(Cursor::new(
-        EmbedAvro::get("spell_properties.avro").unwrap().data,
-    ))
-    .unwrap();
-    let mut xs = Vec::new();
-    for value in reader {
-        let r = apache_avro::from_value::<SpellProperty>(&value.unwrap()).unwrap();
-        xs.push(r);
-    }
-    xs
-}
+pub static KEYWORDS_MAP: Lazy<KeywordsMap> = Lazy::new(|| KeywordsMap::new());
 
-pub fn load() -> Data {
-    Data::from(
-        load_effects(),
-        Keyword::load(),
-        Personality::load(),
-        load_spell_properties(),
-    )
-}
+// pub static SPELL_PROPERTIES_MAP: Lazy<SpellPropertiesMap> = Lazy::new(|| {
+//     let cursor = Cursor::new(
+//         EmbedAvro::get("spell_properties.avro")
+//             .expect("spell_properties.avro not found")
+//             .data,
+//     );
+//     SpellPropertiesMap::new(cursor).expect("Failed to load spell properties")
+// });

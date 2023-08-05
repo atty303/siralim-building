@@ -191,7 +191,7 @@ fn build_regex(
         .iter()
         .map(|x| x.name.as_str())
         .chain(effects.iter().map(|x| x.name.as_str()))
-        .chain(keywords.iter().map(|x| x.name.as_str()))
+        .chain(keywords.iter().map(|x| x.name))
         .collect::<Vec<&str>>();
     tokens
         .iter()
@@ -348,7 +348,7 @@ fn gen_traits() {
     writer.flush().unwrap();
 
     {
-        let mut writer = BufWriter::new(File::create("data/src/stats.rs").unwrap());
+        let mut writer = BufWriter::new(File::create("stat.rs").unwrap());
         let mut write_line = |name, min, max| {
             writer
                 .write(

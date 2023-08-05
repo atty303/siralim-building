@@ -1,16 +1,19 @@
+use std::collections::HashMap;
+use std::ops::Deref;
+
 #[derive(Debug, Clone)]
 pub struct Keyword {
-    pub name: String,
-    pub category: String,
-    pub icon: String,
+    pub name: &'static str,
+    pub category: &'static str,
+    pub icon: &'static str,
 }
 
 impl Keyword {
-    fn new(name: &str, category: &str, icon: &str) -> Keyword {
+    fn new(name: &'static str, category: &'static str, icon: &'static str) -> Keyword {
         Self {
-            name: String::from(name),
-            category: String::from(category),
-            icon: String::from(icon),
+            name,
+            category,
+            icon,
         }
     }
 
@@ -37,5 +40,26 @@ impl Keyword {
             Keyword::new("Provoked", "action", "battle_provoke_0.png"),
             Keyword::new("Provoking", "action", "battle_provoke_0.png"),
         ]
+    }
+}
+
+pub struct KeywordsMap {
+    inner: HashMap<String, Keyword>,
+}
+
+impl KeywordsMap {
+    pub fn new() -> KeywordsMap {
+        let inner = Keyword::load()
+            .into_iter()
+            .map(|e| (e.name.to_string(), e))
+            .collect::<HashMap<_, _>>();
+        Self { inner }
+    }
+}
+
+impl Deref for KeywordsMap {
+    type Target = HashMap<String, Keyword>;
+    fn deref(&self) -> &Self::Target {
+        &self.inner
     }
 }

@@ -1,19 +1,16 @@
 #![allow(non_snake_case)]
 
-use crate::atom;
-use crate::component::card_tooltip::CardTooltip;
-use data::Data;
 use dioxus::prelude::*;
-use fermi::use_read;
+
+use crate::component::card_tooltip::CardTooltip;
+use crate::embed_data::{EFFECTS_MAP, KEYWORDS_MAP};
 
 #[inline_props]
 pub fn Description(cx: Scope, value: Vec<String>) -> Element {
-    let data: &Data = use_read(cx, &atom::DATA);
-
     render! {
         span {
             value.iter().map(|t| {
-                if let Some(w) = data.keywords.get(t) {
+                if let Some(w) = KEYWORDS_MAP.get(t) {
                     rsx! {
                         span {
                             class: "font-bold text-accent",
@@ -24,7 +21,7 @@ pub fn Description(cx: Scope, value: Vec<String>) -> Element {
                             "{t}"
                         }
                     }
-                } else if let Some(e) = data.effects.get(t) {
+                } else if let Some(e) = EFFECTS_MAP.get(t) {
                     let color = match e.category.as_str() {
                         "buff" => "text-success",
                         "debuff" => "text-error",
