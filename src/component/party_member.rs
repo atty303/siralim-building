@@ -189,7 +189,7 @@ pub fn PartyMember<'a>(
                                 }
                             }
                             div {
-                                class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
+                                class: "font-bold bg-secondary text-secondary-content p-2 w-64 rounded-md underline decoration-dotted",
                                 img {
                                     class: "inline-block mr-2",
                                     src: "images/chaos.png",
@@ -248,7 +248,7 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                     }
                 }
                 div {
-                    class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
+                    class: "font-bold bg-secondary text-secondary-content p-2 w-64 rounded-md underline decoration-dotted",
                     CardTooltip {
                         tip: render! { CreatureCard { r#trait: *t } },
                         img {

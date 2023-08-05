@@ -156,6 +156,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "bitstream-io"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82704769cb85a22df2c54d6bdd6a158b7931d256cf3248a07d6ecbe9d58b31d7"
+
+[[package]]
 name = "block-buffer"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2064,6 +2070,7 @@ dependencies = [
  "anyhow",
  "apache-avro",
  "base64",
+ "bitstream-io",
  "classes",
  "data",
  "dioxus",

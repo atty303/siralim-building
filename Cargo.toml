@@ -16,8 +16,6 @@ fermi = "0.4.0"
 dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "835d5f42c6d5026deffcc515474738a47143ed46" }
 classes = "1.0.0"
 
-#yew = { version = "0.20.0", features = [ "csr" ] }
-#yewdux = "0.9.2"
 wasm-bindgen = "0.2.86"
 web-sys = { version = "0.3.61", features = [ "Window", "History", "Location", "HtmlDialogElement" ] }
 gloo-events = "0.1.2"
@@ -40,18 +38,6 @@ qstring = "0.7.2"
 anyhow = "1"
 
 #getrandom = { version = "0.2.8", features = [ "js" ] }
-#implicit-clone = "0.3.5"
-#packed_struct = "0.10.1"
 
-#[dependencies.yew_icons]
-#version = "0.7.0"
-#features = [
-#    "BootstrapXLg",
-#    "BootstrapGripVertical",
-#    "BootstrapArrowDownShort",
-#    "BootstrapArrowUpShort",
-#    "BootstrapCheckSquareFill",
-#    "BootstrapPlusCircleDotted",
-#    "BootstrapChevronDoubleDown",
-#    "BootstrapChevronDoubleUp",
-#]
+#packed_struct = "0.10.1"
+bitstream-io = "1.7.0"

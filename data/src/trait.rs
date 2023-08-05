@@ -7,7 +7,7 @@ use indicium::simple::{Indexable, SearchIndex};
 use serde::{Deserialize, Serialize};
 use stat::Stat;
 
-pub type TraitId = i32;
+pub type TraitId = u32;
 pub type StatValue = u8;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize, AvroSchema)]

@@ -1,54 +1,48 @@
 use std::io::Cursor;
 
-use apache_avro::AvroSchema;
 use base64::Engine;
+use bitstream_io::{BitRead, BitReader, BitWrite, BitWriter};
 use qstring::QString;
-use serde::{Deserialize, Serialize};
 
 use crate::embed_data::TRAITS_MAP;
-use crate::state::{Member, UrlState};
-use data::r#trait::TraitId;
+use crate::state::UrlState;
 
-#[derive(Serialize, Deserialize, AvroSchema, Debug)]
+#[derive(Debug)]
 pub struct UrlSave {
-    party: Vec<SaveMember>,
-}
-
-#[derive(Serialize, Deserialize, AvroSchema, Debug)]
-struct SaveMember {
-    traits: Vec<Option<TraitId>>,
+    bytes: Vec<u8>,
 }
 
 impl UrlSave {
     pub fn from_state(state: &UrlState) -> anyhow::Result<UrlSave> {
-        Ok(UrlSave {
-            party: state
-                .party
-                .iter()
-                .map(|m| SaveMember {
-                    traits: m.traits.iter().map(|t| t.clone().map(|c| c.id)).collect(),
-                })
-                .collect(),
-        })
+        let mut bytes: Vec<u8> = Vec::new();
+        {
+            let mut writer = BitWriter::endian(&mut bytes, bitstream_io::BigEndian);
+            for m in &state.party {
+                for t in &m.traits {
+                    writer.write(20, t.map(|c| c.id).unwrap_or(0))?;
+                    writer.write(4, 0)?;
+                }
+            }
+        }
+        Ok(UrlSave { bytes })
     }
 
     pub fn to_state<'a>(&self) -> UrlState<'a> {
-        UrlState {
-            party: self
-                .party
-                .iter()
-                .map(|m| Member {
-                    traits: m
-                        .traits
-                        .iter()
-                        .map(|t| match t {
-                            Some(id) => TRAITS_MAP.get(id),
-                            None => None,
-                        })
-                        .collect(),
-                })
-                .collect(),
+        let mut state = UrlState::default();
+
+        let mut cursor = Cursor::new(&self.bytes);
+        {
+            let mut reader = BitReader::endian(&mut cursor, bitstream_io::BigEndian);
+            for m in 0..6 {
+                for t in 0..3 {
+                    let id = reader.read(20).unwrap();
+                    let _: u8 = reader.read(4).unwrap();
+                    state.party[m].traits[t] = TRAITS_MAP.get(&id);
+                }
+            }
         }
+
+        state
     }
 
     pub fn from_string(value: &str) -> anyhow::Result<UrlSave> {
@@ -56,19 +50,15 @@ impl UrlSave {
         // let mut decoder = flate2::read::ZlibDecoder::new(std::io::Cursor::new(z_bytes));
         // let mut bytes: Vec<u8> = Vec::new();
         // decoder.read_to_end(&mut bytes)?;
-        let avro_value =
-            apache_avro::from_avro_datum(&UrlSave::get_schema(), &mut Cursor::new(bytes), None)?;
-        let save: UrlSave = apache_avro::from_value(&avro_value)?;
-        Ok(save)
+        Ok(UrlSave { bytes })
     }
 
     pub fn to_string(&self) -> String {
-        let save_value = apache_avro::to_value(self).unwrap();
-        let bytes = apache_avro::to_avro_datum(&UrlSave::get_schema(), save_value).unwrap();
+        log::debug!("save: {:?} bytes", self.bytes.len());
         // let mut e = flate2::write::ZlibEncoder::new(Vec::new(), flate2::Compression::best());
         // e.write_all(&bytes).unwrap();
         // let c = e.finish().unwrap();
-        base64::engine::general_purpose::URL_SAFE.encode(bytes)
+        base64::engine::general_purpose::URL_SAFE.encode(&self.bytes)
     }
 
     pub fn set_to_url(&self) {
@@ -87,10 +77,14 @@ impl UrlSave {
     pub fn get_from_url() -> Option<UrlSave> {
         let location: web_sys::Location = web_sys::window().unwrap().location();
         let qs = QString::from(location.search().unwrap().as_str());
-        if let Some(v1) = qs.get("s1") {
-            UrlSave::from_string(v1).ok()
+        let r = if let Some(v1) = qs.get("s1") {
+            UrlSave::from_string(v1)
         } else {
-            None
+            Err(anyhow::anyhow!("no save found"))
+        };
+        if r.is_err() {
+            log::warn!("failed to parse url save: {:?}", r);
         }
+        r.ok()
     }
 }

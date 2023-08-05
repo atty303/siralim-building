@@ -18,7 +18,7 @@ use regex::Regex;
 use serde::Deserialize;
 
 use data::keyword::Keyword;
-use data::r#trait::{Stats, Trait};
+use data::r#trait::{Stats, Trait, TraitId};
 use data::realm::Realm;
 use data::spell::Spell;
 use data::spell_property::SpellProperty;
@@ -330,7 +330,7 @@ fn gen_traits() {
         };
 
         let r = Trait {
-            id: hash,
+            id: hash as TraitId,
             class: r.class.clone(),
             family: r.family.clone(),
             creature: r.creature.clone(),
