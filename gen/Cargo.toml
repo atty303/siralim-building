@@ -7,6 +7,6 @@ data = { path = "../data" }
 reqwest = { version = "0.11.14", features = [ "blocking" ] }
 csv = "1.1.6"
 serde = { version = "1.0.152", features = [ "derive" ] }
-apache-avro = { version = "0.14.0", features = [ "derive" ] }
+apache-avro = { version = "0.15.0", features = [ "derive" ] }
 ahash = "0.8.3"
 regex = "1.7.1"

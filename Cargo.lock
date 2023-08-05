@@ -41,16 +41,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "anyhow"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "224afbd727c3d6e4b90103ece64b8d1b67fbb1973b1046c2281eed3f3803f800"
-
-[[package]]
 name = "apache-avro"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cf4144857f9e4d7dd6cc4ba4c78efd2a46bad682b029bd0d91e76a021af1b2a"
+checksum = "9c0fdddc3fdac97394ffcc5c89c634faa9c1c166ced54189af34e407c97b6ee7"
 dependencies = [
  "apache-avro-derive",
  "byteorder",
@@ -74,15 +68,15 @@ dependencies = [
 
 [[package]]
 name = "apache-avro-derive"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b51802ff40292be24b7b5007d4f96210be3a0423225a3ae5dacebece66d83db9"
+checksum = "6686cd705badba064ec2322b9c3d72f5c70db8394e486bbb56e84fbdb3fa158c"
 dependencies = [
- "darling 0.14.3",
+ "darling",
  "proc-macro2",
  "quote",
  "serde_json",
- "syn 1.0.107",
+ "syn 2.0.27",
 ]
 
 [[package]]
@@ -310,35 +304,12 @@ dependencies = [
 
 [[package]]
 name = "darling"
-version = "0.14.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0808e1bd8671fb44a113a14e13497557533369847788fa2ae912b6ebfce9fa8"
-dependencies = [
- "darling_core 0.14.3",
- "darling_macro 0.14.3",
-]
-
-[[package]]
-name = "darling"
 version = "0.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0558d22a7b463ed0241e993f76f09f30b126687447751a8638587b864e4b3944"
 dependencies = [
- "darling_core 0.20.1",
- "darling_macro 0.20.1",
-]
-
-[[package]]
-name = "darling_core"
-version = "0.14.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "001d80444f28e193f30c2f293455da62dcf9a6b29918a4253152ae2b1de592cb"
-dependencies = [
- "fnv",
- "ident_case",
- "proc-macro2",
- "quote",
- "syn 1.0.107",
+ "darling_core",
+ "darling_macro",
 ]
 
 [[package]]
@@ -356,22 +327,11 @@ dependencies = [
 
 [[package]]
 name = "darling_macro"
-version = "0.14.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b36230598a2d5de7ec1c6f51f72d8a99a9208daff41de2084d06e3fd3ea56685"
-dependencies = [
- "darling_core 0.14.3",
- "quote",
- "syn 1.0.107",
-]
-
-[[package]]
-name = "darling_macro"
 version = "0.20.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29a358ff9f12ec09c3e61fef9b5a9902623a695a46a917b07f269bff1445611a"
 dependencies = [
- "darling_core 0.20.1",
+ "darling_core",
  "quote",
  "syn 2.0.27",
 ]
@@ -380,7 +340,6 @@ dependencies = [
 name = "data"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "apache-avro",
  "indicium",
  "serde",
@@ -575,7 +534,7 @@ version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e08b6c6ab82d70f08844964ba10c7babb716de2ecaeab9be5717918a5177d3af"
 dependencies = [
- "darling 0.20.1",
+ "darling",
  "proc-macro2",
  "quote",
  "syn 2.0.27",
@@ -1719,21 +1678,21 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "strum"
-version = "0.24.1"
+version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "063e6045c0e62079840579a7e47a355ae92f60eb74daaf156fb1e84ba164e63f"
+checksum = "290d54ea6f91c969195bdbcd7442c8c2a2ba87da8bf60a7ee86a235d4bc1e125"
 
 [[package]]
 name = "strum_macros"
-version = "0.24.3"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e385be0d24f186b4ce2f9982191e7101bb737312ad61c1f2f984f34bcf85d59"
+checksum = "6069ca09d878a33f883cc06aaa9718ede171841d3832450354410b718b097232"
 dependencies = [
  "heck",
  "proc-macro2",
  "quote",
  "rustversion",
- "syn 1.0.107",
+ "syn 2.0.27",
 ]
 
 [[package]]
@@ -1900,9 +1859,9 @@ checksum = "3528ecfd12c466c6f163363caf2d02a71161dd5e1cc6ae7b34207ea2d42d81ed"
 
 [[package]]
 name = "typed-builder"
-version = "0.10.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89851716b67b937e393b3daa8423e67ddfc4bbbf1654bcf05488e95e0828db0c"
+checksum = "64cba322cb9b7bc6ca048de49e83918223f35e7a86311267013afff257004870"
 dependencies = [
  "proc-macro2",
  "quote",
