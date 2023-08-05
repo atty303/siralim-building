@@ -1,8 +1,7 @@
 #![allow(non_snake_case)]
 
-use data::r#trait::TraitId;
 use dioxus::prelude::*;
-use fermi::{use_init_atom_root, use_read};
+use fermi::{use_atom_state, use_init_atom_root};
 
 use crate::atom;
 use crate::component::footer::Footer;
@@ -10,32 +9,32 @@ use crate::component::modal::use_modal;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::traits_table::TraitsModal;
+use crate::embed_data::TRAITS_MAP;
 
 pub fn App(cx: Scope) -> Element {
     use_init_atom_root(cx);
 
     let trait_modal = use_modal(cx);
 
-    // let spell_modal_state = use_modal(cx);
-    // let SpellModal = spell_modal_state.component(cx, render! { "Spells" });
-
-    let party = use_read(cx, &atom::PARTY);
+    let party = use_atom_state(cx, &atom::PARTY);
 
     render! {
         NavBar {}
 
         h2 {
             class: "text-xl text-center text-secondary my-4",
-            "PARTY"}
+            "PARTY"
+        }
 
         div {
             class: "mx-4 space-y-4",
-            for m in party {
+            for (i, m) in party.get().iter().enumerate() {
                 PartyMember {
                     member: m.clone(),
-                    on_trait_click: |trait_index: usize| {
+                    on_trait_click: move |trait_index: usize| {
+                        let p = party.clone();
                         trait_modal.show_modal(move |e| {
-                            log::debug!("trait_index: {}, {:?}", trait_index, e);
+                            p.with_mut(|p| p[i].traits[trait_index] = Some(&TRAITS_MAP[&e]));
                         });
                     }
                 }
@@ -45,7 +44,6 @@ pub fn App(cx: Scope) -> Element {
         Footer {}
 
         trait_modal.component(cx, TraitsModal)
-        // SpellModal
     }
 
     // cx.render(rsx! {

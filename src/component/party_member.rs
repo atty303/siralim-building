@@ -5,13 +5,14 @@ use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
 use crate::component::card_tooltip::CardTooltip;
+use crate::component::creature_card::CreatureCard;
 use crate::component::outline_icon::OutlineIcon;
 use crate::state::Member;
 
 #[inline_props]
 pub fn PartyMember<'a>(
     cx: Scope<'a>,
-    member: Member,
+    member: Member<'a>,
     on_trait_click: EventHandler<'a, usize>,
 ) -> Element<'a> {
     render! {
@@ -153,19 +154,19 @@ pub fn PartyMember<'a>(
                         class: "space-y-2 grow",
                         MemberTrait {
                             index: 0,
-                            r#trait: member.traits[0].clone(),
+                            r#trait: member.traits[0],
                             empty_text: "Click to add a primary trait",
                             on_click: |i| on_trait_click.call(i),
                         }
                         MemberTrait {
                             index: 1,
-                            r#trait: member.traits[1].clone(),
+                            r#trait: member.traits[1],
                             empty_text: "Click to add a fused trait",
                             on_click: |i| on_trait_click.call(i),
                         }
                         MemberTrait {
                             index: 2,
-                            r#trait: member.traits[2].clone(),
+                            r#trait: member.traits[2],
                             empty_text: "Click to add a artifact trait",
                             on_click: |i| on_trait_click.call(i),
                         }
@@ -230,7 +231,7 @@ pub fn PartyMember<'a>(
 struct MemberTraitProps<'a> {
     index: usize,
     #[props(!optional)]
-    r#trait: Option<Trait>,
+    r#trait: Option<&'a Trait>,
     empty_text: &'static str,
     on_click: EventHandler<'a, usize>,
 }
@@ -249,12 +250,12 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                 div {
                     class: "font-bold bg-secondary text-secondary-content p-2 w-48 rounded-md underline decoration-dotted",
                     CardTooltip {
-                        tip: None, //render! { CreatureCard {} },
+                        tip: render! { CreatureCard { r#trait: *t } },
                         img {
                             class: "inline-block mr-2",
                             src: "images/death.png",
                         }
-                        "{t.trait_name}"
+                        "{t.creature}"
                     }
                 }
                 div {
