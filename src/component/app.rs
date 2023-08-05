@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use data::r#trait::TraitId;
 use dioxus::prelude::*;
 use fermi::{use_init_atom_root, use_read};
 
@@ -35,7 +36,7 @@ pub fn App(cx: Scope) -> Element {
                     member: m.clone(),
                     on_trait_click: |trait_index: usize| {
                         // trait_modal_state.show();
-                        trait_modal_state.show_modal(move |e| {
+                        trait_modal_state.show_modal(move |e: TraitId| {
                             log::debug!("trait_index: {}, {:?}", trait_index, e);
                         });
                     }

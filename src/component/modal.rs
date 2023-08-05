@@ -7,7 +7,7 @@ use wasm_bindgen::JsCast;
 
 use crate::component::outline_icon::OutlineIcon;
 
-pub fn use_modal(cx: &ScopeState) -> &ModalState {
+pub fn use_modal<T: 'static>(cx: &ScopeState) -> &ModalState<T> {
     let modalRef: &UseRef<Option<web_sys::HtmlDialogElement>> = use_ref(cx, || None);
     let done = use_ref(cx, || None);
 
@@ -51,9 +51,9 @@ pub fn use_modal(cx: &ScopeState) -> &ModalState {
     })
 }
 
-pub struct ModalState {
+pub struct ModalState<T: 'static> {
     pub modalRef: UseRef<Option<web_sys::HtmlDialogElement>>,
-    pub done: UseRef<Option<Box<dyn Fn(i32)>>>,
+    pub done: UseRef<Option<Box<dyn Fn(T)>>>,
     pub component: for<'a> fn(Scope<'a, ModalProps<'a>>) -> Element<'a>,
 }
 
@@ -64,15 +64,15 @@ pub struct ModalProps<'a> {
 }
 
 #[derive(Props)]
-pub struct ModalDialogProps<'a> {
-    pub on_result: EventHandler<'a, i32>,
+pub struct ModalDialogProps<'a, T: 'static> {
+    pub on_result: EventHandler<'a, T>,
 }
 
-impl ModalState {
+impl<T> ModalState<T> {
     pub fn component<'a>(
         &self,
         cx: &'a ScopeState,
-        child: fn(Scope<'a, ModalDialogProps<'a>>) -> Element<'a>,
+        child: fn(Scope<'a, ModalDialogProps<'a, T>>) -> Element<'a>,
     ) -> DynamicNode<'a> {
         let modalRef = self.modalRef.clone();
         let done = self.done.clone();
@@ -101,7 +101,7 @@ impl ModalState {
         )
     }
 
-    pub fn show_modal(&self, done: impl Fn(i32) -> () + 'static) {
+    pub fn show_modal(&self, done: impl Fn(T) + 'static) {
         *self.done.write() = Some(Box::new(done));
 
         if let Some(el) = self.modalRef.read().as_ref() {

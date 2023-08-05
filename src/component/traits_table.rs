@@ -19,7 +19,7 @@ use crate::component::modal::ModalDialogProps;
 use crate::component::outline_icon::OutlineIcon;
 use crate::embed_data;
 
-pub fn TraitsModal<'a>(cx: Scope<'a, ModalDialogProps<'a>>) -> Element<'a> {
+pub fn TraitsModal<'a>(cx: Scope<'a, ModalDialogProps<'a, TraitId>>) -> Element<'a> {
     let keys = use_ref(cx, || vec![]);
     let total = embed_data::TRAITS_MAP.len();
     let autocomplete_items = use_ref(cx, || Vec::<String>::new());
