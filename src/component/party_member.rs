@@ -51,11 +51,9 @@ pub fn PartyMember<'a>(
                     MemberStats {
                         member: member,
                     }
-
                     MemberArtifact {
                         _member: member,
                     }
-
                     MemberRelic {
                         _member: member,
                     }
