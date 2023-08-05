@@ -32,6 +32,7 @@ struct StorageEntry<T> {
 }
 
 /// Storage that persists across application reloads
+#[derive(Clone)]
 pub struct UsePersistent<T: 'static> {
     inner: UseRef<StorageEntry<T>>,
 }

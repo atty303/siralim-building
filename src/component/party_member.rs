@@ -3,16 +3,15 @@
 use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
-use fermi::use_atom_state;
 
 use data::r#trait::Trait;
 use data::stat::Stat;
 
-use crate::atom;
 use crate::component::card_tooltip::CardTooltip;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
+use crate::hooks::persistent::UsePersistent;
 use crate::state::Member;
 
 #[inline_props]
@@ -21,23 +20,9 @@ pub fn PartyMember<'a>(
     member: Member<'a>,
     on_trait_click: EventHandler<'a, usize>,
     on_trait_clear: EventHandler<'a, usize>,
+    show_traits: UsePersistent<bool>,
+    show_spells: UsePersistent<bool>,
 ) -> Element<'a> {
-    let show_traits = use_atom_state(cx, &atom::SHOW_TRAITS);
-    let traits_class = classes!["space-y-2 grow", "hidden" => !*show_traits.get()];
-    let traits_icon = if *show_traits.get() {
-        Shape::ChevronLeft
-    } else {
-        Shape::ChevronRight
-    };
-
-    let show_spells = use_atom_state(cx, &atom::SHOW_SPELLS);
-    let spells_class = classes!["space-y-2 grow", "hidden" => !*show_spells.get()];
-    let spells_icon = if *show_spells.get() {
-        Shape::ChevronLeft
-    } else {
-        Shape::ChevronRight
-    };
-
     render! {
         div {
             class: "card card-bordered border-base-300 card-side card-compact w-full shadow-sm shadow-black/50 bg-base-300",
@@ -82,19 +67,11 @@ pub fn PartyMember<'a>(
 
                 div {
                     class: "flex items-start gap-2",
-                    button {
-                        class: "[writing-mode:vertical-rl] bg-primary text-primary-content rounded-md self-stretch rotate-180 flex items-center justify-center px-1 py-8",
-                        onclick: |_| show_traits.modify(|v| !v),
-                        OutlineIcon { icon: traits_icon, size: 20, }
-                        span {
-                            class: "my-2",
-                            "TRAITS"
-                        }
-                        OutlineIcon { icon: traits_icon, size: 20, }
-                    }
 
-                    div {
-                        class: "{traits_class}",
+                    MemberCollapsable {
+                        state: show_traits.clone(),
+                        text: "TRAITS",
+
                         MemberTrait {
                             index: 0,
                             r#trait: member.traits[0],
@@ -118,19 +95,9 @@ pub fn PartyMember<'a>(
                         }
                     }
 
-                    button {
-                        class: "[writing-mode:vertical-rl] bg-primary text-primary-content rounded-md self-stretch rotate-180 flex items-center justify-center px-1 py-8",
-                        onclick: |_| show_spells.modify(|v| !v),
-                        OutlineIcon { icon: spells_icon, size: 20, }
-                        span {
-                            class: "my-2",
-                            "SPELLS"
-                        }
-                        OutlineIcon { icon: spells_icon, size: 20, }
-                    }
-
-                    div {
-                        class: "{spells_class}",
+                    MemberCollapsable {
+                        state: show_spells.clone(),
+                        text: "SPELLS",
 
                         div {
                             class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
@@ -328,6 +295,38 @@ fn MemberRelic<'a>(cx: Scope<'a>, _member: &'a Member<'a>) -> Element<'a> {
                 class: "underline decoration-dotted whitespace-nowrap",
                 "5740-NG"
             }
+        }
+    }
+}
+
+#[inline_props]
+fn MemberCollapsable<'a>(
+    cx: Scope<'a>,
+    state: UsePersistent<bool>,
+    text: &'a str,
+    children: Element<'a>,
+) -> Element<'a> {
+    let class = classes!["space-y-2 grow", "hidden" => !state.get()];
+    let icon = if state.get() {
+        Shape::ChevronRight
+    } else {
+        Shape::ChevronLeft
+    };
+
+    render! {
+        button {
+            class: "[writing-mode:vertical-rl] bg-primary text-primary-content rounded-md self-stretch rotate-180 flex items-center justify-center px-1 py-8",
+            onclick: |_| state.set(!state.get()),
+            OutlineIcon { icon: icon, size: 20, }
+            span {
+                class: "my-2",
+                *text
+            }
+            OutlineIcon { icon: icon, size: 20, }
+        }
+        div {
+            class: "{class}",
+            children
         }
     }
 }

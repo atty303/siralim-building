@@ -10,6 +10,7 @@ use crate::component::party_member::PartyMember;
 use crate::component::traits_table::TraitsModal;
 use crate::embed_data::TRAITS_MAP;
 use crate::hooks::modal::use_modal;
+use crate::hooks::persistent::use_persistent;
 use crate::url_save;
 
 pub fn App(cx: Scope) -> Element {
@@ -25,6 +26,9 @@ pub fn App(cx: Scope) -> Element {
             url_save::set_to_url(&state);
         }
     });
+
+    let show_traits = use_persistent(cx, "show_traits", || true);
+    let show_spells = use_persistent(cx, "show_spells", || true);
 
     render! {
         NavBar {}
@@ -53,6 +57,8 @@ pub fn App(cx: Scope) -> Element {
                             us.party[i].traits[trait_index] = None;
                         });
                     },
+                    show_traits: show_traits.clone(),
+                    show_spells: show_spells.clone(),
                 }
             }
         }
