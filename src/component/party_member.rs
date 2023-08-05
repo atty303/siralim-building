@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 use data::r#trait::Trait;
+use data::stat::Stat;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
@@ -18,21 +19,10 @@ pub fn PartyMember<'a>(
     render! {
         div {
             class: "card card-bordered border-base-300 card-side card-compact w-full shadow-sm shadow-black/50 bg-base-300",
-            figure {
-                class: "bg-nature/50 p-4 relative",
-                img {
-                    class: "inline-block w-28 h-28",
-                    src: "battle_sprites/spr_crits_battle_2933.png",
-                }
-                div {
-                    class: "badge absolute inset-x-2 bottom-2 text-center font-bold w-auto bg-black/25 text-sm h-8",
-                    img {
-                        class: "inline-block mr-1",
-                        src: "images/nature.png"
-                    }
-                    "Nature"
-                }
+            MemberFigure {
+                member: member,
             }
+
             div {
                 class: "card-body",
 
@@ -44,103 +34,30 @@ pub fn PartyMember<'a>(
                             icon: Shape::Bars3,
                         }
                     }
+
                     div {
                         class: "grow divide-x divide-base",
                         span {
                             class: "pr-2",
-                            "Alexandria"
+                            "{member.creature().unwrap_or_default()}"
                         }
                         span {
                             class: "text-sm pl-2",
-                            "Diabolic Horde"
+                            "{member.family().unwrap_or_default()}"
                         }
                     }
 
-                    div {
-                        class: "flex items-center whitespace-nowrap",
-                        button {
-                            class: "btn btn-primary btn-xs mr-2",
-                            "Stats"
-                        }
-                        span {
-                            class: "space-x-4 text-sm",
-
-                            span {
-                                class: "py-1 px-2 bg-success text-success-content rounded-md",
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/health.png",
-                                }
-                                "30"
-                                OutlineIcon {
-                                    icon: Shape::ArrowUp,
-                                    size: 16,
-                                }
-                            }
-                            span {
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/attack.png",
-                                }
-                                "22"
-                            }
-                            span {
-                                class: "py-1 px-2 bg-error text-error-content rounded-md",
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/intelligence.png",
-                                }
-                                "26"
-                                OutlineIcon {
-                                    icon: Shape::ArrowDown,
-                                    size: 16,
-                                }
-                            }
-                            span {
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/defense.png",
-                                }
-                                "18"
-                            }
-                            span {
-                                img {
-                                    class: "inline-block mr-2",
-                                    src: "images/speed.png",
-                                }
-                                "28"
-                            }
-                        }
+                    MemberStats {
+                        member: member,
                     }
 
-                    div {
-                        class: "flex items-center",
-                        button {
-                            class: "btn btn-primary btn-xs mr-2",
-                            "Artifacts"
-                        }
-                        span {
-                            class: "underline decoration-dotted whitespace-nowrap",
-                            img {
-                                class: "inline-block mr-2",
-                                src: "images/boots_0_0.png"
-                            }
-                            "Boots"
-                        }
+                    MemberArtifact {
+                        _member: member,
                     }
 
-                    div {
-                        class: "flex items-center",
-                        button {
-                            class: "btn btn-primary btn-xs mr-2",
-                            "Relic"
-                        }
-                        span {
-                            class: "underline decoration-dotted whitespace-nowrap",
-                            "5740-NG"
-                        }
+                    MemberRelic {
+                        _member: member,
                     }
-
                 }
 
                 div {
@@ -222,6 +139,159 @@ pub fn PartyMember<'a>(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+#[inline_props]
+fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
+    let mc = member.class();
+    let class_name = mc.as_ref().map(|c| c.as_str());
+    let class_color = match class_name {
+        Some("Death") => "bg-death/50",
+        Some("Nature") => "bg-nature/50",
+        Some("Life") => "bg-life/50",
+        Some("Sorcery") => "bg-sorcery/50",
+        Some("Chaos") => "bg-chaos/50",
+        _ => "bg-base/50",
+    };
+
+    render! {
+        figure {
+            class: "{class_color} p-4 relative",
+            if let Some(sprite) = member.sprite() {
+                rsx! {
+                    img {
+                        class: "block w-28 h-28",
+                        src: "battle_sprites/{sprite}",
+                    }
+                }
+            } else {
+                rsx! {
+                    div {
+                        class: "w-28 h-28",
+                    }
+                }
+            }
+            if let Some(c) = class_name {
+                rsx! {
+                    div {
+                        class: "badge absolute inset-x-2 bottom-2 text-center font-bold w-auto bg-black/25 text-sm h-8",
+                        img {
+                            class: "inline-block mr-1",
+                            src: "images/{c}.png"
+                        }
+                        "{c}"
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+#[inline_props]
+fn MemberStats<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
+    let format_stat = |stat: Stat| -> String {
+        member
+            .stats(stat)
+            .map_or("-".to_string(), |s| format!("{}", s))
+    };
+
+    render! {
+        div {
+            class: "flex items-center whitespace-nowrap",
+            button {
+                class: "btn btn-primary btn-xs mr-2",
+                "Stats"
+            }
+            span {
+                class: "space-x-4 text-sm",
+
+                span {
+                    class: "py-1 px-2 bg-success text-success-content rounded-md",
+                    img {
+                        class: "inline-block mr-2",
+                        src: "images/health.png",
+                    }
+                    format_stat(Stat::Health)
+                    OutlineIcon {
+                        icon: Shape::ArrowUp,
+                        size: 16,
+                    }
+                }
+                span {
+                    img {
+                        class: "inline-block mr-2",
+                        src: "images/attack.png",
+                    }
+                    format_stat(Stat::Attack)
+                }
+                span {
+                    class: "py-1 px-2 bg-error text-error-content rounded-md",
+                    img {
+                        class: "inline-block mr-2",
+                        src: "images/intelligence.png",
+                    }
+                    format_stat(Stat::Intelligence)
+                    OutlineIcon {
+                        icon: Shape::ArrowDown,
+                        size: 16,
+                    }
+                }
+                span {
+                    img {
+                        class: "inline-block mr-2",
+                        src: "images/defense.png",
+                    }
+                    format_stat(Stat::Defense)
+                }
+                span {
+                    img {
+                        class: "inline-block mr-2",
+                        src: "images/speed.png",
+                    }
+                    format_stat(Stat::Speed)
+                }
+            }
+        }
+    }
+}
+
+#[inline_props]
+fn MemberArtifact<'a>(cx: Scope<'a>, _member: &'a Member<'a>) -> Element<'a> {
+    render! {
+        div {
+            class: "flex items-center",
+            button {
+                class: "btn btn-primary btn-xs mr-2",
+                "Artifacts"
+            }
+            span {
+                class: "underline decoration-dotted whitespace-nowrap",
+                img {
+                    class: "inline-block mr-2",
+                    src: "images/boots_0_0.png"
+                }
+                "Boots"
+            }
+        }
+    }
+}
+
+#[inline_props]
+fn MemberRelic<'a>(cx: Scope<'a>, _member: &'a Member<'a>) -> Element<'a> {
+    render! {
+        div {
+            class: "flex items-center",
+            button {
+                class: "btn btn-primary btn-xs mr-2",
+                "Relic"
+            }
+            span {
+                class: "underline decoration-dotted whitespace-nowrap",
+                "5740-NG"
             }
         }
     }
