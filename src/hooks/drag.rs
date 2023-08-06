@@ -172,7 +172,7 @@ pub fn use_droppable<C: 'static>(cx: &ScopeState, id: String) -> UseDroppable {
         ondragover: { cx.event_handler(move |_: DragEvent| {}) },
         ondrop: {
             to_owned![state, id];
-            cx.event_handler(move |e: DragEvent| {
+            cx.event_handler(move |_: DragEvent| {
                 let active_id = &state.read().dragging;
                 state.read().on_drag_end.read()(DragEndEvent {
                     active_id: active_id.clone(),

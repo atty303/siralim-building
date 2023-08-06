@@ -12,7 +12,30 @@ use crate::hooks::modal::use_modal;
 use crate::hooks::persistent::use_persistent;
 use crate::url_save;
 
-pub struct TraitDndContext;
+#[derive(Debug)]
+pub struct TraitDndContext {
+    pub member_index: usize,
+    pub trait_index: usize,
+}
+
+impl TraitDndContext {
+    pub fn to_id(&self) -> String {
+        format!("trait:{}:{}", self.member_index, self.trait_index)
+    }
+
+    pub fn parse_id(id: &str) -> Option<Self> {
+        let mut parts = id.split(':');
+        if parts.next()? != "trait" {
+            return None;
+        }
+        let member_index = parts.next()?.parse().ok()?;
+        let trait_index = parts.next()?.parse().ok()?;
+        Some(Self {
+            member_index,
+            trait_index,
+        })
+    }
+}
 
 pub fn App(cx: Scope) -> Element {
     let trait_modal = use_modal(cx);
@@ -31,12 +54,26 @@ pub fn App(cx: Scope) -> Element {
     let show_traits = use_persistent(cx, "show_traits", || true);
     let show_spells = use_persistent(cx, "show_spells", || true);
 
-    let traits_dnd_context = use_dnd_context::<TraitDndContext>(
-        cx,
-        Box::new(|e: DragEndEvent| {
+    let traits_dnd_context = use_dnd_context::<TraitDndContext>(cx, {
+        to_owned![url_state];
+        Box::new(move |e: DragEndEvent| {
             log::debug!("DragEndEvent: {:?}", e);
-        }),
-    );
+            if let (Some(a), Some(o)) = (
+                TraitDndContext::parse_id(e.active_id.as_str()),
+                TraitDndContext::parse_id(e.over_id.as_str()),
+            ) {
+                log::debug!("a: {:?}, o: {:?}", a, o);
+
+                let us = url_state.clone();
+                us.with_mut(|us| {
+                    let tmp = us.party[a.member_index].traits[a.trait_index];
+                    us.party[a.member_index].traits[a.trait_index] =
+                        us.party[o.member_index].traits[o.trait_index];
+                    us.party[o.member_index].traits[o.trait_index] = tmp;
+                });
+            }
+        })
+    });
 
     render! {
         NavBar {
