@@ -1,9 +1,7 @@
 #![allow(non_snake_case)]
 
 use dioxus::prelude::*;
-use fermi::{use_atom_state, use_init_atom_root};
 
-use crate::atom;
 use crate::component::footer::Footer;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
@@ -14,13 +12,13 @@ use crate::hooks::persistent::use_persistent;
 use crate::url_save;
 
 pub fn App(cx: Scope) -> Element {
-    use_init_atom_root(cx);
-
     let trait_modal = use_modal(cx);
 
-    let url_state = use_atom_state(cx, &atom::URL_STATE);
+    let url_state = use_ref(cx, || {
+        url_save::get_from_url().unwrap_or(Default::default())
+    });
 
-    use_effect(cx, url_state.get(), move |state| {
+    use_effect(cx, &*url_state.read(), move |state| {
         to_owned![state];
         async move {
             url_save::set_to_url(&state);
@@ -31,7 +29,9 @@ pub fn App(cx: Scope) -> Element {
     let show_spells = use_persistent(cx, "show_spells", || true);
 
     render! {
-        NavBar {}
+        NavBar {
+            url_state: url_state.clone()
+        }
 
         h2 {
             class: "text-xl text-center text-secondary my-4",
@@ -40,7 +40,7 @@ pub fn App(cx: Scope) -> Element {
 
         div {
             class: "mx-4 space-y-4",
-            for (i, m) in url_state.get().party.iter().enumerate() {
+            for (i, m) in url_state.read().party.iter().enumerate() {
                 PartyMember {
                     member: m.clone(),
                     on_trait_click: move |trait_index| {

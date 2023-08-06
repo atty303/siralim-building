@@ -22,7 +22,7 @@ pub fn write_state<W: Write>(w: &mut W, state: &UrlState) -> anyhow::Result<()> 
     Ok(())
 }
 
-pub fn read_state<'a, R: Read>(r: &mut R) -> anyhow::Result<UrlState<'a>> {
+pub fn read_state<R: Read>(r: &mut R) -> anyhow::Result<UrlState> {
     let mut state = UrlState::default();
     let mut reader = BitReader::endian(r, bitstream_io::BigEndian);
 
@@ -49,7 +49,7 @@ pub fn set_to_url(state: &UrlState) {
         .unwrap();
 }
 
-pub fn get_from_url<'a>() -> Option<UrlState<'a>> {
+pub fn get_from_url<'a>() -> Option<UrlState> {
     let location: web_sys::Location = gloo_utils::window().location();
     let qs = QString::from(location.search().unwrap().as_str());
     let r = if let Some(v1) = qs.get("s1") {

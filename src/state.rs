@@ -2,11 +2,11 @@ use data::r#trait::Trait;
 use data::stat::Stat;
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct UrlState<'a> {
-    pub party: [Member<'a>; 6],
+pub struct UrlState {
+    pub party: [Member; 6],
 }
 
-impl Default for UrlState<'_> {
+impl Default for UrlState {
     fn default() -> Self {
         UrlState {
             party: [
@@ -22,11 +22,11 @@ impl Default for UrlState<'_> {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Member<'a> {
-    pub traits: [Option<&'a Trait>; 3],
+pub struct Member {
+    pub traits: [Option<&'static Trait>; 3],
 }
 
-impl<'a> Member<'a> {
+impl Member {
     pub fn new() -> Self {
         Member {
             traits: [None, None, None],

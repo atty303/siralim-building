@@ -1,6 +1,5 @@
 use crate::component::app::App;
 
-mod atom;
 mod component;
 mod embed_data;
 mod hooks;

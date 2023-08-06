@@ -11,7 +11,7 @@ data = { path = "./data" }
 
 dioxus = "0.4.0"
 dioxus-web = "0.4.0"
-fermi = "0.4.0"
+#fermi = "0.4.0"
 
 dioxus-heroicons = { git = "https://github.com/atty303/dioxus-heroicons.git", rev = "835d5f42c6d5026deffcc515474738a47143ed46" }
 classes = "1.0.0"

@@ -18,7 +18,7 @@ use crate::state::Member;
 #[inline_props]
 pub fn PartyMember<'a>(
     cx: Scope<'a>,
-    member: Member<'a>,
+    member: Member,
     on_trait_click: EventHandler<'a, usize>,
     on_trait_clear: EventHandler<'a, usize>,
     show_traits: UsePersistent<bool>,
@@ -114,7 +114,7 @@ pub fn PartyMember<'a>(
 }
 
 #[inline_props]
-fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
+fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member) -> Element<'a> {
     let mc = member.class();
     let class_name = mc.as_ref().map(|c| c.as_str());
     let class_color = match class_name {
@@ -161,7 +161,7 @@ fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
 }
 
 #[inline_props]
-fn MemberStats<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
+fn MemberStats<'a>(cx: Scope<'a>, member: &'a Member) -> Element<'a> {
     let format_stat = |stat: Stat| -> String {
         member
             .stats(stat)
@@ -229,7 +229,7 @@ fn MemberStats<'a>(cx: Scope<'a>, member: &'a Member<'a>) -> Element<'a> {
 }
 
 #[inline_props]
-fn MemberArtifact<'a>(cx: Scope<'a>, _member: &'a Member<'a>) -> Element<'a> {
+fn MemberArtifact<'a>(cx: Scope<'a>, _member: &'a Member) -> Element<'a> {
     render! {
         div {
             class: "flex items-center",
@@ -250,7 +250,7 @@ fn MemberArtifact<'a>(cx: Scope<'a>, _member: &'a Member<'a>) -> Element<'a> {
 }
 
 #[inline_props]
-fn MemberRelic<'a>(cx: Scope<'a>, _member: &'a Member<'a>) -> Element<'a> {
+fn MemberRelic<'a>(cx: Scope<'a>, _member: &'a Member) -> Element<'a> {
     render! {
         div {
             class: "flex items-center",
