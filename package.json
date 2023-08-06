@@ -6,7 +6,7 @@
   "scripts": {
     "build": "run-script-os",
     "build:win32": "tailwindcss -m -i public\\input.css -o %TRUNK_STAGING_DIR%\\tailwind.css",
-    "build:default": "tailwindcss -m -i public/input.css -o \\\"$TRUNK_STAGING_DIR/tailwind.css\\\""
+    "build:default": "tailwindcss -m -i public/input.css -o $TRUNK_STAGING_DIR/tailwind.css"
   },
   "author": "",
   "license": "ISC",
