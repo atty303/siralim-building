@@ -328,11 +328,9 @@ struct MemberTraitProps<'a> {
 }
 
 fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
-    let draggable = use_draggable::<TraitDndContext>(
-        cx,
-        format!("{}_{}", cx.props.member_index, cx.props.index),
-    );
-    let droppable = use_droppable::<TraitDndContext>(cx);
+    let id = format!("trait:{}_{}", cx.props.member_index, cx.props.index);
+    let draggable = use_draggable::<TraitDndContext>(cx, id.clone());
+    let droppable = use_droppable::<TraitDndContext>(cx, id.clone());
 
     if let Some(t) = cx.props.r#trait {
         render! {

@@ -6,7 +6,10 @@ use std::marker::PhantomData;
 use dioxus::prelude::*;
 
 #[derive(Debug)]
-pub struct DragEndEvent {}
+pub struct DragEndEvent {
+    pub active_id: String,
+    pub over_id: String,
+}
 
 struct Context<C> {
     dragging: String,
@@ -126,12 +129,12 @@ pub fn use_draggable<C: 'static>(cx: &ScopeState, id: String) -> UseDraggable {
             })
         },
         ondragstart: cx.event_handler(move |_: DragEvent| {
-            log::debug!("ondragstart");
+            // log::debug!("ondragstart");
         }),
         ondragend: {
             to_owned![state];
             cx.event_handler(move |_: DragEvent| {
-                log::debug!("ondragend");
+                // log::debug!("ondragend");
                 state.write().dragging = "".to_string();
             })
         },
@@ -162,16 +165,19 @@ pub struct UseDroppable<'a> {
     pub ondrop: EventHandler<'a, DragEvent>,
 }
 
-pub fn use_droppable<C: 'static>(cx: &ScopeState) -> UseDroppable {
+pub fn use_droppable<C: 'static>(cx: &ScopeState, id: String) -> UseDroppable {
     let state = use_dnd_state::<C>(cx);
 
     UseDroppable {
-        ondragover: { cx.event_handler(move |e: DragEvent| {}) },
+        ondragover: { cx.event_handler(move |_: DragEvent| {}) },
         ondrop: {
-            to_owned![state];
+            to_owned![state, id];
             cx.event_handler(move |e: DragEvent| {
-                log::debug!("ondrop: {:?}", e);
-                state.read().on_drag_end.read()(DragEndEvent {});
+                let active_id = &state.read().dragging;
+                state.read().on_drag_end.read()(DragEndEvent {
+                    active_id: active_id.clone(),
+                    over_id: id.clone(),
+                });
             })
         },
     }
