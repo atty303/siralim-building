@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 
 use std::marker::PhantomData;
-use std::rc::Rc;
 
 use dioxus::prelude::*;
 use gloo_events::EventListener;
@@ -46,6 +45,8 @@ pub struct UseDraggable<'a, C: 'static> {
     pub draggable: UseRef<bool>,
     pub onmounted: EventHandler<'a, MountedEvent>,
     pub onmousedown: EventHandler<'a, MouseEvent>,
+    pub ondragstart: EventHandler<'a, DragEvent>,
+    pub ondragend: EventHandler<'a, DragEvent>,
     pub activator: UseDraggableActivator<'a>,
 }
 
@@ -73,6 +74,20 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDragg
             }
         }
     });
+
+    // let global_onmouseup =
+    //     Closure::wrap(Box::new(|e: &web_sys::Event| {}) as Box<dyn FnMut(&web_sys::Event)>);
+
+    {
+        to_owned![state];
+        cx.use_hook(move || {
+            EventListener::new(&gloo_utils::body(), "mouseup", move |e| {
+                log::debug!("mouseup");
+                // node.set_attribute("draggable", "true").unwrap();
+                state.write().dragging = "".to_string();
+            })
+        });
+    }
 
     to_owned![id];
 
@@ -109,6 +124,16 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDragg
                 }
             })
         },
+        ondragstart: cx.event_handler(move |e: DragEvent| {
+            log::debug!("ondragstart");
+        }),
+        ondragend: {
+            to_owned![state];
+            cx.event_handler(move |e: DragEvent| {
+                log::debug!("ondragend");
+                state.write().dragging = "".to_string();
+            })
+        },
         activator: UseDraggableActivator {
             onmounted: cx.event_handler(|e: MountedEvent| {
                 let el = e
@@ -139,50 +164,6 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDragg
     }
 }
 
-// #[derive(Props)]
-// pub struct DraggableProps<'a> {
-//     draggable_id: &'a str,
-//     children: Element<'a>,
-// }
-
-// pub fn Draggable<'a, C: 'static>(cx: Scope<'a, DraggableProps<'a>>) -> Element<'a> {
-//     let draggable = use_draggable::<C>(cx, cx.props.draggable_id);
-//
-//     let x = render! {
-//         div {
-//             class: "{draggable.class.read()}",
-//             // draggable: *draggable.draggable.read(),
-//             onmounted: move |e| {
-//                 draggable.onmounted.call(e);
-//             },
-//             onmousedown: move |e| {
-//                 draggable.onmousedown.call(e);
-//             },
-//             &cx.props.children
-//         }
-//     };
-//     x
-// }
-
-// #[inline_props]
-// pub fn DraggableActivator<'a>(cx: Scope<'a>, children: Element<'a>) -> Element<'a> {
-//     render! {
-//         div {
-//             onmounted: move |e| {
-//                 if let Some(a) = activator {
-//                     (*a.onmounted).borrow()(e);
-//                 }
-//             },
-//             onmousedown: move |e| {
-//                 if let Some(a) = activator {
-//                     //a.onmou.call(e);
-//                 }
-//             },
-//             children
-//         }
-//     }
-// }
-
 // #[inline_props]
 // pub fn Droppable<'a>(cx: Scope<'a>, children: Element<'a>) -> Element {
 //     cx.render(rsx!(div {
@@ -202,33 +183,4 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDragg
 //         },
 //         children
 //     }))
-// }
-
-// pub struct UseDrag<'a> {
-//     dragRef: UseRef<Option<web_sys::Element>>,
-//     pub onmousedown: EventHandler<'a, MouseEvent>,
-// }
-//
-// pub fn use_drag(cx: &ScopeState) -> UseDrag {
-//     let dragRef = use_ref(cx, move || None);
-//
-//     UseDrag {
-//         dragRef: dragRef.clone(),
-//         onmousedown: cx.event_handler(move |_: MouseEvent| {
-//             dioxus::prelude::con
-//             use_dnd_state(cx.consume_context()).write().dragging = true;
-//         }),
-//     }
-// }
-
-// impl UseDrag<'_> {
-//     pub fn set_drag_ref(&self, e: MountedEvent) {
-//         let el = e
-//             .get_raw_element()
-//             .expect("no raw element")
-//             .downcast_ref::<web_sys::Element>()
-//             .expect("no element");
-//         log::debug!("{:?}", el);
-//         self.dragRef.set(Some(el.clone()));
-//     }
 // }

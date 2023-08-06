@@ -331,6 +331,8 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                 draggable: *draggable.draggable.read(),
                 onmounted: move |e| draggable.onmounted.call(e),
                 onmousedown: move |e| draggable.onmousedown.call(e),
+                ondragstart: move |e| draggable.ondragstart.call(e),
+                ondragend: move |e| draggable.ondragend.call(e),
                 div {
                     class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
                     div {
