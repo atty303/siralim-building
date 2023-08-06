@@ -42,7 +42,7 @@ pub fn set_to_url(state: &UrlState) {
     write_state(&mut bytes, state).unwrap();
 
     // log::debug!("save: {:?} bytes", bytes.len());
-    let save_string = base64::engine::general_purpose::URL_SAFE.encode(bytes);
+    let save_string = base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes);
     let history = gloo_history::BrowserHistory::new();
     history
         .replace_with_query("", HashMap::from([("s1", save_string)]))
@@ -53,7 +53,9 @@ pub fn get_from_url<'a>() -> Option<UrlState> {
     let location: web_sys::Location = gloo_utils::window().location();
     let qs = QString::from(location.search().unwrap().as_str());
     let r = if let Some(v1) = qs.get("s1") {
-        let bytes = base64::engine::general_purpose::URL_SAFE.decode(v1).ok()?;
+        let bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD
+            .decode(v1)
+            .ok()?;
         read_state(&mut Cursor::new(bytes))
     } else {
         Err(anyhow::anyhow!("no save found"))
