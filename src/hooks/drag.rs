@@ -1,36 +1,67 @@
 #![allow(non_snake_case)]
 
+use dioxus::core::DynamicNode;
 use std::marker::PhantomData;
 
 use dioxus::prelude::*;
 
+#[derive(Debug)]
+pub struct DragEndEvent {}
+
 struct Context<C> {
     dragging: String,
+    on_drag_end: UseRef<Box<dyn Fn(DragEndEvent)>>,
     phantom: PhantomData<C>,
-}
-
-impl<C> Default for Context<C> {
-    fn default() -> Self {
-        Self {
-            dragging: String::new(),
-            phantom: PhantomData,
-        }
-    }
 }
 
 fn use_dnd_state<'a, C: 'static>(cx: &ScopeState) -> &UseSharedState<Context<C>> {
     use_shared_state::<Context<C>>(cx).expect("You must provide DndState")
 }
 
+pub struct UseDndContext {
+    on_drag_end: UseRef<Box<dyn Fn(DragEndEvent)>>,
+}
+
 #[derive(Props)]
 pub struct DndContextProps<'a> {
+    on_drag_end: UseRef<Box<dyn Fn(DragEndEvent)>>,
     children: Element<'a>,
 }
 
-pub fn DndContext<'a, C: 'static>(cx: Scope<'a, DndContextProps<'a>>) -> Element<'a> {
-    use_shared_state_provider(cx, || Context::<C>::default());
-    render! {
-        &cx.props.children
+impl UseDndContext {
+    pub fn component<'a, C: 'static>(
+        &self,
+        cx: &'a ScopeState,
+        child: Element<'a>,
+    ) -> DynamicNode<'a> {
+        cx.component(
+            |cx| {
+                let context = Context::<C> {
+                    dragging: String::new(),
+                    on_drag_end: cx.props.on_drag_end.clone(),
+                    phantom: PhantomData,
+                };
+                use_shared_state_provider(cx, || context);
+                render! { &cx.props.children }
+            },
+            DndContextProps {
+                on_drag_end: self.on_drag_end.clone(),
+                children: render! { child },
+            },
+            "DndContext",
+        )
+    }
+}
+
+pub fn use_dnd_context<C: 'static>(
+    cx: &ScopeState,
+    on_drag_end_fn: Box<dyn Fn(DragEndEvent) + 'static>,
+) -> UseDndContext {
+    let on_drag_end: &UseRef<Box<dyn Fn(DragEndEvent)>> = use_ref(cx, || on_drag_end_fn);
+    //*on_drag_end.write_silent() = Some(Box::new(on_drag_end_fn));
+
+    UseDndContext {
+        on_drag_end: on_drag_end.clone(),
     }
 }
 
@@ -49,7 +80,7 @@ pub struct UseDraggableActivator<'a> {
     pub onmousedown: EventHandler<'a, MouseEvent>,
 }
 
-pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDraggable<'a> {
+pub fn use_draggable<C: 'static>(cx: &ScopeState, id: String) -> UseDraggable {
     let state = use_dnd_state::<C>(cx);
 
     let node_ref: &UseRef<Option<web_sys::Element>> = use_ref(cx, || None);
@@ -126,23 +157,22 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDragg
     }
 }
 
-// #[inline_props]
-// pub fn Droppable<'a>(cx: Scope<'a>, children: Element<'a>) -> Element {
-//     cx.render(rsx!(div {
-//         onmounted: move |e| {
-//             log::debug!(
-//                 "{:?}",
-//                 e.get_raw_element()
-//                     .unwrap()
-//                     .downcast_ref::<web_sys::Element>()
-//             );
-//         },
-//         ondragenter: move |e| {
-//             e.stop_propagation();
-//         },
-//         ondragover: move |e| {
-//             e.stop_propagation();
-//         },
-//         children
-//     }))
-// }
+pub struct UseDroppable<'a> {
+    pub ondragover: EventHandler<'a, DragEvent>,
+    pub ondrop: EventHandler<'a, DragEvent>,
+}
+
+pub fn use_droppable<C: 'static>(cx: &ScopeState) -> UseDroppable {
+    let state = use_dnd_state::<C>(cx);
+
+    UseDroppable {
+        ondragover: { cx.event_handler(move |e: DragEvent| {}) },
+        ondrop: {
+            to_owned![state];
+            cx.event_handler(move |e: DragEvent| {
+                log::debug!("ondrop: {:?}", e);
+                state.read().on_drag_end.read()(DragEndEvent {});
+            })
+        },
+    }
+}

@@ -13,13 +13,14 @@ use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
-use crate::hooks::drag::use_draggable;
+use crate::hooks::drag::{use_draggable, use_droppable};
 use crate::hooks::persistent::UsePersistent;
 use crate::state::Member;
 
 #[inline_props]
 pub fn PartyMember<'a>(
     cx: Scope<'a>,
+    index: usize,
     member: Member,
     on_trait_click: EventHandler<'a, usize>,
     on_trait_clear: EventHandler<'a, usize>,
@@ -77,6 +78,7 @@ pub fn PartyMember<'a>(
 
                         MemberTrait {
                             index: 0,
+                            member_index: *index,
                             r#trait: member.traits[0],
                             empty_text: "Click to add a primary trait",
                             on_click: |i| on_trait_click.call(i),
@@ -84,6 +86,7 @@ pub fn PartyMember<'a>(
                         }
                         MemberTrait {
                             index: 1,
+                            member_index: *index,
                             r#trait: member.traits[1],
                             empty_text: "Click to add a fused trait",
                             on_click: |i| on_trait_click.call(i),
@@ -91,6 +94,7 @@ pub fn PartyMember<'a>(
                         }
                         MemberTrait {
                             index: 2,
+                            member_index: *index,
                             r#trait: member.traits[2],
                             empty_text: "Click to add a artifact trait",
                             on_click: |i| on_trait_click.call(i),
@@ -315,6 +319,7 @@ fn MemberCollapsable<'a>(
 #[derive(Props)]
 struct MemberTraitProps<'a> {
     index: usize,
+    member_index: usize,
     #[props(!optional)]
     r#trait: Option<&'a Trait>,
     empty_text: &'static str,
@@ -323,16 +328,23 @@ struct MemberTraitProps<'a> {
 }
 
 fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
-    let draggable = use_draggable::<TraitDndContext>(cx, format!("{}", cx.props.index));
+    let draggable = use_draggable::<TraitDndContext>(
+        cx,
+        format!("{}_{}", cx.props.member_index, cx.props.index),
+    );
+    let droppable = use_droppable::<TraitDndContext>(cx);
 
     if let Some(t) = cx.props.r#trait {
         render! {
             div {
+                prevent_default: "ondragover ondrop",
                 draggable: *draggable.draggable.read(),
                 onmounted: move |e| draggable.onmounted.call(e),
                 onmousedown: move |e| draggable.onmousedown.call(e),
                 ondragstart: move |e| draggable.ondragstart.call(e),
                 ondragend: move |e| draggable.ondragend.call(e),
+                ondragover: move |e| droppable.ondragover.call(e),
+                ondrop: move |e| droppable.ondrop.call(e),
                 div {
                     class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
                     div {
@@ -377,7 +389,10 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
     } else {
         render! {
             div {
+                prevent_default: "ondragover ondrop",
                 class: "text-center p-4 rounded-md bg-base-100 text-primary hover:text-primary-focus cursor-pointer font-bold whitespace-nowrap",
+                ondragover: move |e| droppable.ondragover.call(e),
+                ondrop: move |e| droppable.ondrop.call(e),
                 onclick: |_| cx.props.on_click.call(cx.props.index),
                 cx.props.empty_text
             }
