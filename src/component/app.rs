@@ -13,6 +13,26 @@ use crate::hooks::persistent::use_persistent;
 use crate::url_save;
 
 #[derive(Debug)]
+pub struct MemberDndContext {
+    pub index: usize,
+}
+
+impl MemberDndContext {
+    pub fn to_id(&self) -> String {
+        format!("member:{}", self.index)
+    }
+
+    pub fn parse_id(id: &str) -> Option<Self> {
+        let mut parts = id.split(':');
+        if parts.next()? != "member" {
+            return None;
+        }
+        let index = parts.next()?.parse().ok()?;
+        Some(Self { index })
+    }
+}
+
+#[derive(Debug)]
 pub struct TraitDndContext {
     pub member_index: usize,
     pub trait_index: usize,
@@ -54,6 +74,26 @@ pub fn App(cx: Scope) -> Element {
     let show_traits = use_persistent(cx, "show_traits", || true);
     let show_spells = use_persistent(cx, "show_spells", || true);
 
+    let member_dnd_context = use_dnd_context::<MemberDndContext>(cx, {
+        to_owned![url_state];
+        Box::new(move |e: DragEndEvent| {
+            log::debug!("DragEndEvent: {:?}", e);
+            if let (Some(a), Some(o)) = (
+                MemberDndContext::parse_id(e.active_id.as_str()),
+                MemberDndContext::parse_id(e.over_id.as_str()),
+            ) {
+                log::debug!("a: {:?}, o: {:?}", a, o);
+
+                let us = url_state.clone();
+                us.with_mut(|us| {
+                    let tmp = us.party[a.index].clone();
+                    us.party[a.index] = us.party[o.index].clone();
+                    us.party[o.index] = tmp;
+                });
+            }
+        })
+    });
+
     let traits_dnd_context = use_dnd_context::<TraitDndContext>(cx, {
         to_owned![url_state];
         Box::new(move |e: DragEndEvent| {
@@ -85,53 +125,38 @@ pub fn App(cx: Scope) -> Element {
             "PARTY"
         }
 
-        traits_dnd_context.component::<TraitDndContext>(cx, render! {
-            div {
-                class: "mx-4 space-y-4",
-                for (i, m) in url_state.read().party.iter().enumerate() {
-                    PartyMember {
-                        index: i,
-                        member: m.clone(),
-                        on_trait_click: move |trait_index| {
-                            let us = url_state.clone();
-                            trait_modal.show_modal(move |e| {
-                                us.with_mut(|us| {
-                                    us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
+        member_dnd_context.component::<MemberDndContext>(cx, render! {
+            traits_dnd_context.component::<TraitDndContext>(cx, render! {
+                div {
+                    class: "mx-4 space-y-4",
+                    for (i, m) in url_state.read().party.iter().enumerate() {
+                        PartyMember {
+                            index: i,
+                            member: m.clone(),
+                            on_trait_click: move |trait_index| {
+                                let us = url_state.clone();
+                                trait_modal.show_modal(move |e| {
+                                    us.with_mut(|us| {
+                                        us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
+                                    });
                                 });
-                            });
-                        },
-                        on_trait_clear: move |trait_index| {
-                            let us = url_state.clone();
-                            us.with_mut(|us| {
-                                us.party[i].traits[trait_index] = None;
-                            });
-                        },
-                        show_traits: show_traits.clone(),
-                        show_spells: show_spells.clone(),
+                            },
+                            on_trait_clear: move |trait_index| {
+                                let us = url_state.clone();
+                                us.with_mut(|us| {
+                                    us.party[i].traits[trait_index] = None;
+                                });
+                            },
+                            show_traits: show_traits.clone(),
+                            show_spells: show_spells.clone(),
+                        }
                     }
                 }
-            }
-            }
-        )
+            })
+        })
 
         Footer {}
 
         trait_modal.component(cx, TraitsModal)
     }
-
-    // cx.render(rsx! {
-    //     div {
-    //         DndState {
-    //             Draggable {
-    //                 DragHandle {
-    //                     div { "Drag me" }
-    //                 }
-    //                 div { "outer" }
-    //             }
-    //             Droppable {
-    //                 div { "Drop here" }
-    //             }
-    //         }
-    //     }
-    // })
 }

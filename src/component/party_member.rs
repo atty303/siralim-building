@@ -4,7 +4,7 @@ use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
-use crate::component::app::TraitDndContext;
+use crate::component::app::{MemberDndContext, TraitDndContext};
 use data::r#trait::Trait;
 use data::stat::Stat;
 
@@ -27,9 +27,23 @@ pub fn PartyMember<'a>(
     show_traits: UsePersistent<bool>,
     show_spells: UsePersistent<bool>,
 ) -> Element<'a> {
-    render! {
+    let c = MemberDndContext { index: *index };
+    let id = c.to_id();
+    let draggable = use_draggable::<MemberDndContext>(cx, id.clone());
+    let droppable = use_droppable::<MemberDndContext>(cx, id.clone());
+
+    let x = render! {
         div {
             class: "card card-bordered border-base-300 card-side card-compact w-full shadow-sm shadow-black/50 bg-base-300",
+            prevent_default: "ondragover ondrop",
+            draggable: *draggable.draggable.read(),
+            onmounted: move |e| draggable.onmounted.call(e),
+            onmousedown: move |e| draggable.onmousedown.call(e),
+            ondragstart: move |e| draggable.ondragstart.call(e),
+            ondragend: move |e| draggable.ondragend.call(e),
+            ondragover: move |e| droppable.ondragover.call(e),
+            ondrop: move |e| droppable.ondrop.call(e),
+
             MemberFigure {
                 member: member,
             }
@@ -41,6 +55,8 @@ pub fn PartyMember<'a>(
                     class: "card-title flex items-center gap-4",
                     div {
                         class: "text-primary hover:text-primary-focus cursor-pointer",
+                        onmounted: move |e| draggable.activator.onmounted.call(e),
+                        onmousedown: move |e| draggable.activator.onmousedown.call(e),
                         OutlineIcon {
                             icon: Shape::Bars3,
                         }
@@ -116,7 +132,8 @@ pub fn PartyMember<'a>(
                 }
             }
         }
-    }
+    };
+    x
 }
 
 #[inline_props]
@@ -352,11 +369,9 @@ fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
                     div {
                         onmounted: move |e| draggable.activator.onmounted.call(e),
                         onmousedown: move |e| draggable.activator.onmousedown.call(e),
-                        div {
-                            class: "text-primary hover:text-primary-focus cursor-pointer",
-                            OutlineIcon {
-                                icon: Shape::Bars3,
-                            }
+                        class: "text-primary hover:text-primary-focus cursor-pointer",
+                        OutlineIcon {
+                            icon: Shape::Bars3,
                         }
                     }
                     div {
