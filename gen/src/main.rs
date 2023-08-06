@@ -240,11 +240,11 @@ fn gen_traits() {
 
     let seed = search_hash_seed(&traits);
     println!("using seed: {}", seed);
+    assert_eq!(seed, 2);
 
     let schema = Trait::get_schema();
-    let file_writer = std::io::BufWriter::new(
-        std::fs::File::create(Path::new("embed/avro/traits.avro")).unwrap(),
-    );
+    let file_writer =
+        std::io::BufWriter::new(std::fs::File::create(Path::new("data/avro/traits.avro")).unwrap());
     let mut writer = apache_avro::Writer::new(&schema, file_writer);
 
     let mut stats_max = Stats {
@@ -348,7 +348,7 @@ fn gen_traits() {
     writer.flush().unwrap();
 
     {
-        let mut writer = BufWriter::new(File::create("stat.rs").unwrap());
+        let mut writer = BufWriter::new(File::create("data/src/stats.rs").unwrap());
         let mut write_line = |name, min, max| {
             writer
                 .write(
@@ -375,7 +375,7 @@ fn gen_traits() {
 fn gen_effects() {
     let schema = Effect::get_schema();
     let file_writer = std::io::BufWriter::new(
-        std::fs::File::create(Path::new("embed/avro/effects.avro")).unwrap(),
+        std::fs::File::create(Path::new("data/avro/effects.avro")).unwrap(),
     );
     let mut writer = apache_avro::Writer::new(&schema, file_writer);
 
@@ -394,13 +394,13 @@ fn gen_spells() {
     let words = build_regex(&spells, &effects, &keywords);
 
     let schema = Spell::get_schema();
-    let file_writer = std::io::BufWriter::new(
-        std::fs::File::create(Path::new("embed/avro/spells.avro")).unwrap(),
-    );
+    let file_writer =
+        std::io::BufWriter::new(std::fs::File::create(Path::new("data/avro/spells.avro")).unwrap());
     let mut writer = apache_avro::Writer::new(&schema, file_writer);
 
     let seed = search_hash_seed(&spells);
     println!("using seed: {}", seed);
+    assert_eq!(seed, 14);
 
     spells.iter().enumerate().for_each(|(_i, r)| {
         let hash = r.default_hash(seed);
@@ -431,7 +431,7 @@ fn load_spell_properties() -> Vec<SpellProperty> {
 fn gen_spell_properties() {
     let schema = SpellProperty::get_schema();
     let file_writer = std::io::BufWriter::new(
-        std::fs::File::create(Path::new("embed/avro/spell_properties.avro")).unwrap(),
+        std::fs::File::create(Path::new("data/avro/spell_properties.avro")).unwrap(),
     );
     let mut writer = apache_avro::Writer::new(&schema, file_writer);
 

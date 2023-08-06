@@ -8,12 +8,12 @@ use data::keyword::KeywordsMap;
 use data::r#trait::{TraitsIndex, TraitsMap};
 
 #[derive(RustEmbed, Clone)]
-#[folder = "embed/avro/"]
-pub struct EmbedAvro;
+#[folder = "data/avro/"]
+pub struct DataAvro;
 
 pub static TRAITS_MAP: Lazy<TraitsMap> = Lazy::new(|| {
     let cursor = Cursor::new(
-        EmbedAvro::get("traits.avro")
+        DataAvro::get("traits.avro")
             .expect("traits.avro not found")
             .data,
     );
@@ -24,7 +24,7 @@ pub static TRAITS_INDEX: Lazy<TraitsIndex> = Lazy::new(|| TraitsIndex::new(&TRAI
 
 pub static EFFECTS_MAP: Lazy<EffectsMap> = Lazy::new(|| {
     let cursor = Cursor::new(
-        EmbedAvro::get("effects.avro")
+        DataAvro::get("effects.avro")
             .expect("effects.avro not found")
             .data,
     );
