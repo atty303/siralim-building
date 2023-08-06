@@ -237,13 +237,19 @@ fn MemberArtifact<'a>(cx: Scope<'a>, _member: &'a Member) -> Element<'a> {
                 class: "btn btn-primary btn-xs mr-2",
                 "Artifacts"
             }
-            span {
-                class: "underline decoration-dotted whitespace-nowrap",
-                img {
-                    class: "inline-block mr-2",
-                    src: "images/boots_0_0.png"
+            if false {
+                rsx! {
+                    span {
+                        class: "underline decoration-dotted whitespace-nowrap",
+                        img {
+                            class: "inline-block mr-2",
+                            src: "images/boots_0_0.png"
+                        }
+                        "Boots"
+                    }
                 }
-                "Boots"
+            } else {
+                rsx! { "-" }
             }
         }
     }
@@ -258,9 +264,15 @@ fn MemberRelic<'a>(cx: Scope<'a>, _member: &'a Member) -> Element<'a> {
                 class: "btn btn-primary btn-xs mr-2",
                 "Relic"
             }
-            span {
-                class: "underline decoration-dotted whitespace-nowrap",
-                "5740-NG"
+            if false {
+                rsx! {
+                    span {
+                        class: "underline decoration-dotted whitespace-nowrap",
+                        "5740-NG"
+                    }
+                }
+            } else {
+                rsx! { "-" }
             }
         }
     }

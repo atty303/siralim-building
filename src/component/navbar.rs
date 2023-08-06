@@ -9,6 +9,10 @@ use crate::state::UrlState;
 
 #[inline_props]
 pub fn NavBar(cx: Scope, url_state: UseRef<UrlState>) -> Element {
+    let base_uri = gloo_utils::document()
+        .base_uri()
+        .unwrap_or_default()
+        .unwrap();
     render! {
         div {
             class: "navbar mb-2 shadow-lg bg-neutral text-neutral-content",
@@ -16,7 +20,11 @@ pub fn NavBar(cx: Scope, url_state: UseRef<UrlState>) -> Element {
                 class: "flex-1 px-2 mx-2",
                 span {
                     class: "text-lg font-bold",
-                    "Siralim Building"
+                    a {
+                        class: "link link-hover",
+                        href: "{base_uri}",
+                        "Siralim Building"
+                    }
                 }
             }
             div {
@@ -25,7 +33,7 @@ pub fn NavBar(cx: Scope, url_state: UseRef<UrlState>) -> Element {
                     class: "flex items-center space-x-4",
 
                     a {
-                        class: "btn btn-ghost btn-sm rounded-btn",
+                        class: "btn btn-ghost btn-sm rounded-btn hidden",
                         OutlineIcon {
                             icon: Shape::ArrowUpOnSquare,
                         }
