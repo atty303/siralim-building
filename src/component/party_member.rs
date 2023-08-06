@@ -4,6 +4,7 @@ use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
+use crate::component::app::TraitDndContext;
 use data::r#trait::Trait;
 use data::stat::Stat;
 
@@ -12,6 +13,7 @@ use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
+use crate::hooks::drag::Draggable;
 use crate::hooks::persistent::UsePersistent;
 use crate::state::Member;
 
@@ -323,38 +325,41 @@ struct MemberTraitProps<'a> {
 fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
     if let Some(t) = cx.props.r#trait {
         render! {
-            div {
-                class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
+            Draggable::<TraitDndContext> {
+                draggable_id: "{cx.props.index}",
                 div {
-                    class: "text-primary hover:text-primary-focus cursor-pointer",
-                    OutlineIcon {
-                        icon: Shape::Bars3,
-                    }
-                }
-                div {
-                    class: "bg-secondary text-secondary-content py-2 px-4 min-w-max rounded-md ",
-                    CardTooltip {
-                        tip: render! { CreatureCard { r#trait: t } },
-                        class: "font-bold underline decoration-dotted",
-                        ClassIcon {
-                            class: "inline-block mr-2",
-                            name: "{t.class}",
+                    class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
+                    div {
+                        class: "text-primary hover:text-primary-focus cursor-pointer",
+                        OutlineIcon {
+                            icon: Shape::Bars3,
                         }
-                        "{t.creature}"
                     }
-                }
-                div {
-                    class: "grow",
-                    Description {
-                        value: t.trait_description.clone(),
+                    div {
+                        class: "bg-secondary text-secondary-content py-2 px-4 min-w-max rounded-md ",
+                        CardTooltip {
+                            tip: render! { CreatureCard { r#trait: t } },
+                            class: "font-bold underline decoration-dotted",
+                            ClassIcon {
+                                class: "inline-block mr-2",
+                                name: "{t.class}",
+                            }
+                            "{t.creature}"
+                        }
                     }
-                }
-                button {
-                    class: "btn btn-primary btn-circle btn-xs",
-                    onclick: move |_| cx.props.on_clear.call(cx.props.index),
-                    OutlineIcon {
-                        icon: Shape::XMark,
-                        size: 16,
+                    div {
+                        class: "grow",
+                        Description {
+                            value: t.trait_description.clone(),
+                        }
+                    }
+                    button {
+                        class: "btn btn-primary btn-circle btn-xs",
+                        onclick: move |_| cx.props.on_clear.call(cx.props.index),
+                        OutlineIcon {
+                            icon: Shape::XMark,
+                            size: 16,
+                        }
                     }
                 }
             }

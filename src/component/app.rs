@@ -7,9 +7,12 @@ use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
 use crate::component::traits_table::TraitsModal;
 use crate::embed_data::TRAITS_MAP;
+use crate::hooks::drag::DndContext;
 use crate::hooks::modal::use_modal;
 use crate::hooks::persistent::use_persistent;
 use crate::url_save;
+
+pub struct TraitDndContext;
 
 pub fn App(cx: Scope) -> Element {
     let trait_modal = use_modal(cx);
@@ -38,27 +41,29 @@ pub fn App(cx: Scope) -> Element {
             "PARTY"
         }
 
-        div {
-            class: "mx-4 space-y-4",
-            for (i, m) in url_state.read().party.iter().enumerate() {
-                PartyMember {
-                    member: m.clone(),
-                    on_trait_click: move |trait_index| {
-                        let us = url_state.clone();
-                        trait_modal.show_modal(move |e| {
-                            us.with_mut(|us| {
-                                us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
+        DndContext::<TraitDndContext> {
+            div {
+                class: "mx-4 space-y-4",
+                for (i, m) in url_state.read().party.iter().enumerate() {
+                    PartyMember {
+                        member: m.clone(),
+                        on_trait_click: move |trait_index| {
+                            let us = url_state.clone();
+                            trait_modal.show_modal(move |e| {
+                                us.with_mut(|us| {
+                                    us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
+                                });
                             });
-                        });
-                    },
-                    on_trait_clear: move |trait_index| {
-                        let us = url_state.clone();
-                        us.with_mut(|us| {
-                            us.party[i].traits[trait_index] = None;
-                        });
-                    },
-                    show_traits: show_traits.clone(),
-                    show_spells: show_spells.clone(),
+                        },
+                        on_trait_clear: move |trait_index| {
+                            let us = url_state.clone();
+                            us.with_mut(|us| {
+                                us.party[i].traits[trait_index] = None;
+                            });
+                        },
+                        show_traits: show_traits.clone(),
+                        show_spells: show_spells.clone(),
+                    }
                 }
             }
         }
