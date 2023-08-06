@@ -170,9 +170,9 @@ fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member) -> Element<'a> {
                 rsx! {
                     div {
                         class: "badge absolute inset-x-2 bottom-2 text-center font-bold w-auto !bg-base-100/50 text-sm h-8",
-                        img {
-                            class: "inline-block mr-1",
-                            src: "images/{c}.png"
+                        ClassIcon {
+                            class: "mr-1",
+                            name: "{c}"
                         }
                         "{c}"
                     }
