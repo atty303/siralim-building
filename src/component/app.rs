@@ -5,8 +5,9 @@ use dioxus::prelude::*;
 use crate::component::footer::Footer;
 use crate::component::navbar::NavBar;
 use crate::component::party_member::PartyMember;
+use crate::component::personality_dialog::PersonalityDialog;
 use crate::component::traits_table::TraitsModal;
-use crate::embed_data::TRAITS_MAP;
+use crate::embed_data::{PERSONALITIES_MAP, TRAITS_MAP};
 use crate::hooks::drag::{use_dnd_context, DragEndEvent};
 use crate::hooks::modal::use_modal;
 use crate::hooks::persistent::use_persistent;
@@ -58,8 +59,6 @@ impl TraitDndContext {
 }
 
 pub fn App(cx: Scope) -> Element {
-    let trait_modal = use_modal(cx);
-
     let url_state = use_ref(cx, || {
         url_save::get_from_url().unwrap_or(Default::default())
     });
@@ -71,19 +70,19 @@ pub fn App(cx: Scope) -> Element {
         }
     });
 
+    let trait_modal = use_modal(cx, "w-[calc(100vw-5em)] max-w-full h-full".to_string());
+    let personality_modal = use_modal(cx, "".to_string());
+
     let show_traits = use_persistent(cx, "show_traits", || true);
     let show_spells = use_persistent(cx, "show_spells", || true);
 
     let member_dnd_context = use_dnd_context::<MemberDndContext>(cx, {
         to_owned![url_state];
         Box::new(move |e: DragEndEvent| {
-            log::debug!("DragEndEvent: {:?}", e);
             if let (Some(a), Some(o)) = (
                 MemberDndContext::parse_id(e.active_id.as_str()),
                 MemberDndContext::parse_id(e.over_id.as_str()),
             ) {
-                log::debug!("a: {:?}, o: {:?}", a, o);
-
                 let us = url_state.clone();
                 us.with_mut(|us| {
                     let tmp = us.party[a.index].clone();
@@ -97,13 +96,10 @@ pub fn App(cx: Scope) -> Element {
     let traits_dnd_context = use_dnd_context::<TraitDndContext>(cx, {
         to_owned![url_state];
         Box::new(move |e: DragEndEvent| {
-            log::debug!("DragEndEvent: {:?}", e);
             if let (Some(a), Some(o)) = (
                 TraitDndContext::parse_id(e.active_id.as_str()),
                 TraitDndContext::parse_id(e.over_id.as_str()),
             ) {
-                log::debug!("a: {:?}, o: {:?}", a, o);
-
                 let us = url_state.clone();
                 us.with_mut(|us| {
                     let tmp = us.party[a.member_index].traits[a.trait_index];
@@ -133,17 +129,25 @@ pub fn App(cx: Scope) -> Element {
                         PartyMember {
                             index: i,
                             member: m.clone(),
+                            on_personality_click: move |_| {
+                                to_owned![url_state];
+                                personality_modal.show_modal(move |e| {
+                                    url_state.with_mut(|us| {
+                                        us.party[i].personality = Some(&PERSONALITIES_MAP[&e]);
+                                    });
+                                });
+                            },
                             on_trait_click: move |trait_index| {
-                                let us = url_state.clone();
+                                to_owned![url_state];
                                 trait_modal.show_modal(move |e| {
-                                    us.with_mut(|us| {
+                                    url_state.with_mut(|us| {
                                         us.party[i].traits[trait_index] = Some(&TRAITS_MAP[&e]);
                                     });
                                 });
                             },
                             on_trait_clear: move |trait_index| {
-                                let us = url_state.clone();
-                                us.with_mut(|us| {
+                                to_owned![url_state];
+                                url_state.with_mut(|us| {
                                     us.party[i].traits[trait_index] = None;
                                 });
                             },
@@ -158,5 +162,6 @@ pub fn App(cx: Scope) -> Element {
         Footer {}
 
         trait_modal.component(cx, TraitsModal)
+        personality_modal.component(cx, PersonalityDialog)
     }
 }

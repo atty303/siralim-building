@@ -6,7 +6,7 @@ use bitstream_io::{BitRead, BitReader, BitWrite, BitWriter};
 use gloo_history::History;
 use qstring::QString;
 
-use crate::embed_data::TRAITS_MAP;
+use crate::embed_data::{PERSONALITIES_MAP, TRAITS_MAP};
 use crate::state::UrlState;
 
 pub fn write_state<W: Write>(w: &mut W, state: &UrlState) -> anyhow::Result<()> {
@@ -17,7 +17,8 @@ pub fn write_state<W: Write>(w: &mut W, state: &UrlState) -> anyhow::Result<()> 
         for t in &m.traits {
             writer.write(20, t.map(|c| c.id).unwrap_or(0))?;
         }
-        writer.write(4, 0)?;
+        writer.write(5, m.personality.map_or(0, |p| p.id))?;
+        writer.write(7, 0)?;
     }
     Ok(())
 }
@@ -32,7 +33,9 @@ pub fn read_state<R: Read>(r: &mut R) -> anyhow::Result<UrlState> {
             let id = reader.read(20)?;
             state.party[m].traits[t] = TRAITS_MAP.get(&id);
         }
-        let _: u8 = reader.read(4)?;
+        let id = reader.read(5)?;
+        state.party[m].personality = PERSONALITIES_MAP.get(&id);
+        let _: u8 = reader.read(7)?;
     }
     Ok(state)
 }

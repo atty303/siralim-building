@@ -4,10 +4,11 @@ use classes::classes;
 use dioxus::prelude::*;
 use dioxus_heroicons::outline::Shape;
 
-use crate::component::app::{MemberDndContext, TraitDndContext};
+use data::personality::Personality;
 use data::r#trait::Trait;
 use data::stat::Stat;
 
+use crate::component::app::{MemberDndContext, TraitDndContext};
 use crate::component::card_tooltip::CardTooltip;
 use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
@@ -22,6 +23,7 @@ pub fn PartyMember<'a>(
     cx: Scope<'a>,
     index: usize,
     member: Member,
+    on_personality_click: EventHandler<'a>,
     on_trait_click: EventHandler<'a, usize>,
     on_trait_clear: EventHandler<'a, usize>,
     show_traits: UsePersistent<bool>,
@@ -76,6 +78,7 @@ pub fn PartyMember<'a>(
 
                     MemberStats {
                         member: member,
+                        on_personality_click: |e| on_personality_click.call(e),
                     }
                     MemberArtifact {
                         _member: member,
@@ -184,69 +187,104 @@ fn MemberFigure<'a>(cx: Scope<'a>, member: &'a Member) -> Element<'a> {
 }
 
 #[inline_props]
-fn MemberStats<'a>(cx: Scope<'a>, member: &'a Member) -> Element<'a> {
-    let format_stat = |stat: Stat| -> String {
-        member
-            .stats(stat)
-            .map_or("-".to_string(), |s| format!("{}", s))
+fn MemberStats<'a>(
+    cx: Scope<'a>,
+    member: &'a Member,
+    on_personality_click: EventHandler<'a>,
+) -> Element<'a> {
+    let (tip_class, tip) = if let Some(p) = member.personality {
+        ("tooltip", p.name)
+    } else {
+        ("", "")
     };
-
     render! {
         div {
             class: "flex items-center whitespace-nowrap",
-            button {
-                class: "btn btn-primary btn-xs mr-2",
-                "Stats"
+            div {
+                class: "{tip_class}",
+                "data-tip": "{tip}",
+                button {
+                    class: "btn btn-primary btn-xs mr-2",
+                    onclick: |_| on_personality_click.call(()),
+                    "Stats"
+                }
             }
             span {
                 class: "space-x-4 text-sm",
 
-                span {
-                    class: "py-1 px-2 bg-success text-success-content rounded-md",
-                    img {
-                        class: "inline-block mr-2",
-                        src: "images/health.png",
-                    }
-                    format_stat(Stat::Health)
-                    OutlineIcon {
-                        icon: Shape::ArrowUp,
-                        size: 16,
-                    }
+                MemberStat {
+                    stat: &Stat::Health,
+                    value: member.stats(Stat::Health),
+                    personality: member.personality,
                 }
-                span {
-                    img {
-                        class: "inline-block mr-2",
-                        src: "images/attack.png",
-                    }
-                    format_stat(Stat::Attack)
+                MemberStat {
+                    stat: &Stat::Attack,
+                    value: member.stats(Stat::Attack),
+                    personality: member.personality,
                 }
-                span {
-                    class: "py-1 px-2 bg-error text-error-content rounded-md",
-                    img {
-                        class: "inline-block mr-2",
-                        src: "images/intelligence.png",
-                    }
-                    format_stat(Stat::Intelligence)
-                    OutlineIcon {
-                        icon: Shape::ArrowDown,
-                        size: 16,
-                    }
+                MemberStat {
+                    stat: &Stat::Intelligence,
+                    value: member.stats(Stat::Intelligence),
+                    personality: member.personality,
                 }
-                span {
-                    img {
-                        class: "inline-block mr-2",
-                        src: "images/defense.png",
-                    }
-                    format_stat(Stat::Defense)
+                MemberStat {
+                    stat: &Stat::Defense,
+                    value: member.stats(Stat::Defense),
+                    personality: member.personality,
                 }
-                span {
-                    img {
-                        class: "inline-block mr-2",
-                        src: "images/speed.png",
-                    }
-                    format_stat(Stat::Speed)
+                MemberStat {
+                    stat: &Stat::Speed,
+                    value: member.stats(Stat::Speed),
+                    personality: member.personality,
                 }
             }
+        }
+    }
+}
+
+#[inline_props]
+fn MemberStat<'a>(
+    cx: Scope,
+    stat: &'a Stat,
+    #[props(!optional)] value: Option<u8>,
+    #[props(!optional)] personality: Option<&'a Personality>,
+) -> Element {
+    let icon = if let Some(p) = personality {
+        if *stat == &p.positive {
+            rsx! {
+                span {
+                    class: "text-success",
+                    OutlineIcon {
+                        icon: Shape::ChevronDoubleUp,
+                        size: 16,
+                    }
+                }
+            }
+        } else if *stat == &p.negative {
+            rsx! {
+                span {
+                    class: "text-error",
+                    OutlineIcon {
+                        icon: Shape::ChevronDoubleDown,
+                        size: 16,
+                    }
+                }
+            }
+        } else {
+            rsx! { "" }
+        }
+    } else {
+        rsx! { "" }
+    };
+
+    render! {
+        span {
+            img {
+                class: "inline-block mr-2",
+                src: "images/{stat}.png",
+            }
+            value.map_or("-".to_string(), |s| format!("{}", s))
+            icon
         }
     }
 }

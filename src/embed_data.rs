@@ -5,6 +5,7 @@ use rust_embed::RustEmbed;
 
 use data::effect::EffectsMap;
 use data::keyword::KeywordsMap;
+use data::personality::PersonalitiesMap;
 use data::r#trait::{TraitsIndex, TraitsMap};
 
 #[derive(RustEmbed, Clone)]
@@ -32,6 +33,8 @@ pub static EFFECTS_MAP: Lazy<EffectsMap> = Lazy::new(|| {
 });
 
 pub static KEYWORDS_MAP: Lazy<KeywordsMap> = Lazy::new(|| KeywordsMap::new());
+
+pub static PERSONALITIES_MAP: Lazy<PersonalitiesMap> = Lazy::new(|| PersonalitiesMap::new());
 
 // pub static SPELL_PROPERTIES_MAP: Lazy<SpellPropertiesMap> = Lazy::new(|| {
 //     let cursor = Cursor::new(

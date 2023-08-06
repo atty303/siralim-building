@@ -1,3 +1,4 @@
+use data::personality::Personality;
 use data::r#trait::Trait;
 use data::stat::Stat;
 
@@ -24,12 +25,14 @@ impl Default for UrlState {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Member {
     pub traits: [Option<&'static Trait>; 3],
+    pub personality: Option<&'static Personality>,
 }
 
 impl Member {
     pub fn new() -> Self {
         Member {
             traits: [None, None, None],
+            personality: None,
         }
     }
 

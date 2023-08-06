@@ -7,12 +7,13 @@ use wasm_bindgen::JsCast;
 
 use crate::component::outline_icon::OutlineIcon;
 
-pub fn use_modal<T: 'static>(cx: &ScopeState) -> &UseModal<T> {
+pub fn use_modal<T: 'static>(cx: &ScopeState, box_class: String) -> &UseModal<T> {
     let modal_ref: &UseRef<Option<web_sys::HtmlDialogElement>> = use_ref(cx, || None);
     let done = use_ref(cx, || None);
 
     cx.use_hook(move || UseModal {
         modal_ref: modal_ref.clone(),
+        box_class: box_class.clone(),
         done: done.clone(),
         component: |cx| render! {
             dialog {
@@ -26,9 +27,9 @@ pub fn use_modal<T: 'static>(cx: &ScopeState) -> &UseModal<T> {
                     cx.props.modal_ref.write().replace(el.clone());
                 },
                 div {
-                    class: "modal-box w-[calc(100vw-5em)] max-w-full h-full relative",
+                    class: "modal-box relative {cx.props.box_class}",
                     button {
-                        class: "btn btn-sm btn-circle btn-ghost absolute right-1 top-1",
+                        class: "btn btn-xs btn-circle btn-ghost absolute right-1 top-1",
                         tabindex: -1,
                         onclick: move |_| {
                             if let Some(el) = cx.props.modal_ref.read().as_ref() {
@@ -53,6 +54,7 @@ pub fn use_modal<T: 'static>(cx: &ScopeState) -> &UseModal<T> {
 
 pub struct UseModal<T: 'static> {
     pub modal_ref: UseRef<Option<web_sys::HtmlDialogElement>>,
+    pub box_class: String,
     pub done: UseRef<Option<Box<dyn Fn(T)>>>,
     pub component: for<'a> fn(Scope<'a, ModalProps<'a>>) -> Element<'a>,
 }
@@ -60,6 +62,7 @@ pub struct UseModal<T: 'static> {
 #[derive(Props, Clone)]
 pub struct ModalProps<'a> {
     pub modal_ref: UseRef<Option<web_sys::HtmlDialogElement>>,
+    pub box_class: String,
     pub children: Element<'a>,
 }
 
@@ -95,6 +98,7 @@ impl<T> UseModal<T> {
             self.component,
             ModalProps {
                 modal_ref: self.modal_ref.clone(),
+                box_class: self.box_class.clone(),
                 children: render! { child_component },
             },
             "Modal",

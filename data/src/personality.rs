@@ -5,7 +5,7 @@ use stat::Stat;
 
 pub type PersonalityId = i8;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Personality {
     pub id: PersonalityId,
     pub name: &'static str,
