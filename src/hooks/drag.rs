@@ -4,8 +4,8 @@ use std::marker::PhantomData;
 
 use dioxus::prelude::*;
 
-pub struct Context<C> {
-    pub dragging: String,
+struct Context<C> {
+    dragging: String,
     phantom: PhantomData<C>,
 }
 
@@ -34,7 +34,6 @@ pub fn DndContext<'a, C: 'static>(cx: Scope<'a, DndContextProps<'a>>) -> Element
     }
 }
 
-//#[derive(Clone)]
 pub struct UseDraggable<'a> {
     pub class: UseRef<&'static str>,
     pub draggable: UseRef<bool>,
@@ -52,6 +51,7 @@ pub struct UseDraggableActivator<'a> {
 
 pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDraggable<'a> {
     let state = use_dnd_state::<C>(cx);
+
     let node_ref: &UseRef<Option<web_sys::Element>> = use_ref(cx, || None);
     let activator_node_ref: &UseRef<Option<web_sys::Element>> = use_ref(cx, || None);
     let class = use_ref(cx, || "");
