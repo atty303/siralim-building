@@ -1,9 +1,11 @@
 #![allow(non_snake_case)]
 
 use std::marker::PhantomData;
+use std::rc::Rc;
 
 use dioxus::prelude::*;
 use gloo_events::EventListener;
+use wasm_bindgen::closure::Closure;
 
 pub struct Context<C> {
     pub dragging: String,
@@ -37,18 +39,25 @@ pub fn DndContext<'a, C: 'static>(cx: Scope<'a, DndContextProps<'a>>) -> Element
 
 //#[derive(Clone)]
 pub struct UseDraggable<'a, C: 'static> {
-    id: &'a str,
+    id: String,
     state: UseSharedState<Context<C>>,
     node_ref: UseRef<Option<web_sys::Element>>,
     pub class: UseRef<&'static str>,
     pub draggable: UseRef<bool>,
     pub onmounted: EventHandler<'a, MountedEvent>,
     pub onmousedown: EventHandler<'a, MouseEvent>,
+    pub activator: UseDraggableActivator<'a>,
 }
 
-pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: &'a str) -> UseDraggable<'a, C> {
+pub struct UseDraggableActivator<'a> {
+    pub onmounted: EventHandler<'a, MountedEvent>,
+    pub onmousedown: EventHandler<'a, MouseEvent>,
+}
+
+pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: String) -> UseDraggable<'a, C> {
     let state = use_dnd_state::<C>(cx);
     let node_ref: &UseRef<Option<web_sys::Element>> = use_ref(cx, || None);
+    let activator_node_ref: &UseRef<Option<web_sys::Element>> = use_ref(cx, || None);
     let class = use_ref(cx, || "");
     let draggable = use_ref(cx, || false);
 
@@ -65,8 +74,10 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: &'a str) -> UseDrag
         }
     });
 
+    to_owned![id];
+
     UseDraggable {
-        id,
+        id: id.clone(),
         state: state.clone(),
         node_ref: node_ref.clone(),
         class: class.clone(),
@@ -79,56 +90,93 @@ pub fn use_draggable<'a, C: 'static>(cx: &'a ScopeState, id: &'a str) -> UseDrag
                 .expect("expecting Element");
             node_ref.write().replace(el.clone());
         }),
-        onmousedown: cx.event_handler(|e: MouseEvent| {
-            e.stop_propagation();
-            state.write().dragging = id.to_string();
-            to_owned![state];
-            EventListener::once(&gloo_utils::body(), "mouseup", move |_e| {
-                log::debug!("mouseup");
-                state.write().dragging = "".to_string();
+        onmousedown: {
+            to_owned![id];
+            cx.event_handler(move |e: MouseEvent| {
+                if activator_node_ref.read().is_none() {
+                    e.stop_propagation();
+                    if let Some(node) = node_ref.read().as_ref() {
+                        to_owned![state, node];
+                        state.write().dragging = id.to_string();
+                        node.set_attribute("draggable", "true").unwrap();
+                        EventListener::once(&gloo_utils::body(), "mouseup", move |_e| {
+                            log::debug!("mouseup");
+                            // node.set_attribute("draggable", "true").unwrap();
+                            state.write().dragging = "".to_string();
+                        })
+                        .forget();
+                    }
+                }
             })
-            .forget();
-        }),
+        },
+        activator: UseDraggableActivator {
+            onmounted: cx.event_handler(|e: MountedEvent| {
+                let el = e
+                    .get_raw_element()
+                    .expect("expecting raw element")
+                    .downcast_ref::<web_sys::Element>()
+                    .expect("expecting Element");
+                activator_node_ref.write().replace(el.clone());
+            }),
+            onmousedown: {
+                to_owned![id];
+                cx.event_handler(move |e: MouseEvent| {
+                    e.stop_propagation();
+                    if let Some(node) = node_ref.read().as_ref() {
+                        to_owned![state, node];
+                        state.write().dragging = id.to_string();
+                        node.set_attribute("draggable", "true").unwrap();
+                        EventListener::once(&gloo_utils::body(), "mouseup", move |_e| {
+                            log::debug!("mouseup");
+                            // node.set_attribute("draggable", "true").unwrap();
+                            state.write().dragging = "".to_string();
+                        })
+                        .forget();
+                    }
+                })
+            },
+        },
     }
 }
 
-#[derive(Props)]
-pub struct DraggableProps<'a> {
-    draggable_id: &'a str,
-    children: Element<'a>,
-}
+// #[derive(Props)]
+// pub struct DraggableProps<'a> {
+//     draggable_id: &'a str,
+//     children: Element<'a>,
+// }
 
-pub fn Draggable<'a, C: 'static>(cx: Scope<'a, DraggableProps<'a>>) -> Element<'a> {
-    let draggable = use_draggable::<C>(cx, cx.props.draggable_id);
-
-    let x = render! {
-        div {
-            class: "{draggable.class.read()}",
-            draggable: *draggable.draggable.read(),
-            onmounted: move |e| {
-                draggable.onmounted.call(e);
-            },
-            onmousedown: move |e| {
-                draggable.onmousedown.call(e);
-            },
-            &cx.props.children
-        }
-    };
-    x
-}
+// pub fn Draggable<'a, C: 'static>(cx: Scope<'a, DraggableProps<'a>>) -> Element<'a> {
+//     let draggable = use_draggable::<C>(cx, cx.props.draggable_id);
+//
+//     let x = render! {
+//         div {
+//             class: "{draggable.class.read()}",
+//             // draggable: *draggable.draggable.read(),
+//             onmounted: move |e| {
+//                 draggable.onmounted.call(e);
+//             },
+//             onmousedown: move |e| {
+//                 draggable.onmousedown.call(e);
+//             },
+//             &cx.props.children
+//         }
+//     };
+//     x
+// }
 
 // #[inline_props]
-// pub fn DragHandle<'a>(cx: Scope<'a>, children: Element<'a>) -> Element {
-//     let state = use_dnd_state(cx);
+// pub fn DraggableActivator<'a>(cx: Scope<'a>, children: Element<'a>) -> Element<'a> {
 //     render! {
 //         div {
-//             onmousedown: move |_| {
-//                 state.write().dragging = true;
-//                 let s = state.clone();
-//                 EventListener::once(&body(), "mouseup", move |_e| {
-//                     log::debug!("mouseup");
-//                     s.write().dragging = false;
-//                 }).forget();
+//             onmounted: move |e| {
+//                 if let Some(a) = activator {
+//                     (*a.onmounted).borrow()(e);
+//                 }
+//             },
+//             onmousedown: move |e| {
+//                 if let Some(a) = activator {
+//                     //a.onmou.call(e);
+//                 }
 //             },
 //             children
 //         }

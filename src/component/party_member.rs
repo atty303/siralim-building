@@ -13,7 +13,7 @@ use crate::component::class_icon::ClassIcon;
 use crate::component::creature_card::CreatureCard;
 use crate::component::description::Description;
 use crate::component::outline_icon::OutlineIcon;
-use crate::hooks::drag::Draggable;
+use crate::hooks::drag::use_draggable;
 use crate::hooks::persistent::UsePersistent;
 use crate::state::Member;
 
@@ -323,16 +323,24 @@ struct MemberTraitProps<'a> {
 }
 
 fn MemberTrait<'a>(cx: Scope<'a, MemberTraitProps<'a>>) -> Element<'a> {
+    let draggable = use_draggable::<TraitDndContext>(cx, format!("{}", cx.props.index));
+
     if let Some(t) = cx.props.r#trait {
         render! {
-            Draggable::<TraitDndContext> {
-                draggable_id: "{cx.props.index}",
+            div {
+                draggable: *draggable.draggable.read(),
+                onmounted: move |e| draggable.onmounted.call(e),
+                onmousedown: move |e| draggable.onmousedown.call(e),
                 div {
                     class: "flex items-center p-2 gap-2 rounded-md bg-base-100",
                     div {
-                        class: "text-primary hover:text-primary-focus cursor-pointer",
-                        OutlineIcon {
-                            icon: Shape::Bars3,
+                        onmounted: move |e| draggable.activator.onmounted.call(e),
+                        onmousedown: move |e| draggable.activator.onmousedown.call(e),
+                        div {
+                            class: "text-primary hover:text-primary-focus cursor-pointer",
+                            OutlineIcon {
+                                icon: Shape::Bars3,
+                            }
                         }
                     }
                     div {
