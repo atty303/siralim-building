@@ -7,4 +7,5 @@ watch = ["src", "index.html"]
 
 [[hooks]]
 stage = "build"
-command = "./tailwind-build.bat"
+command = "npm"
+command_arguments = ["run", "build"]

@@ -4,10 +4,9 @@
   "description": "# Running the app locally",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "concurrently \"npm run serve:tailwind\" \"npm run serve:dioxus\"",
-    "serve:tailwind": "tailwindcss -i ./src/input.css -o ./public/tailwind.css --watch",
-    "serve:dioxus": "dx serve --hot-reload"
+    "build": "run-script-os",
+    "build:win32": "tailwindcss -m -i src\\input.css -o %TRUNK_STAGING_DIR%\\tailwind.css",
+    "build:default": "tailwindcss -m -i src/input.css -o \"$TRUNK_STAGING_DIR/tailwind.css\""
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +15,6 @@
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "run-script-os": "^1.1.6"
   }
 }
